@@ -4,8 +4,6 @@ import akka.actor.ActorRef
 import com.google.gson.annotations.SerializedName
 import hdf.hdf5lib.HDF5Constants
 import net.imagej.Main
-//import com.google.common.collect.HashBiMap
-//import com.google.gson.annotations.SerializedName
 import net.imagej.overlay.Overlay
 import org.scijava.module.*
 import org.scijava.plugin.PluginInfo
@@ -35,6 +33,17 @@ fun setIcon(width: Int, height: Int, path: String, title: String = "",
     }
     return null
 }
+
+fun getOutputPathAndName(fileName: String) : String{
+    val pathAndName = Paths.EXPERIMENT_OUTPUT_FOLDER + "/$fileName"
+    return pathAndName
+}
+
+fun getConfigPathAndName(fileName: String) : String{
+    val pathAndName = Paths.EXPERIMENT_CONFIG_FOLDER + "/$fileName"
+    return pathAndName
+}
+
 enum class Acknowledgement {
     INSTANCE
 }
@@ -68,31 +77,17 @@ open class STRIMMBuffer(val dataID : Int, val status : Int){
     fun getVectorDataMap(): HashMap<String , Double>{
         return hashMapOf("v" to 0.0 , "w" to 1.0)
     }
-
-
-
-
 }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 open class STRIMMSaveBuffer(val data : List<STRIMMBuffer>, val name : String){
-
 }
+
 open class STRIMMImageBuffer(var pix : Any?, val w : Int, val h : Int, val bitDepth : Int, val timeAcquired : Number, dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status){
-
     }
+
 open class STRIMMPixelBuffer(var pix : Any?, val w : Int, val h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Number, dataID : Int, status : Int) :
     STRIMMBuffer(dataID, status){
-
 }
 
 open class STRIMMSignalBuffer(var data : DoubleArray?, var times : DoubleArray?,  val numSamples : Int,  val channelNames : List<String>?,  dataID : Int, status : Int) :

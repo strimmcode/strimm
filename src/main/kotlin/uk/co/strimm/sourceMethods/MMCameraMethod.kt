@@ -37,8 +37,6 @@ open class MMCameraMethod() : SourceMethod {
     var coreBytesPerPixel = 0
     var bSnapped = false
 
-
-
     override fun init(source : Source){
         this.source = source
         //load the config file - inside (source.sourceName).cfg

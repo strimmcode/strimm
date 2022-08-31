@@ -5,6 +5,7 @@ import com.opencsv.CSVReader
 import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.experiment.Source
+import uk.co.strimm.getConfigPathAndName
 import java.io.FileReader
 import java.lang.Math.cos
 import java.lang.Math.sin
@@ -34,7 +35,7 @@ open class SignalSourceMethod() : SourceMethod {
             properties = hashMapOf<String, String>()
             var r: List<Array<String>>? = null
             try {
-                val reader = CSVReader(FileReader(source.sourceCfg))
+                val reader = CSVReader(FileReader(getConfigPathAndName(source.sourceCfg)))
                 r = reader.readAll()
                 for (props in r!!) {
                     properties[props[0]] = props[1]

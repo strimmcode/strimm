@@ -4,12 +4,14 @@ package uk.co.strimm.sinkMethods
 import akka.actor.ActorRef
 import com.opencsv.CSVReader
 import uk.co.strimm.DisplayInfo
+import uk.co.strimm.Paths
 import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.actors.messages.complete.CompleteStreaming
 import uk.co.strimm.actors.messages.start.StartStreaming
 import uk.co.strimm.actors.messages.tell.TellDisplayInfo
 import uk.co.strimm.actors.messages.tell.TellDisplaySink
 import uk.co.strimm.experiment.Sink
+import uk.co.strimm.getConfigPathAndName
 import uk.co.strimm.gui.CameraWindowPlugin
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
@@ -29,7 +31,7 @@ class SinkImageJPixelTest() : SinkMethod {
             properties = hashMapOf<String, String>()
             var r: List<Array<String>>? = null
             try {
-                CSVReader(FileReader(sink.sinkCfg)).use { reader ->
+                CSVReader(FileReader(getConfigPathAndName(sink.sinkCfg))).use { reader ->
                     r = reader.readAll()
                     for (props in r!!) {
                         //specific properties are read from Cfg

@@ -7,6 +7,7 @@ import uk.co.strimm.experiment.Source
 import java.io.FileReader
 import com.fazecast.jSerialComm.SerialPort
 import uk.co.strimm.STRIMMSignalBuffer
+import uk.co.strimm.getConfigPathAndName
 
 class ArduinoSourceMethod() : SourceMethod {
     lateinit var source: Source
@@ -25,7 +26,7 @@ class ArduinoSourceMethod() : SourceMethod {
             properties = hashMapOf<String, String>()
             var r: List<Array<String>>? = null
             try {
-                val reader = CSVReader(FileReader(source.sourceCfg))
+                val reader = CSVReader(FileReader(getConfigPathAndName(source.sourceCfg)))
                 r = reader.readAll()
                 for (props in r!!) {
                     properties[props[0]] = props[1]

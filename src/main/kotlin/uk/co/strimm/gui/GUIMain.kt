@@ -29,13 +29,10 @@ import org.scijava.thread.ThreadService
 import org.scijava.ui.UIService
 import org.scijava.ui.swing.SwingToolBar
 import org.scijava.ui.swing.sdi.SwingSDIUI
+import uk.co.strimm.*
 
-import uk.co.strimm.ComponentTexts
-import uk.co.strimm.STRIMMBuffer
-import uk.co.strimm.STRIMMPixelBuffer
 import uk.co.strimm.actors.messages.ask.AskInitHDF5File
 import uk.co.strimm.services.*
-import uk.co.strimm.setIcon
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
@@ -207,7 +204,7 @@ class GUIMain : Command {
     }
     private fun addLoadButtonListener(){
         loadExperimentConfigButton.addActionListener{
-            val folder = File(".")
+            val folder = File(Paths.EXPERIMENT_CONFIG_FOLDER)
             //get a list of JSONs from the ExperimentConfigurations folder in the Working Directory
             val fileList = folder.listFiles { f -> f.extension == "json" }
             if(fileList != null && fileList.isNotEmpty()) {

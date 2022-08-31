@@ -344,7 +344,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                         experimentSinks.add(expSink)
                     }
                 else{
-                        expSink.sink = builder.add(Sink.foreach(){x : List<STRIMMBuffer> ->
+                        expSink.sink = builder.add(Sink.foreach{x : List<STRIMMBuffer> ->
                             sinkMethod.run(x)
                         })
                         experimentSinks.add(expSink)

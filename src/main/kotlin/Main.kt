@@ -7,8 +7,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.script.ScriptEngine.FILENAME
 
-
-
 class Main {
         companion object {
             /**
@@ -226,18 +224,6 @@ class Main {
 //                    Thread.sleep(2000)
 //              }
 //
-
-
-
-
-
-
-
-
             }
-
-
-
-
         }
     }
