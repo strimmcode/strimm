@@ -1,0 +1,29 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "MySource",
+				"sourceType" : "SourceBaseMethod",
+				"isTimeLapse" : True,
+				"intervalMs" : 100.0
+		
+
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "MySink",
+				"sinkType" : "SinkBaseMethod",
+				"inputNames" : [
+					"MySource"
+				]
+			}
+		]
+	}
+
+}

@@ -1,0 +1,29 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "HF5SourceMethod",
+				"sourceCfg" : "1_HF5Source.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 1
+		
+
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "PixelTestSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "OpenCVSink.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	}
+
+}

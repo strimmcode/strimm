@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="MMCore-1.0.0_R">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../MMCore/uk/co/cairnresearch/MMCore/1.0.0/MMCore-1.0.0_R.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

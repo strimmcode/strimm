@@ -1,0 +1,55 @@
+{
+	"experimentConfigurationName" : "TestConfig1",
+	"experimentMode" : "Preview",
+	"experimentDurationMs" : "10000",
+	"HDF5Save" : True,
+	"ROIAdHoc" : "True",
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"outputType" : "Image",
+
+				"isImageSnapped" : False,
+				"isTriggered" : False,
+				"isTimeLapse" : True,
+				"intervalMs" : 1000.0,
+				"exposureMs" : -6,
+				"outputType" : "Image"
+		
+
+			},
+			{
+				"sourceName" : "2",
+				"outputType" : "Image",
+
+				"isImageSnapped" : False,
+				"isTriggered" : False,
+				"isTimeLapse" : True,
+				"intervalMs" : 1000.0,
+				"exposureMs" : -6,
+				"outputType" : "Image"
+		
+
+			}
+		]
+	},
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "Cam1Display1",
+				"sinkType" : "",
+				"inputNames" : [
+					"1", "2"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+"imageWidth" : 1000,
+"imageHeight" : 1000,
+"bitDepth" : 16
+			}
+		]
+	}
+
+}

@@ -1,0 +1,3 @@
+package messages
+
+class StartStreamingCamera

@@ -1,0 +1,47 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "SourceBaseMethod",
+				"sourceCfg" : "1.cfg",
+				"isTimeLapse" : True,
+				"intervalMs" : 50.0
+		
+
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "S1",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "S1.cfg",
+				"inputNames" : [
+					"1"
+				]
+			},
+			{
+				"sinkName" : "S2",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "S1.cfg",
+				"inputNames" : [
+					"1"
+				]
+			},
+			{
+				"sinkName" : "S3",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "S1.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	}
+
+}
