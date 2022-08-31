@@ -13,3 +13,5 @@ settings.json
 *.h5
 *.desc
 ExperimentOutput/*
+Akkatest/*
+Akkatest
