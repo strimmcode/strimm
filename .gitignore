@@ -11,3 +11,4 @@ target/*
 *.tif
 settings.json
 *.h5
+*.desc
