@@ -1,0 +1,13 @@
+.idea/*
+log/*
+target/*
+**.bak
+*.bak
+**.orig
+**.lck
+*.lck
+*.iml
+**.tif
+*.tif
+settings.json
+*.h5
