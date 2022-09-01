@@ -8,11 +8,9 @@ import com.fazecast.jSerialComm.SerialPort;
 //import ArduinoCommunicator.*;
 
 public class NBCode {
-
-
     //======================================
     //======================================
-    public static void main(String args[]){
+    public static void main(String args[]) {
 
         System.out.println("\nUsing Library Version v" + SerialPort.getVersion());
 
@@ -21,10 +19,10 @@ public class NBCode {
         //===list available ports
         SerialPort[] availableComPorts = SerialPort.getCommPorts();
         System.out.println("\nAvailable Ports:\n");
-        for (int i = 0; i < availableComPorts.length; ++i){
+        for (int i = 0; i < availableComPorts.length; ++i) {
             System.out.println("   [" + i + "] " + availableComPorts[i].getSystemPortName()
                     + " (" + availableComPorts[i].getSystemPortPath()
-                    + "): "+ availableComPorts[i].getDescriptivePortName()
+                    + "): " + availableComPorts[i].getDescriptivePortName()
                     + " - " + availableComPorts[i].getPortDescription()
                     + " @ " + availableComPorts[i].getPortLocation());
         }
@@ -34,7 +32,7 @@ public class NBCode {
         //===connect the first available port
         //!!!!check list size here, must be at least (and better the only) one port or procedure should be more complicate
 
-        ArduinoCommunicator ardu=new ArduinoCommunicator(availableComPorts[0], 115200);
+        ArduinoCommunicator ardu = new ArduinoCommunicator(availableComPorts[0], 115200);
         //ArduinoCommunicator ardu=new ArduinoCommunicator(availableComPorts[0], 57600);
 
         ardu.debugOn(); //allow debug printing here
@@ -43,7 +41,7 @@ public class NBCode {
             System.out.println("ERROR: cannot connect. Terminated");
             return;
         }
-        if (! ardu.isInCommandMode()) {
+        if (!ardu.isInCommandMode()) {
             System.out.println("Board is not in command mode. Terminated");
             return;
         }
@@ -59,12 +57,12 @@ public class NBCode {
             return;
         }
 
-        if (!ardu.setAnalogInputPins (0, 1, 2, 3, 4, 5)) {
+        if (!ardu.setAnalogInputPins(0, 1, 2, 3, 4, 5)) {
             System.out.println("ERROR: cannot setanalog pins");
             return;
         }
 
-        int stepsNumber=10;
+        int stepsNumber = 10;
 
         byte seqArray[] = new byte[stepsNumber];
 
@@ -84,16 +82,16 @@ public class NBCode {
            */
 
         //===binary increment value
-        seqArray[0]=0b0000001;
-        seqArray[1]=0b0000010;
-        seqArray[2]=0b0000100; //0b0011 skipped
-        seqArray[3]=0b0000101;
-        seqArray[4]=0b0000111;
-        seqArray[5]=0b0001000;
-        seqArray[6]=0b0001001;
-        seqArray[7]=0b0101010; //extra pin used
-        seqArray[8]=0b0001011;
-        seqArray[9]=0b0101100; //extra pin used
+        seqArray[0] = 0b0000001;
+        seqArray[1] = 0b0000010;
+        seqArray[2] = 0b0000100; //0b0011 skipped
+        seqArray[3] = 0b0000101;
+        seqArray[4] = 0b0000111;
+        seqArray[5] = 0b0001000;
+        seqArray[6] = 0b0001001;
+        seqArray[7] = 0b0101010; //extra pin used
+        seqArray[8] = 0b0001011;
+        seqArray[9] = 0b0101100; //extra pin used
 
            /*
            //==="running one"
@@ -130,85 +128,83 @@ public class NBCode {
            seqArray[4]=(byte) 'e';
            */
 
-        long stepsMicros=500000;
+        long stepsMicros = 500000;
 
-        int resultArray_digital[]=new int[stepsNumber];
-        int resultArray_analog[][]=new int[stepsNumber][ArduinoCommunicator.ANALOG_INPUTS_NUMBER];
-        int tmpTimingsArray[][]=new int[stepsNumber][ArduinoCommunicator.ANALOG_INPUTS_NUMBER];
+        int resultArray_digital[] = new int[stepsNumber];
+        int resultArray_analog[][] = new int[stepsNumber][ArduinoCommunicator.ANALOG_INPUTS_NUMBER];
+        int tmpTimingsArray[][] = new int[stepsNumber][ArduinoCommunicator.ANALOG_INPUTS_NUMBER];
 
 
-        if(!ardu.doMeasurement(seqArray, stepsMicros, resultArray_digital, resultArray_analog, tmpTimingsArray)){
+        if (!ardu.doMeasurement(seqArray, stepsMicros, resultArray_digital, resultArray_analog, tmpTimingsArray)) {
             System.out.print("No data returned");
         }
-        if (! ardu.isInCommandMode()) {
+        if (!ardu.isInCommandMode()) {
             System.out.println("Board is not in command mode. Terminated");
             return;
         }
 
 
         for (int i = 0; i < stepsNumber; i++) {
-            System.out.println(""+i+":"+Integer.toBinaryString(resultArray_digital[i]));
+            System.out.println("" + i + ":" + Integer.toBinaryString(resultArray_digital[i]));
         }
 
         for (int i = 0; i < stepsNumber; i++) {
-            System.out.print(""+i+":");
+            System.out.print("" + i + ":");
             for (int inpNo = 0; inpNo < ArduinoCommunicator.ANALOG_INPUTS_NUMBER; inpNo++) {
-                System.out.print(""+tmpTimingsArray[i][inpNo]+"\t"+resultArray_analog[i][inpNo]+";\t\t");
+                System.out.print("" + tmpTimingsArray[i][inpNo] + "\t" + resultArray_analog[i][inpNo] + ";\t\t");
             }
             System.out.print("\r\n");
         }
 
         //================================
 
-        if (!ardu.setAnalogInputPins (0,
+        if (!ardu.setAnalogInputPins(0,
                 ArduinoCommunicator.ANALOG_PIN_NOT_USED,
                 ArduinoCommunicator.ANALOG_PIN_NOT_USED,
                 ArduinoCommunicator.ANALOG_PIN_NOT_USED,
                 ArduinoCommunicator.ANALOG_PIN_NOT_USED,
                 ArduinoCommunicator.ANALOG_PIN_NOT_USED
         )
-        ){
+                ) {
             System.out.println("ERROR: cannot setanalog pins");
             return;
         }
-        stepsMicros=1000;
+        stepsMicros = 1000;
         //===binary increment value
-        seqArray[0]=0b0000001;
-        seqArray[1]=0b0000000;
-        seqArray[2]=0b0000101; //0b0011 skipped
-        seqArray[3]=0b0000100;
-        seqArray[4]=0b0000111;
-        seqArray[5]=0b0001000;
-        seqArray[6]=0b0001001;
-        seqArray[7]=0b0101010; //extra pin used
-        seqArray[8]=0b0001011;
-        seqArray[9]=0b0101100; //extra pin used
+        seqArray[0] = 0b0000001;
+        seqArray[1] = 0b0000000;
+        seqArray[2] = 0b0000101; //0b0011 skipped
+        seqArray[3] = 0b0000100;
+        seqArray[4] = 0b0000111;
+        seqArray[5] = 0b0001000;
+        seqArray[6] = 0b0001001;
+        seqArray[7] = 0b0101010; //extra pin used
+        seqArray[8] = 0b0001011;
+        seqArray[9] = 0b0101100; //extra pin used
 
-        if(!ardu.doMeasurement(seqArray, stepsMicros, resultArray_digital, resultArray_analog, tmpTimingsArray)){
+        if (!ardu.doMeasurement(seqArray, stepsMicros, resultArray_digital, resultArray_analog, tmpTimingsArray)) {
             System.out.print("No data returned");
         }
 
-        if (! ardu.isInCommandMode()) {
+        if (!ardu.isInCommandMode()) {
             System.out.println("Board is not in command mode. Terminated");
             return;
         }
 
         for (int i = 0; i < stepsNumber; i++) {
-            System.out.println(""+i+":"+Integer.toBinaryString(resultArray_digital[i]));
+            System.out.println("" + i + ":" + Integer.toBinaryString(resultArray_digital[i]));
         }
 
         for (int i = 0; i < stepsNumber; i++) {
-            System.out.print(""+i+":");
+            System.out.print("" + i + ":");
             for (int inpNo = 0; inpNo < ArduinoCommunicator.ANALOG_INPUTS_NUMBER; inpNo++) {
-                System.out.print(""+tmpTimingsArray[i][inpNo]+"\t"+resultArray_analog[i][inpNo]+";\t\t");
+                System.out.print("" + tmpTimingsArray[i][inpNo] + "\t" + resultArray_analog[i][inpNo] + ";\t\t");
             }
             System.out.print("\r\n");
         }
             /*
              stepsNumber=15;
-
            seqArray= new byte[stepsNumber];
-
            seqArray[0]=0b1010101;
            seqArray[1]=0b0101010;
            seqArray[2]=0b0010101;
@@ -247,8 +243,5 @@ public class NBCode {
             }
  */
         System.out.println("\r\n\r\nTESTING ENDED, chech result!");
-
-
     }    //\public static void main(String args[])...
-
 }
