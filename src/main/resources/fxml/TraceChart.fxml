@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:id="tracePane">
+    <stylesheets>
+        <URL value="@/css/traceWindow.css" />
+    </stylesheets>
+</VBox>
