@@ -15,4 +15,4 @@ settings.json
 ExperimentOutput/*
 Akkatest/*
 Akkatest
-package/*
+package/STRIMM.app/*
