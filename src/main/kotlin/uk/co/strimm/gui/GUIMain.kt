@@ -41,7 +41,7 @@ import javax.swing.*
 
 
 /**
- * Main GUI for the STRIMM plugin
+ * uk.co.strimm.Main GUI for the STRIMM plugin
  */
 @Plugin(type = Command::class, headless = true, menuPath = "Plugins>STRIMM")
 class GUIMain : Command {

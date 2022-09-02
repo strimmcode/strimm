@@ -116,7 +116,7 @@ class ActorService : AbstractService(), ImageJService {
             ref.get() //This line should cause an error if a StrimmActor doesn't exist
         }
         catch(ex : NoSuchElementException){
-            GUIMain.loggerService.log(Level.INFO,"Main STRIMM actor does not exist, creating...")
+            GUIMain.loggerService.log(Level.INFO,"uk.co.strimm.Main STRIMM actor does not exist, creating...")
             createActor(StrimmActor.props(actorCreateMessages), ActorConstants.MAIN_ACTOR_NAME, StrimmActor::class.java)
         }
 

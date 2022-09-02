@@ -1,3 +1,5 @@
+package uk.co.strimm;
+
 import java.io.InputStream;
 
 //===need it for parameters parsing
@@ -5,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fazecast.jSerialComm.SerialPort;
-//import ArduinoCommunicator.*;
+//import uk.co.strimm.ArduinoCommunicator.*;
 
 public class NBCode {
     //======================================
@@ -27,13 +29,13 @@ public class NBCode {
                     + " @ " + availableComPorts[i].getPortLocation());
         }
 
-        //ArduinoCommunicator ardu=ArduinoCommunicator("COM" + 4, 9600); //connect using a fixed port name
+        //uk.co.strimm.ArduinoCommunicator ardu=uk.co.strimm.ArduinoCommunicator("COM" + 4, 9600); //connect using a fixed port name
 
         //===connect the first available port
         //!!!!check list size here, must be at least (and better the only) one port or procedure should be more complicate
 
         ArduinoCommunicator ardu = new ArduinoCommunicator(availableComPorts[0], 115200);
-        //ArduinoCommunicator ardu=new ArduinoCommunicator(availableComPorts[0], 57600);
+        //uk.co.strimm.ArduinoCommunicator ardu=new uk.co.strimm.ArduinoCommunicator(availableComPorts[0], 57600);
 
         ardu.debugOn(); //allow debug printing here
         ardu.setLogLevel(2); //0 - no log, 1 - errors only, 2 - workflow, 5 - detailed

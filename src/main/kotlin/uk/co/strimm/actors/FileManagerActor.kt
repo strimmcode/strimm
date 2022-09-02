@@ -52,16 +52,20 @@ class FileManagerActor() : AbstractActor() {
                 filename += ".h5"
 
                 //create file (which is a long/handle) with defaults
-                file = H5.H5Fcreate(
-                    filename,
-                    HDF5Constants.H5F_ACC_TRUNC,
-                    HDF5Constants.H5P_DEFAULT,
-                    HDF5Constants.H5P_DEFAULT
-                )
-
-                handles["file"] = file
-
-                GUIMain.loggerService.log(Level.INFO, "Created h5 file")
+                try {
+                    file = H5.H5Fcreate(
+                        filename,
+                        HDF5Constants.H5F_ACC_TRUNC,
+                        HDF5Constants.H5P_DEFAULT,
+                        HDF5Constants.H5P_DEFAULT
+                    )
+                    handles["file"] = file
+                    GUIMain.loggerService.log(Level.INFO, "Successfully created h5 file")
+                }
+                catch(ex: Exception){
+                    GUIMain.loggerService.log(Level.SEVERE, "Could not create h5 file")
+                    GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                }
             }
             .match<AskShutdownHDF5File>(AskShutdownHDF5File::class.java) {
             }

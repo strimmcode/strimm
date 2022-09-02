@@ -1,10 +1,12 @@
+package uk.co.strimm
+
 import net.imagej.ImageJ
 import uk.co.strimm.gui.GUIMain
 
 class Main {
         companion object {
             /**
-             * Main method.
+             * uk.co.strimm.Main method.
              *
              * @param args the array of arguments
              */

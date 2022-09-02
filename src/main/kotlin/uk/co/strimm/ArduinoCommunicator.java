@@ -1,3 +1,5 @@
+package uk.co.strimm;
+
 import com.fazecast.jSerialComm.SerialPort;
 
 import java.io.InputStream;
@@ -103,7 +105,7 @@ public class ArduinoCommunicator {
         myComPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 5, 5);
         //myComPort.addDataListener(this);
 
-    } //\public ArduinoCommunicator...
+    } //\public uk.co.strimm.ArduinoCommunicator...
 
     public boolean connect() {
 
@@ -581,4 +583,4 @@ public class ArduinoCommunicator {
         waitForOK(5);
         return true;
     }
-}//\public class ArduinoCommunicator ...
+}//\public class uk.co.strimm.ArduinoCommunicator ...
