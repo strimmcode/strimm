@@ -9,6 +9,7 @@ import mmcorej.StrVector
 import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMPixelBuffer
 import uk.co.strimm.experiment.Source
+import uk.co.strimm.getConfigPathAndName
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
 import java.util.*
@@ -92,6 +93,7 @@ open class MMCameraMethod() : SourceMethod {
             }
         }
     }
+
     override fun run() : STRIMMBuffer?{
         if (bSnapped) return runSnapped()
         else return runCircBuffer()
@@ -147,11 +149,11 @@ open class MMCameraMethod() : SourceMethod {
             if (numChannels == 1){
                 if (coreBytesPerPixel != 2){
                     println("Core format clashes with cfg")
-                }else{
+                }
+                else{
                     //16bit GREY
                     dataID++
                     return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
-
                 }
             }
             else if (numChannels == 4){
@@ -188,6 +190,7 @@ open class MMCameraMethod() : SourceMethod {
 
         return STRIMMPixelBuffer(null, 0, 0,"", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
     }
+
     fun runCircBuffer() : STRIMMBuffer? {
         //does not specify the type of pix
         //live acquisition from circular buffer - take the next image
@@ -326,12 +329,13 @@ open class MMCameraMethod() : SourceMethod {
     override fun postStop(){
 
     }
+
     fun loadCfg() {
         if (source.sourceCfg != ""){
             properties = hashMapOf<String, String>()
             var r: List<Array<String>>? = null
             try {
-                val reader = CSVReader(FileReader(source.sourceCfg))
+                val reader = CSVReader(FileReader(getConfigPathAndName(source.sourceCfg)))
                 r = reader.readAll()
                 for (props in r!!) {
                     properties[props[0]] = props[1]

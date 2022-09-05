@@ -61,8 +61,7 @@ class FileManagerActor() : AbstractActor() {
                     )
                     handles["file"] = file
                     GUIMain.loggerService.log(Level.INFO, "Successfully created h5 file")
-                }
-                catch(ex: Exception){
+                } catch (ex: Exception) {
                     GUIMain.loggerService.log(Level.SEVERE, "Could not create h5 file")
                     GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
                 }
@@ -74,12 +73,10 @@ class FileManagerActor() : AbstractActor() {
                 self.tell(Kill.getInstance(), self)
             }
             .match<TellSaveDatasets>(TellSaveDatasets::class.java) {
-                println("**#######stop message received")
                 if (GUIMain.strimmUIService.state == UIstate.ACQUISITION) {
+                    GUIMain.loggerService.log(Level.INFO, "Saving data...")
                     //flush remaining data
-                    //
                     //multithread issue
-
                     while (b_capturing_to_buffers == true) {
                         Thread.sleep(100)
                     } // errors are a thread issue
@@ -89,13 +86,13 @@ class FileManagerActor() : AbstractActor() {
                         var data = buffers[keySz]
                         if (data != null) {
                             println("*******flush******")
-                            //save matrix data//////////////////////////////////////////////
+                            //save matrix data
                             for (frame in 0 until data.size) {
                                 var frames = data[frame]
                                 var frm = frames[0] // STRIMMBuffer
 
-                                var dims_frm = frm.getDims() //returns the dims of this STRIMMBuffer which can vary
-                                var type_frm = frm.getType() //returns the type of each pixel
+                                val dims_frm = frm.getDims() //returns the dims of this STRIMMBuffer which can vary
+                                val type_frm = frm.getType() //returns the type of each pixel
                                 for (matrix_ix in 0 until data[frame].size) {
                                     println("******* create dataset at " + frame.toString() + "," + matrix_ix.toString())
                                     println("******* write dataset")
@@ -119,12 +116,11 @@ class FileManagerActor() : AbstractActor() {
                                     H5.H5Dclose(datasetId)
                                 }
                             }
-                            //save the vector data/////////////////////////////////////////////
+                            //save the vector data
                             //get the vector data to extend the dataset
-                            //
                             val curLength = vec_size_map[keySz]!!  ///
-                            for (strimm_ix in 0..data[0].size - 1) {
-                                println("strimm_ix " + strimm_ix.toString())
+                            for (strimm_ix in 0 until data[0].size) {
+                                println("strimm_ix $strimm_ix")
                                 val strimm_1 = data[0][strimm_ix]
                                 val vec1 = strimm_1.vector_data
                                 //so to store as a 2d double array we need an array which is (frame x vec1.size)
@@ -137,14 +133,14 @@ class FileManagerActor() : AbstractActor() {
                                         vec_data[vec_ix + vec1.size * frame] = vec[vec_ix]
                                     }
                                 }
-                                //
+
                                 //extend and save array
                                 val newLength: Long = (curLength + data.size).toLong()
                                 val dataset_vector = handles["dataset_" + keySz + "_vector" + strimm_ix.toString()]!!
 
                                 H5.H5Dset_extent(dataset_vector, longArrayOf(newLength, 2))
                                 val newOffset: Long = curLength.toLong()
-                                val extLength: Long = data.size.toLong() ///
+                                val extLength: Long = data.size.toLong()
                                 var filespace = H5.H5Dget_space(dataset_vector)
                                 H5.H5Sselect_hyperslab(
                                     filespace,
@@ -169,6 +165,7 @@ class FileManagerActor() : AbstractActor() {
                         }
                     }
 
+                    GUIMain.loggerService.log(Level.INFO, "Closing H5 file")
                     for (ky in handles.keys) {
                         when {
                             ky == "file" -> {
@@ -184,7 +181,7 @@ class FileManagerActor() : AbstractActor() {
                         }
 
                     }
-                    println("**#####Close H5 file")
+
                     //explicitely clean up
                     handles = hashMapOf<String, Int>()
 //                    vec_size_map[keySz] = vec_size_map[keySz]!! + flush_cnt
@@ -205,7 +202,7 @@ class FileManagerActor() : AbstractActor() {
                         //is a flush needed
                         if (data.size == flush_cnt) {
                             println("*******flush******")
-                            //save matrix data//////////////////////////////////////////////
+                            //save matrix data
                             for (frame in 0..data.size - 1) {
                                 var frames = data[frame]
                                 var frm = frames[0] // STRIMMBuffer

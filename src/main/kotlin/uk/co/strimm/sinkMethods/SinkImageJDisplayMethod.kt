@@ -65,18 +65,22 @@ class SinkImageJDisplayMethod() : SinkMethod {
         }
         plugin?.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
     }
-    override fun run(data : List<STRIMMBuffer>){
 
+    override fun run(data : List<STRIMMBuffer>){
     }
+
     override fun getActorRef() : ActorRef? {
         return cameraActor
     }
+
     override fun start() : StartStreaming{
         return StartStreaming()
     }
+
     override fun complete() : CompleteStreaming {
         return CompleteStreaming()
     }
+
     override fun fail(ex: Throwable) {
         println("FAIL")
         println(ex.message)

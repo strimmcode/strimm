@@ -66,8 +66,7 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                 GUIMain.loggerService.log(Level.INFO, "Camera actor ${self.path().name()} terminating")
                 self.tell(Kill.getInstance(), self)
             }
-            .match<List<*>>(List::class.java){
-                    imm ->
+            .match<List<*>>(List::class.java){ imm ->
                 if (GUIMain.softwareTimerService.getTime() > timeLast + displayInfo!!.previewInterval) {
                     //sink is expecting STRIMMBuffer configured according to sink.cfg
                     val imageList1 = imm as List<STRIMMPixelBuffer>
@@ -136,19 +135,16 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                     }
 
                     dataset.isDirty = true
-//
-//
+
                     timeLast = GUIMain.softwareTimerService.getTime()
                     im1.timeAcquired = GUIMain.softwareTimerService.getTime()
                     //println("******send to fileManagerActor")
                     GUIMain.actorService.fileManagerActor.tell(STRIMMSaveBuffer(imageList1 , sink!!.sinkName),self)
                 }
-
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .matchAny{
             }
             .build()
     }
-
 }

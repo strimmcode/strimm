@@ -56,16 +56,11 @@ class DatasetActor() : AbstractActor(){
                     GUIMain.actorService.fileManagerActor.tell(AskFlushSTRIMMData(buffer), self)
                     curCnt = 0
                     buffer = arrayListOf< List<STRIMMBuffer> >()
-
-
                 }
             }
-
-
             .matchAny{ im ->
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .build()
     }
-
 }

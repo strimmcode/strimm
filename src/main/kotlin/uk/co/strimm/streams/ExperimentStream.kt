@@ -212,11 +212,10 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
+
     private fun setMergeObjectForSinks(builder : GraphDSL.Builder<NotUsed>){
         try {
             experimentSinks.forEach { x ->
-
-
                 x.mergeObject = builder.add(MergeLatest.create<STRIMMBuffer>(x.ins.size))
                 builder.from(x.mergeObject).to(x.sink)
             }
@@ -226,6 +225,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
+
     private fun setMergeObjectForFlows(builder : GraphDSL.Builder<NotUsed>){
         try {
             experimentFlows.forEach { x ->
