@@ -91,7 +91,7 @@ class FileManagerActor() : AbstractActor() {
                                 var frames = data[frame]
                                 var frm = frames[0] // STRIMMBuffer
 
-                                val dims_frm = frm.getDims() //returns the dims of this STRIMMBuffer which can vary
+                                val dims_frm = frm.getDimensions() //returns the dims of this STRIMMBuffer which can vary
                                 val type_frm = frm.getType() //returns the type of each pixel
                                 for (matrix_ix in 0 until data[frame].size) {
                                     println("******* create dataset at " + frame.toString() + "," + matrix_ix.toString())
@@ -108,7 +108,7 @@ class FileManagerActor() : AbstractActor() {
                                     H5.H5Dwrite(
                                         datasetId, type_frm,
                                         HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
-                                        frames[matrix_ix].matrix_data
+                                        frames[matrix_ix].matrixData
                                     )
 
                                     vec_size_total_map[keySz]!![matrix_ix]++
@@ -122,12 +122,12 @@ class FileManagerActor() : AbstractActor() {
                             for (strimm_ix in 0 until data[0].size) {
                                 println("strimm_ix $strimm_ix")
                                 val strimm_1 = data[0][strimm_ix]
-                                val vec1 = strimm_1.vector_data
+                                val vec1 = strimm_1.vectorData
                                 //so to store as a 2d double array we need an array which is (frame x vec1.size)
                                 var vec_data = DoubleArray(vec1.size * data.size)
                                 //fill in array
                                 for (frame in 0..data.size - 1) {
-                                    var vec = data[frame][strimm_ix].vector_data
+                                    var vec = data[frame][strimm_ix].vectorData
                                     for (vec_ix in 0..vec1.size - 1) {
                                         //print("hi")
                                         vec_data[vec_ix + vec1.size * frame] = vec[vec_ix]
@@ -193,7 +193,7 @@ class FileManagerActor() : AbstractActor() {
                 //only save the STRIMMSaveBuffer if in ACQUISITION mode (and not ACQUISITION_PAUSED or PREVIEW)
                 if (GUIMain.strimmUIService.state == UIstate.ACQUISITION) {
                     b_capturing_to_buffers = true
-                    //the STRIMMBuffer will contain matrix_data and vector_data
+                    //the STRIMMBuffer will contain matrixData and vectorData
                     var data = buffers[it.name]
                     if (data != null) {
                         //add buffer to structure
@@ -207,7 +207,7 @@ class FileManagerActor() : AbstractActor() {
                                 var frames = data[frame]
                                 var frm = frames[0] // STRIMMBuffer
 
-                                var dims_frm = frm.getDims() //returns the dims of this STRIMMBuffer which can vary
+                                var dims_frm = frm.getDimensions() //returns the dims of this STRIMMBuffer which can vary
                                 var type_frm = frm.getType() //returns the type of each pixel
                                 for (matrix_ix in 0..data[frame].size - 1) {
                                     println("******* create dataset at " + frame.toString() + "," + matrix_ix.toString())
@@ -224,7 +224,7 @@ class FileManagerActor() : AbstractActor() {
                                     H5.H5Dwrite(
                                         datasetId, type_frm,
                                         HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
-                                        frames[matrix_ix].matrix_data
+                                        frames[matrix_ix].matrixData
                                     )
 
                                     vec_size_total_map[it.name]!![matrix_ix]++
@@ -238,12 +238,12 @@ class FileManagerActor() : AbstractActor() {
                             val curLength = vec_size_map[it.name]!!
                             for (strimm_ix in 0..data[0].size - 1) {
                                 val strimm_1 = data[0][strimm_ix]
-                                val vec1 = strimm_1.vector_data
+                                val vec1 = strimm_1.vectorData
                                 //so to store as a 2d double array we need an array which is (frame x vec1.size)
                                 var vec_data = DoubleArray(vec1.size * flush_cnt)
                                 //fill in array
                                 for (frame in 0..data.size - 1) {
-                                    var vec = data[frame][strimm_ix].vector_data
+                                    var vec = data[frame][strimm_ix].vectorData
                                     for (vec_ix in 0..vec1.size - 1) {
                                         vec_data[vec_ix + vec1.size * frame] = vec[vec_ix]
                                     }
@@ -291,7 +291,7 @@ class FileManagerActor() : AbstractActor() {
                             data.add(it.data)
                             println("***create Group:Node")
                             println("**** file " + file.toString())
-                            // file/it.name/0/matrix_data   file/it.name/0/vector_data/data
+                            // file/it.name/0/matrixData   file/it.name/0/vectorData/data
                             val group_node = H5.H5Gcreate(
                                 file, it.name, HDF5Constants.H5P_DEFAULT,
                                 HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
@@ -307,21 +307,19 @@ class FileManagerActor() : AbstractActor() {
                                 ) ////////////default
                                 handles["group_node_ix" + f.toString()] = group_node_ix
 
-                                println("******create Group: matrix_data")
+                                println("******create Group: matrixData")
                                 val group_node_ix_matrix = H5.H5Gcreate(
-                                    group_node_ix, "matrix_data", HDF5Constants.H5P_DEFAULT,
+                                    group_node_ix, "matrixData", HDF5Constants.H5P_DEFAULT,
                                     HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                 )
                                 handles["group_node_ix" + f.toString() + "_matrix"] = group_node_ix_matrix
                                 println("******add attributes for matrix data")
-                                //
-                                //
-                                //
+
                                 val datapack = it.data[0]
-                                val datamapm = datapack.getMatrixDataMap()
+                                val datamapm = datapack.getMatrixData()
                                 for (szAttr in datamapm.keys) {
                                     val dims = longArrayOf(1)
-                                    val dataspace_id = H5.H5Screate_simple(1, dims, null);
+                                    val dataspace_id = H5.H5Screate_simple(1, dims, null)
                                     val group_node_ix_matrix_attributes = H5.H5Acreate(
                                         group_node_ix_matrix, szAttr, HDF5Constants.H5T_STD_I32BE, dataspace_id,
                                         HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
@@ -335,15 +333,15 @@ class FileManagerActor() : AbstractActor() {
                                     H5.H5Sclose(dataspace_id)
                                 }
 
-                                print("******create Group: vector_data")
+                                print("******create Group: vectorData")
                                 val group_node_ix_vector = H5.H5Gcreate(
-                                    group_node_ix, "vector_data", HDF5Constants.H5P_DEFAULT,
+                                    group_node_ix, "vectorData", HDF5Constants.H5P_DEFAULT,
                                     HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                 )
                                 handles["group_node_ix" + f.toString() + "_vector"] = group_node_ix_vector
 
-                                print("******create vectro attributes*****")
-                                val datamapv = datapack.getVectorDataMap()
+                                print("******create vector attributes*****")
+                                val datamapv = datapack.getVectorData()
                                 for (szAttr in datamapv.keys) {
                                     val dims = longArrayOf(1)
                                     val dataspace_id = H5.H5Screate_simple(1, dims, null);
@@ -362,7 +360,7 @@ class FileManagerActor() : AbstractActor() {
 
                                 //
                                 //
-                                print("*******size adjustible vector_data dataset")
+                                print("*******size adjustible vectorData dataset")
                                 val maxdims = longArrayOf(HDF5Constants.H5S_UNLIMITED.toLong(), 2)
                                 val dims = longArrayOf(0, 2)
                                 val chunk_dims = longArrayOf(flush_cnt.toLong(), 2)

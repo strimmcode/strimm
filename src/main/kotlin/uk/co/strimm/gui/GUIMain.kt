@@ -89,30 +89,28 @@ class GUIMain : Command {
         loadExperimentConfigButton.maximumSize = Dimension(firstButton.width+15,firstButton.height+15)
         loadExperimentConfigButton.toolTipText = "Load an experiment configuration"
         loadExperimentConfigButton.isEnabled = true
-        loadExperimentConfigButton.icon = setIcon(firstButton.width, firstButton.height, "/icons/load.png", "Load Experiment", loggerService)
+        loadExperimentConfigButton.icon = setIcon(firstButton.width, firstButton.height, "/icons/load.png", "Load Experiment")
 
         startPreviewExperimentButton.maximumSize = Dimension(firstButton.width+15,firstButton.height+15)
         startPreviewExperimentButton.toolTipText = "Start preview"
         startPreviewExperimentButton.isEnabled = false
-        startPreviewExperimentButton.icon = setIcon(firstButton.width, firstButton.height,"/icons/startPreview.png", "StartPreview", loggerService)
+        startPreviewExperimentButton.icon = setIcon(firstButton.width, firstButton.height,"/icons/startPreview.png", "StartPreview")
 
         startAcquisitionExperimentButton.maximumSize = Dimension(firstButton.width+15,firstButton.height+15)
         startAcquisitionExperimentButton.toolTipText = "Start acquisition"
         startAcquisitionExperimentButton.isEnabled = false
-        startAcquisitionExperimentButton.icon = setIcon(firstButton.width, firstButton.height,"/icons/startAcquisition.png", "StartPreview", loggerService)
+        startAcquisitionExperimentButton.icon = setIcon(firstButton.width, firstButton.height,"/icons/startAcquisition.png", "StartPreview")
 
         pauseExperimentButton.maximumSize = Dimension(firstButton.width+15,firstButton.height+15)
         pauseExperimentButton.toolTipText = "Pause/restart acquisition"
         pauseExperimentButton.isEnabled = false
-        pauseExperimentButton.icon = setIcon(firstButton.width, firstButton.height, "/icons/pause.png", "Pause", loggerService)
+        pauseExperimentButton.icon = setIcon(firstButton.width, firstButton.height, "/icons/pause.png", "Pause")
 
 
         stopExperimentButton.maximumSize = Dimension(firstButton.width+15,firstButton.height+15)
         stopExperimentButton.toolTipText = "Stop experiment"
         stopExperimentButton.isEnabled = false
-        stopExperimentButton.icon = setIcon(firstButton.width, firstButton.height, "/icons/stop.png", "Stop", loggerService)
-
-
+        stopExperimentButton.icon = setIcon(firstButton.width, firstButton.height, "/icons/stop.png", "Stop")
 
        // mainWindowIcon = setIcon(firstButton.width, firstButton.height, Paths.Icons.STRIMM_LOGO_ICON, "Strimm Logo", loggerService, false)
         if (mainWindowIcon != null) strimmUIService.strimmFrame.iconImage = mainWindowIcon!!.image
