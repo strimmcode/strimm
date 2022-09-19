@@ -1,5 +1,6 @@
 .idea/*
-log/*
+WorkingDirectory/log/*
+WorkingDirectory/*.log
 target/*
 **.bak
 *.bak
@@ -11,8 +12,12 @@ target/*
 *.tif
 settings.json
 *.h5
+**.h5
 *.desc
 ExperimentOutput/*
 Akkatest/*
 Akkatest
 package/STRIMM.app/*
+STRIMM.app
+Launch_STRIMM
+
