@@ -1,0 +1,62 @@
+{
+	"experimentConfigurationName" : "TestConfig1",
+	"experimentMode" : "Preview",
+	"experimentDurationMs" : "10000",
+	"HDF5Save" : "True",
+	"ROIAdHoc" : "True",
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "Retiga R1",
+				"deviceLabel" : "Retiga R1",
+				"sourceCfg" : "RetigaR1.cfg",
+				"outputType" : "Image",
+				"isImageSnapped" : True,
+				"isTriggered" : False,
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0,
+				"exposureMs" : 100.0,
+				"framesInCircularBuffer" : -1,
+				"previewFps" : 10.0
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "RetigaCamFlow1",
+				"inputNames" : [
+					"Retiga R1"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "RetigaCam1Display1",
+				"sinkType" : "",
+				"inputNames" : [
+					"RetigaCamFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+				"imageWidth" : 1376,
+				"imageHeight" : 1024,
+				"bitDepth" : 16,
+				"lut" : ""
+			},
+			{
+				"sinkName" : "RetigaCam1Store",
+				"sinkType" : "",
+				"inputNames" : [
+					"RetigaCamFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Store"
+			}
+		]
+	}
+}

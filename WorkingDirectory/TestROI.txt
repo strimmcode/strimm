@@ -1,0 +1,8 @@
+        "x": 550.0,
+        "y": 100.0,
+        "w": 50.0,
+        "h": 50.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "OpenCV",
+        "ROIName": "OpenCVROI1",
+        "flowName": "OpenCVROIFlow"

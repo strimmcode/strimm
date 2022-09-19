@@ -1,0 +1,98 @@
+{
+	"experimentConfigurationName" : "Key and Nidaq test",
+	"experimentMode" : "Preview",
+	"experimentDurationMs" : "10000",
+	"HDF5Save" : True,
+	"ROIAdHoc" : "True",
+	"NIDAQ" : {
+				"deviceLabel" : "NIDAQ6343",
+				"deviceID" : 4,
+				"protocolName" : "compoundTest1.csv",
+				"szFolder" : "C:\\Users\\twrig\\Desktop\\Code\\latest_code__15_2_22\\strimm\\CreateCSV\\CreateCSV\\",
+				"bCompound" : True,
+				"bStartTrigger" : False,
+				"bRisingEdge" : True,
+				 timeoutSec : 5.0,
+				"pFIx" : 0,
+				"bRepeat" : True,
+				"minV" :  -10.0,
+				"maxV" :   10.0,
+				"timingMethod" : 0,
+				"virtualChannels" : [
+					{
+						"channelName" : "do0",
+						"physicalChannels" : [
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 0
+
+							}
+						]
+					}
+				]
+		},
+			
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "NIDAQSource",
+				"sourceType" : "NIDAQSource",
+				"deviceLabel" : "NIDAQ6343",
+				"outputType" : "Trace",
+				"deviceSamplingRateHz" : 30
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "Null_NIDAQ",
+				"flowType" : "Identity",
+				"flowDetails" : "",
+				"inputNames" : [
+					"NIDAQSource"
+				],
+				"inputType" : "Trace",
+				"outputType" : "Trace",
+				"description" : "simply copies input to output, needed in order to add a broadcast hub"
+			},
+			{
+				"flowName" : "Select_do0",
+				"flowType" : "ChannelSelector",
+				"flowDetails" : "do0",
+				"inputNames" : [
+					"Null_NIDAQ"
+				],
+				"inputType" : "Trace",
+				"outputType" : "Trace",
+				"description" : "takes all the channels from the NIDAQ as input and filters them down to a few"
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+
+			{
+				"sinkName" : "TraceSink_do0",
+				"inputNames" : [
+					"Select_do0"
+				],
+				"primaryDevice" : "NIDAQ6343",
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "TraceSink_do0_Store",
+				"inputNames" : [
+					"Select_do0"
+				],
+				"primaryDevice" : "NIDAQ6343",
+				"outputType" : "Trace",
+				"displayOrStore" : "Store"
+			}
+		]
+	}
+
+
+}

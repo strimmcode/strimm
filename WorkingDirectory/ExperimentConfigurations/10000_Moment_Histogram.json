@@ -1,0 +1,148 @@
+{
+	"experimentConfigurationName" : "TestConfig1",
+	"experimentMode" : "Preview",
+	"experimentDurationMs" : "20000",
+	"HDF5Save" : True,
+	"ROIAdHoc" : "True",
+
+	"isGlobalStart" : False,
+	"GlobalStartVirtualCode" : 48,
+
+	"TerminateAcquisitionVirtualCode" : 49,
+
+	"NIDAQ" : {
+				"deviceLabel" : "NIDAQ6343",
+				"deviceID" : 4,
+				"protocolName" : "AcquisitionUsing1.csv",
+				"szFolder" : "C:\\Users\\twrig\\Desktop\\Code\\latest_code__20_3_22\\strimm\\CreateCSV\\CreateCSV\\",
+				"bCompound" : False,
+				"bStartTrigger" : False,
+				"bRisingEdge" : True,
+				 timeoutSec : 5.0,
+				"pFIx" : 0,
+				"bRepeat" : True,
+				"minV" :  -10.0,
+				"maxV" :   10.0,
+				"timingMethod" : 0,
+				"virtualChannels" : [
+					{
+						"channelName" : "do0",
+						"physicalChannels" : [
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 0
+
+							},
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 1
+
+							},
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 7
+
+							}
+						]
+					}
+				]
+		},
+	"sourceConfig":{ 
+		"sources" : [
+
+			{
+				"sourceName" : "Moment",
+				"sourceCfg" : "Moment.cfg",
+				"deviceLabel" : "Moment",
+
+				
+				"isImageSnapped" : False,
+
+				"isKeyboardSnapEnabled" : False,
+				"SnapVirtualCode" : 13,
+
+				"isTriggered" : False,
+				"isTimeLapse" : False,
+				"intervalMs" : 110.0,
+				"exposureMs" : 30.0,
+				"framesInCircularBuffer" : -1,
+				"x" : 1100,
+				"y" : 700,
+				"w" : 700,
+				"h" : 500,
+				
+				"outputType" : "Image"
+		
+
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "CameraFlow",
+				
+				"inputNames" : [
+					"Moment"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			},
+			{
+				"flowName" : "CameraHist",
+				"flowType" : "Histogram_Flow_Short",
+				"param1" : 10,
+				"param2" : 0.0,
+				"param3" : 500.0,
+				
+				"inputNames" : [
+					"Moment"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			}
+
+
+			
+
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+	
+
+			{
+				"sinkName" : "CameraDisplay",
+				"sinkType" : "",
+				"inputNames" : [
+					"CameraFlow"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+                                "imageWidth" : 700,
+                                "imageHeight" : 500,
+                                "bitDepth" : 16,
+                                "previewInterval" : 0.01,
+				"autoscale" : True
+			},
+			{
+				"sinkName" : "CameraHistDisplay",
+				"sinkType" : "",
+				"inputNames" : [
+					"CameraHist"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+                                "imageWidth" : 1000,
+                                "imageHeight" : 1000,
+                                "bitDepth" : 16,
+                                "previewInterval" : 0.5,
+				"autoscale" : True
+			}
+		]
+	}
+
+}

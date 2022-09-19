@@ -1,0 +1,18 @@
+/**
+    Author: Jacob Francis
+*/
+.experiment-tree-box{
+    -fx-border-color: black;
+    -fx-border-width : 1;
+}
+
+.tree-box-label{
+    -fx-border-color: #17ec72;
+    -fx-border-width : 1;
+}
+
+.experiment-summary{
+    /*-fx-background-color: #2B2B2B;*/
+    -fx-border-color: black;
+    -fx-border-width : 1;
+}

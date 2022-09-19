@@ -1,0 +1,170 @@
+{
+	"experimentConfigurationName" : "TestConfig1",
+	"experimentMode" : "Preview",
+	"experimentDurationMs" : "10000",
+	"HDF5Save" : "True",
+	"ROIAdHoc" : "True",
+	"NIDAQ" : {
+				"deviceLabel" : "NIDAQ6343",
+				"deviceID" : 1,
+				"protocolName" : "C:\\Users\\twrig\\source\\repos\\CreateCSV\\CreateCSV\\compoundTest1.csv",
+				"bCompound" : True,
+				"bStartTrigger" : True,
+				"pFIx" : 0,
+				"bRepeat" : False,
+				"minV" :  -10.0,
+				"maxV" :   10.0,
+				"timingMethod" : 1,
+				"virtualChannels" : [
+					{
+						"channelName" : "ao1",
+						"physicalChannels" : [
+							{
+							 "bAnalog" : True,
+							 "bOutput" : True,
+							 "channel" : 0
+
+							}
+						]
+
+					},
+					{
+						"channelName" : "do0",
+						"physicalChannels" : [
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 0
+
+							},
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 1
+							}
+						]
+
+					},
+					{
+						"channelName" : "do1",
+						"physicalChannels" : [
+							{
+							 "bAnalog" : True,
+							 "bOutput" : True,
+							 "channel" : 0
+
+							},
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 1
+							}
+						]
+
+					}
+
+				]
+		},
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "OpenCV",
+				"deviceLabel" : "OpenCV",
+				"sourceCfg" : "OpenCV.cfg",
+				"outputType" : "Image",
+				"isImageSnapped" : False,
+				"isTriggered" : False,
+				"isTimeLapse" : True,
+				"intervalMs" : 200.0,
+				"exposureMs" : -6,
+				"framesInCircularBuffer" : 60,
+				"previewFps" : 10.0,
+				"outputType" : "Image"
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "OpenCVFlow1",
+				"inputNames" : [
+					"OpenCV"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			},
+			{
+				"flowName" : "CameraFlowROI",
+				"inputNames" : [
+					"OpenCVFlow1"
+				],
+				"inputType" : "Image",
+				"outputType" : "Trace"
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "CameraFlowROIDisplay",
+				"inputNames" : [
+					"CameraFlowROI"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "CameraFlowROIStore",
+				"inputNames" : [
+					"CameraFlowROI"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Store",
+				"isROI" : True
+			},
+			{
+				"sinkName" : "Cam1Display1",
+				"sinkType" : "",
+				"inputNames" : [
+					"OpenCVFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+				"imageWidth" : 640,
+				"imageHeight" : 480,
+				"bitDepth" : 32,
+				"roiFlowName" : "CameraFlowROI",
+				"lut" : ""
+			},
+			{
+				"sinkName" : "Cam1Store",
+				"sinkType" : "",
+				"inputNames" : [
+					"OpenCVFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Store"
+			}
+		]
+	},
+ 	"roiConfig": {
+		"rois": [
+			  {
+				"x": 1.0,
+				"y": 1.0,
+				"w": 66.0,
+				"h": 70.0,
+				"ROItype": "Rectangle",
+				"flowName": "CameraFlowROI"
+			  },
+			  {
+				"x": 100.0,
+				"y": 100.0,
+				"w": 20.0,
+				"h": 30.0,
+				"ROItype": "Ellipse",
+				"flowName": "CameraFlowROI"
+			  }
+			]
+		}
+}

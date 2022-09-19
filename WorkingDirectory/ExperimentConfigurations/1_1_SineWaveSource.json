@@ -1,0 +1,48 @@
+{
+	"experimentConfigurationName" : "Sine Wave test",
+	"experimentMode" : "Acquisition",
+	"experimentDurationMs" : "10000",
+	"HDF5Save" : True,
+	"ROIAdHoc" : False,
+			
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "MySource",
+				"sourceType" : "SineWaveSource",
+				"deviceLabel" : "SineWaveSource",
+				"param1" : 2000.0,
+				"param2" : 100.0,
+				"param3" : 2.0,
+				"param4" : 10.0,
+				"outputType" : "Trace"
+			}
+ 		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "MyFlow",
+				"flowType" : "",
+				"inputNames" : [
+					"MySource"
+				],
+				"inputType" : "Trace",
+				"outputType" : "Trace"
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "MySink",
+				"inputNames" : [
+					"MyFlow"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			}
+		]
+	}
+
+}

@@ -1,0 +1,89 @@
+{
+	"experimentConfigurationName" : "TestConfig1",
+	"experimentMode" : "Acquisition",
+	"experimentDurationMs" : "10000",
+	"HDF5Save" : "True",
+	"ROIAdHoc" : "False",
+	"NIDAQ" : {
+			"deviceLabel" : "NIDAQ6343",
+			"deviceID" : 1,
+			"protocolName" : "1_DO.csv",
+			"szFolder" : "C:\\strimm\\Mino version\\STRIMM\\CreateCSV\\CreateCSV\\",
+			"bCompound" : False,
+			"bStartTrigger" : True,
+			"bRisingEdge" : True,
+			"timeoutSec" : 10.0,
+			"pFIx" : 0,
+			"bRepeat" : False,
+			"minV" :  -10.0,
+			"maxV" :   10.0,
+			"timingMethod" : 0,
+			"virtualChannels" : [
+				{
+					"channelName" : "do0",
+					"physicalChannels" : [
+						{
+						 "bAnalog" : False,
+						 "bOutput" : True,
+						 "channel" : 0
+						}
+					]
+				}
+			]
+	},
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "Retiga R1",
+				"deviceLabel" : "Retiga R1",
+				"sourceCfg" : "Retiga R1.cfg",
+				"outputType" : "Image",
+				"isImageSnapped" : False,
+				"isTriggered" : True,
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0,
+				"exposureMs" : 100.0,
+				"framesInCircularBuffer" : -1,
+				"previewFps" : 10.0
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "RetigaCamFlow1",
+				"inputNames" : [
+					"Retiga R1"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "RetigaCam1Display1",
+				"sinkType" : "",
+				"inputNames" : [
+					"RetigaCamFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+				"imageWidth" : 1376,
+				"imageHeight" : 1024,
+				"bitDepth" : 8,
+				"lut" : ""
+			},
+			{
+				"sinkName" : "RetigaCam1Store",
+				"sinkType" : "",
+				"inputNames" : [
+					"RetigaCamFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Store"
+			}
+		]
+	}
+}

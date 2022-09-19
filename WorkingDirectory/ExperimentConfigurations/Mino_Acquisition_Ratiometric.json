@@ -1,0 +1,459 @@
+{
+	"experimentConfigurationName" : "TestConfig1",
+	"experimentMode" : "Acquisition",
+	"experimentDurationMs" : "600000",
+	"HDF5Save" : True,
+	"ROIAdHoc" : "True",
+
+	"isGlobalStart" : True,
+	"GlobalStartVirtualCode" : 48,
+
+	"TerminateAcquisitionVirtualCode" : 49,
+
+	"NIDAQ" : {
+				"deviceLabel" : "NIDAQ6343",
+				"deviceID" : 1,
+				"protocolName" : "AcquisitionUsing1.csv",
+				"szFolder" : "C:\\Users\\localadmin\\Desktop\\strimm_23_3_22\\strimm\\CreateCSV\\CreateCSV\\",
+				"bCompound" : False,
+				"bStartTrigger" : False,
+				"bRisingEdge" : True,
+				 timeoutSec : 5.0,
+				"pFIx" : 0,
+				"bRepeat" : True,
+				"minV" :  -10.0,
+				"maxV" :   10.0,
+				"timingMethod" : 0,
+				"virtualChannels" : [
+					{
+						"channelName" : "do0",
+						"physicalChannels" : [
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 0
+
+							},
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 1
+
+							},
+							{
+							 "bAnalog" : False,
+							 "bOutput" : True,
+							 "channel" : 7
+
+							}
+						]
+					}
+				]
+		},
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "NIDAQSource",
+				"sourceType" : "NIDAQSource",
+				"deviceLabel" : "NIDAQ6343",
+				"outputType" : "Trace",
+				"deviceSamplingRateHz" : 30
+			},
+
+
+			{
+
+				"sourceName" : "QElectro",
+				"sourceCfg" : "QElectro.cfg",
+				"deviceLabel" : "QElectro",
+
+				"isImageSnapped" : False,
+				"isKeyboardSnapEnabled" : True,
+				"SnapVirtualCode" : 13,
+
+
+				"isTriggered" : True,
+				"isTimeLapse" : False,
+				"intervalMs" : 50.0,
+				"exposureMs" : 20.0,
+				"framesInCircularBuffer" : -1,
+				"outputType" : "Image"
+		
+
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+		{
+				"flowName" : "Null_NIDAQ",
+				"flowType" : "Identity",
+				"flowDetails" : "",
+				"inputNames" : [
+					"NIDAQSource"
+				],
+				"inputType" : "Trace",
+				"outputType" : "Trace",
+				"description" : "simply copies input to output, needed in order to add a broadcast hub"
+			},
+			{
+				"flowName" : "Select_do0",
+				"flowType" : "ChannelSelector",
+				"flowDetails" : "do0",
+				"inputNames" : [
+					"Null_NIDAQ"
+				],
+				"inputType" : "Trace",
+				"outputType" : "Trace",
+				"description" : "takes all the channels from the NIDAQ as input and filters them down to a few"
+			}
+			,
+			{
+				"flowName" : "CameraFlow",
+				
+				"inputNames" : [
+					"QElectro"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			},
+			
+			{
+				"flowName" : "GreenFlow",
+				"flowType" : "ImageSelectorFlow",
+				"param1" : 2,
+				"param2" : 2,
+				
+				"inputNames" : [
+					"QElectro"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			}
+,
+			{
+				"flowName" : "GreenRatioFlowROI",
+				"inputNames" : [
+					"GreenFlow"
+				],
+				"inputType" : "Image",
+				"outputType" : "Trace"
+			}
+
+,
+			
+{
+				"flowName" : "RedFlow",
+				"flowType" : "ImageSelectorFlow",
+				"param1" : 1,
+				"param2" : 2,
+				
+				"inputNames" : [
+					"QElectro"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			}
+,
+			{
+				"flowName" : "RedRatioFlowROI",
+				"inputNames" : [
+					"RedFlow"
+				],
+				"inputType" : "Image",
+				"outputType" : "Trace"
+			}
+
+,
+{
+				"flowName" : "RatioFlow",
+				"flowType" : "Ratio_Flow_Short",
+				"param1" : 1000.0,
+				"param2" : 0.0,
+				
+				"inputNames" : [
+					"QElectro"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			},
+			{
+				"flowName" : "RatioRatioFlowROI",
+				"inputNames" : [
+					"RatioFlow"
+				],
+				"inputType" : "Image",
+				"outputType" : "Trace"
+			}
+			
+
+			]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "TraceSink_do0",
+				"sinkType" : "Null",
+				
+				"inputNames" : [
+					"Select_do0"
+				],
+				"primaryDevice" : "NIDAQ6343",
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			}
+			,
+			{
+				"sinkName" : "CameraStore",
+				"sinkType" : "",
+				"inputNames" : [
+					"CameraFlow"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Store"
+			},			
+			{
+				"sinkName" : "GreenRatioFlowROIDisplay",
+				"inputNames" : [
+					"GreenRatioFlowROI"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "RedRatioFlowROIDisplay",
+				"inputNames" : [
+					"RedRatioFlowROI"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "RatioRatioFlowROIDisplay",
+				"inputNames" : [
+					"RatioRatioFlowROI"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "380nm",
+				"sinkType" : "",
+				"inputNames" : [
+					"GreenFlow"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+                                "imageWidth" : 1376,
+                                "imageHeight" : 1024,
+                                "bitDepth" : 16,
+                                "previewInterval" : 0.01,
+				"autoscale" : True,
+				"roiFlowName" : "GreenRatioFlowROI"
+			},
+			{
+				"sinkName" : "340nm",
+				"sinkType" : "",
+				"inputNames" : [
+					"RedFlow"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+                                "imageWidth" : 1376,
+                                "imageHeight" :1024,
+                                "bitDepth" : 16,
+                                "previewInterval" : 0.01,
+				"autoscale" : True,
+				"roiFlowName" : "RedRatioFlowROI"
+			},
+			{
+				"sinkName" : "Ratio",
+				"sinkType" : "",
+				"inputNames" : [
+					"RatioFlow"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+                                "imageWidth" : 1376,
+                                "imageHeight" : 1024,
+                                "bitDepth" : 16,
+                                "previewInterval" : 0.01,
+				"autoscale" : True,
+				"roiFlowName" : "RatioRatioFlowROI"
+			}
+		]
+	}
+,
+ "roiConfig": {
+    "rois": [
+      {
+        "x": 194.0,
+        "y": 175.0,
+        "w": 16.0,
+        "h": 18.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 273.0,
+        "y": 275.0,
+        "w": 24.0,
+        "h": 26.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 212.0,
+        "y": 333.0,
+        "w": 16.0,
+        "h": 19.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 398.0,
+        "y": 286.0,
+        "w": 26.0,
+        "h": 26.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 340.0,
+        "y": 392.0,
+        "w": 20.0,
+        "h": 23.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 195.0,
+        "y": 409.0,
+        "w": 18.0,
+        "h": 21.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 283.0,
+        "y": 187.0,
+        "w": 16.0,
+        "h": 17.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 193.0,
+        "y": 237.0,
+        "w": 20.0,
+        "h": 18.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 443.0,
+        "y": 399.0,
+        "w": 15.0,
+        "h": 21.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 276.0,
+        "y": 500.0,
+        "w": 23.0,
+        "h": 23.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 575.0,
+        "y": 566.0,
+        "w": 21.0,
+        "h": 22.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 532.0,
+        "y": 333.0,
+        "w": 28.0,
+        "h": 29.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 75.0,
+        "y": 382.0,
+        "w": 17.0,
+        "h": 20.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 318.0,
+        "y": 447.0,
+        "w": 40.0,
+        "h": 40.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      }
+    ]
+  }
+}

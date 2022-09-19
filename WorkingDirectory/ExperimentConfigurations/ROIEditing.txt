@@ -1,0 +1,148 @@
+"roiConfig": {
+    "rois": [
+      {
+        "x": 43.0,
+        "y": 311.0,
+        "w": 45.0,
+        "h": 34.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 81.0,
+        "y": 795.0,
+        "w": 49.0,
+        "h": 82.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 746.0,
+        "y": 553.0,
+        "w": 27.0,
+        "h": 28.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 812.0,
+        "y": 580.0,
+        "w": 38.0,
+        "h": 46.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 1131.0,
+        "y": 417.0,
+        "w": 24.0,
+        "h": 25.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 1141.0,
+        "y": 449.0,
+        "w": 28.0,
+        "h": 24.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 1150.0,
+        "y": 681.0,
+        "w": 36.0,
+        "h": 26.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 1126.0,
+        "y": 711.0,
+        "w": 45.0,
+        "h": 32.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 904.0,
+        "y": 636.0,
+        "w": 15.0,
+        "h": 15.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 777.0,
+        "y": 539.0,
+        "w": 33.0,
+        "h": 36.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 832.0,
+        "y": 23.0,
+        "w": 43.0,
+        "h": 41.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      },
+      {
+        "x": 158.0,
+        "y": 689.0,
+        "w": 70.0,
+        "h": 68.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "RatioFlowROI",
+        "displaySink": "",
+        "ROInum": 0
+      }
+    ]
+  }

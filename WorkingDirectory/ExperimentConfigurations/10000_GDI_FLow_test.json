@@ -1,0 +1,53 @@
+{
+	"experimentConfigurationName" : "Sine Wave test",
+	"experimentMode" : "Acquisition",
+	"experimentDurationMs" : "10000",
+	"HDF5Save" : True,
+	"ROIAdHoc" : False,
+			
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "MySource",
+				"sourceType" : "SineWaveSource",
+				"deviceLabel" : "SineWaveSource",
+				"param1" : 2000.0,
+				"param2" : 0.0,
+				"param3" : 2.0,
+				"param4" : 0.5,
+				"outputType" : "Trace"
+			}
+ 		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "MyGDI",
+				"flowType" : "GDIFlowTest",
+				"inputNames" : [
+					"MySource"
+				],
+				"inputType" : "Trace",
+				"outputType" : "Image"
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "MyGDIDisplay",
+				"inputNames" : [
+					"MyGDI"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+                                "imageWidth" : 1000,
+                                "imageHeight" : 1000,
+                                "bitDepth" : 16,
+                                "previewInterval" : 0.01,
+				"autoscale" : False
+			}
+		]
+	}
+
+}
