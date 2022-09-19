@@ -20,4 +20,15 @@ Akkatest
 package/STRIMM.app/*
 STRIMM.app
 Launch_STRIMM
+STRIMM/target/*
+STRIMM/*.log
+STRIMM_IJ/target
+STRIMM_IJ/target/*
+STRIMM_IJ/log/*
+STRIMM_JNI/target
+STRIMM_JNI/target/*
+Test/.vs/*
+Project2/*
+CreateCSV/.vs/*
+
 
