@@ -20,4 +20,9 @@ Akkatest
 package/STRIMM.app/*
 STRIMM.app
 Launch_STRIMM
+STRIMM_IJ/target
+STRIMM_IJ/target/*
+STRIMM_JNI/target
+STRIMM_JNI/target/*
+Test/.vs/*
 
