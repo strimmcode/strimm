@@ -20,6 +20,7 @@ Akkatest
 package/STRIMM.app/*
 STRIMM.app
 Launch_STRIMM
+<<<<<<< HEAD
 STRIMM/target/*
 STRIMM/*.log
 STRIMM_IJ/target
@@ -30,5 +31,4 @@ STRIMM_JNI/target/*
 Test/.vs/*
 Project2/*
 CreateCSV/.vs/*
-
 
