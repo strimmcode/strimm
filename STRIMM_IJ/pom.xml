@@ -249,6 +249,20 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../UHDF5/uhdf5-kt-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>hdfjava</groupId>
+            <artifactId>jarhdf5</artifactId>
+            <version>3.3.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../hdfjava/jarhdf5-3.3.2.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>slf4j</groupId>
+            <artifactId>slf4japi</artifactId>
+            <version>1.7.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../hdfjava/slf4j-api-1.7.5.jar</systemPath>
+        </dependency>
     </dependencies>
     <build>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>

@@ -125,7 +125,9 @@ public class Camera {
 
     public void SetExposureMs(double exp) throws Exception {
         exposureMs = exp;
-        if (core != null) core.setExposure(exposureMs);
+        if (core != null){
+            core.setExposure(exposureMs);
+        }
     }
 
     public void SetSnapped(boolean bSnap) {

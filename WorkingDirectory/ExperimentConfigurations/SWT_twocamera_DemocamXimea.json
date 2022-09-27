@@ -7,9 +7,9 @@
 	"sourceConfig":{ 
 		"sources" : [
 			{
-				"sourceName" : "OpenCV",
-				"deviceLabel" : "OpenCV",
-				"sourceCfg" : "OpenCV.cfg",
+				"sourceName" : "DCam",
+				"deviceLabel" : "DCam",
+				"sourceCfg" : "democam.cfg",
 				"outputType" : "Image",
 				"isImageSnapped" : False,
 				"isTriggered" : False,
@@ -38,9 +38,9 @@
 	"flowConfig":{ 
 		"flows" : [
 			{
-				"flowName" : "OpenCVFlow1",
+				"flowName" : "DemocamFlow1",
 				"inputNames" : [
-					"OpenCV"
+					"DCam"
 				],
 				"inputType" : "Image",
 				"outputType" : "Image"
@@ -61,20 +61,20 @@
 				"sinkName" : "Cam1Display1",
 				"sinkType" : "",
 				"inputNames" : [
-					"OpenCVFlow1"
+					"DemocamFlow1"
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Display",
-				"imageWidth" : 640,
-				"imageHeight" : 480,
-				"bitDepth" : 32,
+				"imageWidth" : 512,
+				"imageHeight" : 512,
+				"bitDepth" : 8,
 				"lut" : ""
 			},
 			{
 				"sinkName" : "Cam1Store",
 				"sinkType" : "",
 				"inputNames" : [
-					"OpenCVFlow1"
+					"DemocamFlow1"
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Store"
@@ -87,8 +87,8 @@
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Display",
-				"imageWidth" : 640,
-				"imageHeight" : 480,
+				"imageWidth" : 1280,
+				"imageHeight" : 1024,
 				"bitDepth" : 8,
 				"lut" : ""
 			},

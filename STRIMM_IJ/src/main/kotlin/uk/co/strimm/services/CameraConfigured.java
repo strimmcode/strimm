@@ -1,15 +1,15 @@
 package uk.co.strimm.services;
 
+import com.opencsv.CSVReader;
 import mmcorej.StrVector;
 import mmcorej.TaggedImage;
+import mmcorej.org.json.JSONObject;
 import uk.co.strimm.STRIMMImage;
 import uk.co.strimm.gui.GUIMain;
-import com.opencsv.CSVReader;
 
-import javax.swing.*;
 import java.io.FileReader;
-import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 public class CameraConfigured extends Camera{
     double timeAcquired = 0.0;
@@ -74,6 +74,7 @@ public class CameraConfigured extends Camera{
             while (!GUIMain.acquisitionMethodService.getBCamerasAcquire()) {
                 Thread.sleep(10);
             }
+
             if (GUIMain.experimentService.experimentStream.getExpConfig().isGlobalStart()){
                 //System.out.println("Start trigger = " + GUIMain.protocolService.getBGlobalSourceStartTrigger());
                 while (!GUIMain.protocolService.getBGlobalSourceStartTrigger()){
@@ -88,7 +89,6 @@ public class CameraConfigured extends Camera{
                     Thread.sleep(100);
                 }
            }
-
 
 //            while(!GUIMain.experimentService.experimentStream.isRunning()){
 //                Thread.sleep(10);
@@ -108,7 +108,7 @@ public class CameraConfigured extends Camera{
                     while (x2 == x1 || x2 == 0 || core.deviceBusy(label)){
                         x2 = core.getRemainingImageCount();
                     }
-                    //
+
                     //collect and remove (pop) the last image (to reduce the chances of overflow
                     // which might happen more quickly if you kept the image on the circular buffer)
                     //
@@ -117,15 +117,24 @@ public class CameraConfigured extends Camera{
                     //try/catch  to alert us to this happening and also to have another go at getting an
                     //image when it does happen.
                     //
-                    if (count == 0) timeStart = System.nanoTime();
+                    if (count == 0) {
+                        timeStart = 0L;
+                    }
+
                     try {
                         //collect the image
                         TaggedImage im = core.getLastTaggedImage();
-                        timeAcquired = System.nanoTime();
                         pix = im.pix;
                         count++;
+
+                        String MMMetadataTagName = "ElapsedTime-ms";
+                        JSONObject test = im.tags;
+                        String timeStamp = (String)im.tags.get(MMMetadataTagName);
+                        timeAcquired = Double.parseDouble(timeStamp);
                         break;
                     } catch (Exception ex) {
+                        GUIMain.loggerService.log(Level.SEVERE, "Error getting image from circular buffer. Message " + ex.getMessage());
+                        GUIMain.loggerService.log(Level.SEVERE, ex.getStackTrace());
                         //TW 2/8/21 the most likely reason for ending up here is that
                         //we attempted to get an image from an circular buffer (it has reset)
                         //so go around the while loop again and retrieve an image
@@ -150,14 +159,16 @@ public class CameraConfigured extends Camera{
                 }
 
                 if (count == 0){
-
                     timeStart = System.nanoTime();
                 }
 
                 core.snapImage();
                 pix = core.getImage();
+
                 count++;
                 timeAcquired = System.nanoTime();
+//                String timeStampString = pop.tags[MMMetadataTagName];
+//                val timeStampString = pop.tags[MMMetadataTagName] as String
             }
         } catch (Exception ex) {
             System.out.println(label + " exception");

@@ -1,17 +1,17 @@
 {
 	"experimentConfigurationName" : "TestConfig1",
-	"experimentMode" : "Preview",
+	"experimentMode" : "Live",
 	"experimentDurationMs" : "10000",
 	"HDF5Save" : "True",
-	"ROIAdHoc" : "True",
+	"ROIAdHoc" : "False",
 	"sourceConfig":{ 
 		"sources" : [
 			{
-				"sourceName" : "OpenCV",
-				"deviceLabel" : "OpenCV",
-				"sourceCfg" : "OpenCV.cfg",
+				"sourceName" : "Ximea",
+				"deviceLabel" : "Ximea",
+				"sourceCfg" : "Ximea.cfg",
 				"outputType" : "Image",
-				"isImageSnapped" : True,
+				"isImageSnapped" : False,
 				"isTriggered" : False,
 				"isTimeLapse" : False,
 				"intervalMs" : 100.0,
@@ -25,9 +25,9 @@
 	"flowConfig":{ 
 		"flows" : [
 			{
-				"flowName" : "OpenCVFlow1",
+				"flowName" : "XimeaFlow1",
 				"inputNames" : [
-					"OpenCV"
+					"Ximea"
 				],
 				"inputType" : "Image",
 				"outputType" : "Image"
@@ -35,7 +35,7 @@
 			{
 				"flowName" : "CameraFlowROI",
 				"inputNames" : [
-					"OpenCVFlow1"
+					"XimeaFlow1"
 				],
 				"inputType" : "Image",
 				"outputType" : "Trace"
@@ -65,13 +65,13 @@
 				"sinkName" : "Cam1Display1",
 				"sinkType" : "",
 				"inputNames" : [
-					"OpenCVFlow1"
+					"XimeaFlow1"
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Display",
-				"imageWidth" : 640,
-				"imageHeight" : 480,
-				"bitDepth" : 32,
+				"imageWidth" : 1280,
+				"imageHeight" : 1024,
+				"bitDepth" : 8,
 				"roiFlowName" : "CameraFlowROI",
 				"lut" : ""
 			},
@@ -79,7 +79,7 @@
 				"sinkName" : "Cam1Store",
 				"sinkType" : "",
 				"inputNames" : [
-					"OpenCVFlow1"
+					"XimeaFlow1"
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Store"
@@ -95,7 +95,7 @@
 				"h": 70.0,
 				"ROItype": "Rectangle",
 				"flowName": "CameraFlowROI",
-				"ROIName" : "OpenCVROI1"
+				"ROIName" : "XimeaROI1"
 			  },
 			  {
 				"x": 100.0,
@@ -104,7 +104,7 @@
 				"h": 30.0,
 				"ROItype": "Ellipse",
 				"flowName": "CameraFlowROI",
-				"ROIName" : "OpenCVROI2"
+				"ROIName" : "XimeaROI2"
 			  }
 			]
 		}

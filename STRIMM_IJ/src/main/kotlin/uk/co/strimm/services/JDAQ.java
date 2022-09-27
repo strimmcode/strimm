@@ -9,9 +9,6 @@ public class JDAQ {
     public int deviceID;
 
     static {
-        System.out.println("LIBRARY PATH :" + System.getProperty("java.library.path"));
-        System.out.println("WORKINGDIRECTORY : " + System.getProperty("user.dir"));
-
         System.out.println("*****************here***************");
         System.loadLibrary("Test");//TODO hardcoded
         System.out.println("*****************here***************");

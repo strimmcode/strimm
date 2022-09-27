@@ -19,9 +19,11 @@ import java.util.logging.Level
 //data class ByteImg(var stack : ArrayImg<UnsignedByteType,net.imglib2.img.basictypeaccess.array.ByteArray>)
 //data class ShortImg(var stack : ArrayImg<UnsignedShortType,net.imglib2.img.basictypeaccess.array.ShortArray>)
 //data class FloatImg(var stack : ArrayImg<FloatType,net.imglib2.img.basictypeaccess.array.FloatArray>)
-data class ByteImg(var stack : ByteArray, val xDim : Long, val yDim : Long, val sourceCamera : String)
-data class ShortImg(var stack : ShortArray, val xDim : Long, val yDim : Long, val sourceCamera : String)
-data class FloatImg(var stack : FloatArray, val xDim : Long, val yDim : Long, val sourceCamera : String)
+
+open class CameraImg(val type: String) //Superclass for generics help when dealing with the data
+data class ByteImg(var stack : ByteArray, val xDim : Long, val yDim : Long, val sourceCamera : String) : CameraImg("Byte")
+data class ShortImg(var stack : ShortArray, val xDim : Long, val yDim : Long, val sourceCamera : String): CameraImg("Short")
+data class FloatImg(var stack : FloatArray, val xDim : Long, val yDim : Long, val sourceCamera : String): CameraImg("Float")
 
 class ArrayImgStore{
     var byteStack = arrayListOf<ByteImg>()
@@ -77,7 +79,6 @@ class CameraDataStoreActor : AbstractActor() {
                 .match<STRIMMImage>(STRIMMImage::class.java) { image ->
                     if (acquiring) { //This flag prevents data store actors acquiring during preview mode
                         val shouldStop = checkIfShouldStop(image.sourceCamera)
-                        println("Camera should stop: " + shouldStop)
                         if (!shouldStop) {
                             println(GUIMain.experimentService.experimentStream.cameraDataStoreActors[getSelf()]  + " " + "  time: " + image.timeAcquired)
                             when (image.pix) {
@@ -136,9 +137,22 @@ class CameraDataStoreActor : AbstractActor() {
 
         val bKeyPressed = GUIMain.protocolService.jdaq.GetKeyState(GUIMain.experimentService.expConfig.TerminateAcquisitionVirtualCode)  //1
        // println("TERRY: checkIfShouldSop" + bKeyPressed.toString())
-        if (bKeyPressed) return true
+        if (bKeyPressed) {
+            return true
+        }
+
+//        for(dataPointNumberPair in GUIMain.experimentService.deviceDatapointNumbers){
+//            if(deviceLabel.contains(dataPointNumberPair.key)){
+//                if(imageCounter >= dataPointNumberPair.value){
+//                    println("camera data store actor shouldstop is true")
+//                    return true
+//                }
+//            }
+//        }
+//        return false
+
         return GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
-        //return imageCounter >= GUIMain.experimentService.deviceDatapointNumbers[deviceLabel]!!
+//        return imageCounter >= GUIMain.experimentService.deviceDatapointNumbers[deviceLabel]!!
     }
 
     private fun sendData(){

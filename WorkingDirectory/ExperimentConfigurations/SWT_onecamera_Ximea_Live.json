@@ -1,0 +1,169 @@
+{
+  "author": "",
+  "affiliation": "",
+  "description": "",
+  "experimentMode": "Live",
+  "experimentConfigurationName": "TestConfig1",
+  "experimentDurationMs": 10000,
+  "isGlobalStart": false,
+  "GlobalStartVirtualCode": 0,
+  "TerminateAcquisitionVirtualCode": 0,
+  "MMDeviceConfigFile": "",
+  "ROIAdHoc": "False",
+  "HDF5Save": true,
+  "COMPort": 9,
+  "NIDAQ": {
+    "deviceLabel": "",
+    "deviceName": "Dev",
+    "deviceID": 0,
+    "protocolName": "",
+    "bCompound": false,
+    "pFIx": 0,
+    "bStartTrigger": false,
+    "bRisingEdge": true,
+    "timeoutSec": -1.0,
+    "bRepeat": false,
+    "minV": 0.0,
+    "maxV": 0.0,
+    "timingMethod": 0,
+    "virtualChannels": []
+  },
+  "hardwareDevices": {
+    "timerName": "",
+    "preinitProperties": {
+      "deviceName": ""
+    },
+    "postInitProperties": {
+      "analogueInputSampleRate": 0.0,
+      "analogueInputBlockSize": 0,
+      "analogueOutputSampleRate": 0.0,
+      "analogueOutputBlockSize": 0,
+      "digitalInputSampleRate": 0.0,
+      "digitalInputBlockSize": 0,
+      "digitalOutputSampleRate": 0.0,
+      "digitalOutputBlockSize": 0
+    },
+    "channelConfig": {
+      "channels": []
+    }
+  },
+  "sourceConfig": {
+    "sources": [
+      {
+        "sourceName": "Ximea",
+        "sourceType": "",
+        "sourceCfg": "Ximea.cfg",
+        "deviceLabel": "Ximea",
+        "sourceDetails": "",
+        "param1": 0.0,
+        "param2": 0.0,
+        "param3": 0.0,
+        "param4": 0.0,
+        "isGreyScale": true,
+        "description": "",
+        "exposureMs": 50.0,
+        "isBusy": false,
+        "isTimeLapse": true,
+        "intervalMs": 100.0,
+        "isTriggered": false,
+        "isImageSnapped": false,
+        "isKeyboardSnapEnabled": false,
+        "SnapVirtualCode": 0,
+        "framesInCircularBuffer": 60,
+        "timeLastCaptured": 0.0,
+        "previewInterval": 0.2,
+        "outputType": "Image",
+        "samplingFrequencyHz": 30.0,
+        "x": 0.0,
+        "y": 0.0,
+        "w": 0.0,
+        "h": 0.0,
+        "channel": "",
+        "sourceMMConfig": ""
+      }
+    ]
+  },
+  "flowConfig": {
+    "flows": [
+      {
+        "flowName": "XimeaCamFlow1",
+        "flowType": "",
+        "flowDetails": "",
+        "param1": 0.0,
+        "param2": 0.0,
+        "param3": 0.0,
+        "param4": 0.0,
+        "param5": 0.0,
+        "param6": 0.0,
+        "param7": 0.0,
+        "param8": 0.0,
+        "roiNumber": 0,
+        "description": "",
+        "inputNames": [
+          "Ximea"
+        ],
+        "inputType": "Image",
+        "outputType": "Image"
+      }
+    ]
+  },
+  "sinkConfig": {
+    "sinks": [
+      {
+        "sinkName": "XimeaCam1Display1",
+        "sinkType": "",
+        "sinkDetails": "",
+        "param1": 0.0,
+        "param2": 0.0,
+        "param3": 0.0,
+        "param4": 0.0,
+        "inputNames": [
+          "XimeaCamFlow1"
+        ],
+        "primaryDevice": "",
+        "primaryDeviceChannel": "",
+        "outputType": "Image",
+        "displayOrStore": "Display",
+        "actorPrettyName": "",
+        "imageWidth": 1280,
+        "imageHeight": 1024,
+        "bitDepth": 8,
+        "previewInterval": 0.0,
+        "roiSz": "",
+        "roiFlowName": "",
+        "autoscale": true,
+        "isROI": false,
+        "lut": ""
+      },
+      {
+        "sinkName": "XimeaCam1Store",
+        "sinkType": "",
+        "sinkDetails": "",
+        "param1": 0.0,
+        "param2": 0.0,
+        "param3": 0.0,
+        "param4": 0.0,
+        "inputNames": [
+          "XimeaCamFlow1"
+        ],
+        "primaryDevice": "",
+        "primaryDeviceChannel": "",
+        "outputType": "Image",
+        "displayOrStore": "Store",
+        "actorPrettyName": "",
+        "imageWidth": 0,
+        "imageHeight": 0,
+        "bitDepth": 0,
+        "previewInterval": 0.0,
+        "roiSz": "",
+        "roiFlowName": "",
+        "autoscale": true,
+        "isROI": false,
+        "lut": ""
+      }
+    ]
+  },
+  "roiConfig": {
+    "rois": []
+  }
+}

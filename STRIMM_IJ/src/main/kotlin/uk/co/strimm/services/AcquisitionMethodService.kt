@@ -453,10 +453,8 @@ class AcquisitionMethodService : AbstractService(), ImageJService {
                 }
             }
 
-
             //snap the image and also gather some information to
             //estimate the fps
-
             // println("AcquisitionMethodService::runMethod")
             //all we can guarantee is that AO,AI,DO,DI will each have the same number of rows
             var dummyAO = inputs[0] as MutableList<Overlay>
@@ -478,7 +476,6 @@ class AcquisitionMethodService : AbstractService(), ImageJService {
                 }
             }
 
-
             src.isBusy = true
 
             var numAOChannels = GUIMain.protocolService.GetNumChannels(0)
@@ -499,18 +496,11 @@ class AcquisitionMethodService : AbstractService(), ImageJService {
 
             }
 
-
-
-          
             if (GUIMain.acquisitionMethodService.bAquisitionProceed) {
                 //println("set to proceed ***************")
-
-
                 GUIMain.protocolService.RunNext(pTimes, dataAO, dataAI, dataDO, dataDI);
             }
             //make up data here for dataAI, dataAO, dataDI, dataDO in order to test the graph drawing
-
-
 
             val traceDataList = arrayListOf<TraceData>()
             //create dummy overlays

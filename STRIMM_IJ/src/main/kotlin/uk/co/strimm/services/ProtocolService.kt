@@ -43,7 +43,7 @@ class ProtocolService : AbstractService(), ImageJService  {
     var bStartExperiment = false
     public var experimentStartTime = 0.0
    // var COMPort =  SerialPort.getCommPort("COM5")
-    var szFolder = ".\\Protocols\\" //TO DO
+    var szFolder = ".\\Protocols\\" //TODO hardcoded
 
     init{
 

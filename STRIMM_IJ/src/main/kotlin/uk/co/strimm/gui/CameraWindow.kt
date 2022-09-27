@@ -2,15 +2,10 @@ package uk.co.strimm.gui
 
 import akka.actor.ActorRef
 import bibliothek.gui.dock.common.DefaultMultipleCDockable
-import net.imagej.*
+import net.imagej.Dataset
 import net.imagej.axis.Axes
 import net.imagej.display.DatasetView
-import net.imagej.display.DefaultDatasetView
-import net.imagej.display.DefaultImageDisplay
 import net.imagej.display.ImageDisplay
-import net.imagej.overlay.Overlay
-import net.imagej.overlay.RectangleOverlay
-import net.imagej.overlay.TextOverlay
 import net.imglib2.type.numeric.integer.UnsignedByteType
 import net.imglib2.type.numeric.integer.UnsignedShortType
 import net.imglib2.type.numeric.real.FloatType
@@ -18,21 +13,16 @@ import org.scijava.display.Display
 import org.scijava.plugin.Plugin
 import org.scijava.ui.swing.viewer.SwingDisplayWindow
 import org.scijava.ui.viewer.DisplayWindow
-import org.scijava.util.ColorRGB
-import org.scijava.util.Colors
 import uk.co.strimm.CameraDeviceInfo
 import uk.co.strimm.DisplayInfo
 import uk.co.strimm.MicroManager.MMCameraDevice
-import uk.co.strimm.experiment.ROIManager
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
-import java.util.*
 import java.awt.Robot
 import java.awt.event.*
-import java.awt.image.BufferedImage
 import java.io.File
-import java.util.logging.Level
-import javax.swing.*
+import java.util.*
+import javax.swing.JPanel
 
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Camera Feed")
@@ -235,12 +225,12 @@ class CameraWindow constructor(val windowPanel: JPanel){
                         windowPanel.add(rootPane)
                         windowPanel.addFocusListener(object : FocusAdapter(){
                             override fun focusGained(e: FocusEvent?) {
-                                println("FOCUS GAINED")
+//                                println("FOCUS GAINED")
                                 super.focusGained(e)
                             }
 
                             override fun focusLost(e: FocusEvent?) {
-                                println("FOCUS LOST")
+//                                println("FOCUS LOST")
                                 super.focusLost(e)
                             }
                         })

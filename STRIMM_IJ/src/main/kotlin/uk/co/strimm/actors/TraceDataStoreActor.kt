@@ -1,23 +1,27 @@
 package uk.co.strimm.actors
 
-import akka.actor.*
-import net.imagej.overlay.Overlay
+import akka.actor.AbstractActor
+import akka.actor.ActorRef
+import akka.actor.PoisonPill
+import akka.actor.Props
 import uk.co.strimm.Acknowledgement
+import uk.co.strimm.TraceData
+import uk.co.strimm.TraceDataStore
 import uk.co.strimm.actors.messages.Message
+import uk.co.strimm.actors.messages.ask.AskIsTraceROI
 import uk.co.strimm.actors.messages.complete.CompleteTraceDataStoring
 import uk.co.strimm.actors.messages.fail.FailTraceDataStoring
 import uk.co.strimm.actors.messages.start.StartTraceDataStoring
-import uk.co.strimm.gui.GUIMain
-import uk.co.strimm.TraceData
 import uk.co.strimm.actors.messages.start.StartTraceStore
-import java.util.logging.Level
-import uk.co.strimm.TraceDataStore
-import uk.co.strimm.actors.messages.ask.AskIsTraceROI
-import uk.co.strimm.actors.messages.start.StartAcquiring
 import uk.co.strimm.actors.messages.stop.AbortStream
-import uk.co.strimm.actors.messages.tell.*
+import uk.co.strimm.actors.messages.tell.TellAnalogueDataStream
+import uk.co.strimm.actors.messages.tell.TellIsTraceROIActor
+import uk.co.strimm.actors.messages.tell.TellTraceData
+import uk.co.strimm.actors.messages.tell.TellTraceSinkName
+import uk.co.strimm.gui.GUIMain
 import uk.co.strimm.services.AnalogueDataStream
 import java.util.*
+import java.util.logging.Level
 
 class TraceDataStoreActor : AbstractActor() {
     companion object {
@@ -82,29 +86,29 @@ class TraceDataStoreActor : AbstractActor() {
                 val incomingDataList = it as List<List<TraceData>>
                 val incomingData = incomingDataList.flatten() //so just List<TraceData>
                 if(incomingData.isNotEmpty() && traceStore) {
-                    println("incoming data")
                     for(traceData in incomingData) { //this will be each TraceData  data = Pair<ROI, value>, timeAcquired
-                        traceData.data.first!!.name = sinkName
+                        if(traceData.data.first!!.name == ""){
+                            traceData.data.first!!.name = sinkName
+                        }
+
+                        //Add an entry for a new trace if the entry doesn't yet exist
                         if(traceData.data.first!!.name !in dataPointCounters.keys){
                             dataPointCounters[traceData.data.first!!.name] = 0
                         }
 
+                        val newStoreObject = TraceDataStore(
+                            timeAcquired = traceData.timeAcquired,
+                            roi = traceData.data.first,
+                            roiVal = traceData.data.second,
+                            dataPointNumber = dataPointCounters[traceData.data.first!!.name]!!,
+                            flowName = "", //is this a problem
+                            roiNumber = 1 //is this a problem
+                        )
+                        this.traceData.add(newStoreObject)
+                        dataPointCounters[traceData.data.first!!.name] = dataPointCounters[traceData.data.first!!.name]!!+1
+
                         val shouldStop = checkIfShouldStop(traceData.data.first!!.name)
-                        //println("should stop trace = " + shouldStop)
-                        if(!shouldStop) {
-                            val newStoreObject = TraceDataStore(
-                                timeAcquired = traceData.timeAcquired,
-                                roi = traceData.data.first,
-                                roiVal = traceData.data.second,
-                                dataPointNumber = dataPointCounters[traceData.data.first!!.name]!!,
-                                flowName = "", //is this a problem
-                                roiNumber = 1 //is this a problem
-                            )
-                            this.traceData.add(newStoreObject)
-                            dataPointCounters[traceData.data.first!!.name] = dataPointCounters[traceData.data.first!!.name]!!+1
-                        }
-                        else{
-                            //println("*******SEND DATA TRACE")
+                        if(shouldStop){
                             sendData()
                             GUIMain.loggerService.log(Level.INFO, "Trace data store actor no longer acquiring")
                             acquiring = false
@@ -118,22 +122,20 @@ class TraceDataStoreActor : AbstractActor() {
     }
 
     private fun checkIfShouldStop(deviceLabel : String) : Boolean{
-        return GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
-//        for(dataPointNumberPair in GUIMain.experimentService.deviceDatapointNumbers){
-//            if(deviceLabel.contains(dataPointNumberPair.key)){
-//                if(dataPointCounters.all{ x -> x.value % 10000 == 0}){
-//                    GUIMain.loggerService.log(Level.INFO, "Trace stored ${dataPointCounters.values.first()} points so far")
-//                }
-//
-//                if(dataPointCounters.all { x -> x.value >= dataPointNumberPair.value}){
-//                    return true
-//                }
-//            }
-//        }
- //       return false
+        for(dataPointNumberPair in GUIMain.experimentService.deviceDatapointNumbers){
+            if(deviceLabel.contains(dataPointNumberPair.key)){
+                if(dataPointCounters.all { x -> x.value >= dataPointNumberPair.value}){
+                    GUIMain.loggerService.log(Level.INFO, "Stopping trace data store actor storing data")
+                    return true
+                }
+            }
+        }
+        return false
+//        return GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
     }
 
     private fun sendData(){
+        GUIMain.loggerService.log(Level.INFO, "Trace data store actor sending data")
         GUIMain.actorService.fileWriterActor.tell(TellTraceData(traceData, isTraceFromROI), ActorRef.noSender())
         traceStore = false
     }

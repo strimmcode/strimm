@@ -47,8 +47,8 @@
 				"isImageSnapped" : False,
 				"isTriggered" : True,
 				"isTimeLapse" : False,
-				"intervalMs" :50.0,
-				"exposureMs" : 50.0,
+				"intervalMs" :100.0,
+				"exposureMs" : 100.0,
 				"framesInCircularBuffer" : -1,
 				"previewFps" : 10.0,
 				"outputType" : "Image"
@@ -97,9 +97,19 @@
 				"inputNames" : [
 					"SelectTrigger"
 				],
-				"primaryDevice" : "Electrode",
+				"primaryDevice" : "NIDAQ6343",
 				"outputType" : "Trace",
 				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "NIDAQStore",
+				"sinkType" : "",
+				"inputNames" : [
+					"SelectTrigger"
+				],
+				"primaryDevice" : "NIDAQ6343",
+				"outputType" : "Trace",
+				"displayOrStore" : "Store"
 			},
 			{
 				"sinkName" : "XimeaCam1Display1",

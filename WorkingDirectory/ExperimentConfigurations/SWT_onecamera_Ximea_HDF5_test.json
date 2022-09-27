@@ -1,9 +1,9 @@
 {
 	"experimentConfigurationName" : "TestConfig1",
-	"experimentMode" : "Preview",
-	"experimentDurationMs" : "10000",
+	"experimentMode" : "Live",
+	"experimentDurationMs" : "1000",
 	"HDF5Save" : "True",
-	"ROIAdHoc" : "True",
+	"ROIAdHoc" : "False",
 	"sourceConfig":{ 
 		"sources" : [
 			{
@@ -13,10 +13,10 @@
 				"outputType" : "Image",
 				"isImageSnapped" : False,
 				"isTriggered" : False,
-				"isTimeLapse" : True,
+				"isTimeLapse" : False,
 				"intervalMs" : 100.0,
-				"exposureMs" : 50.00,
-				"framesInCircularBuffer" : 60,
+				"exposureMs" : 50,
+				"framesInCircularBuffer" : -1,
 				"previewFps" : 10.0
 			}
 		]

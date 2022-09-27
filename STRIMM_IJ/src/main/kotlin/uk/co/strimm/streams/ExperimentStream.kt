@@ -3,7 +3,9 @@ package uk.co.strimm.streams
 import akka.NotUsed
 import akka.actor.ActorRef
 import akka.actor.PoisonPill
-import akka.stream.*
+import akka.stream.ClosedShape
+import akka.stream.Graph
+import akka.stream.OverflowStrategy
 import akka.stream.javadsl.*
 import akka.stream.javadsl.Flow
 import akka.stream.javadsl.Sink
@@ -95,7 +97,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
             return (GraphDSL.create () { builder ->
                 println("****Building Graph*****")
 //                configureTimer()
-//                durationMs = expConfig.experimentDurationMs
+                durationMs = expConfig.experimentDurationMs
                 //Build the graph objects from the experiment config
                 populateLists(expConfig, builder)
                 println("finished populatelists")
@@ -1910,6 +1912,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                     //default settings.  Configure the camera depending on the settings in the JSON
                    // source.camera!!.SetGlobalStart(source.isGlobalStart)
                     source.camera!!.SetExposureMs(source.exposureMs)
+                    source.camera!!.SetIntervalMs(source.intervalMs)
                     source.camera!!.SetSnapped(source.isImageSnapped)
                     source.camera!!.SetKeyboardSnapEnabled(source.isKeyboardSnapEnabled)
                     source.camera!!.SetSnapVirtualCode(source.SnapVirtualCode)
@@ -1973,6 +1976,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                             dummyOverlay.name =
                                 expSource.traceSourceName + " " + "ao" + chan.toString() + " " + Random().nextInt(1000)
                             dummyAO.add(dummyOverlay)
+
+                            val numPoints = GUIMain.protocolService.GetNumberOfDataPoints()
+                            GUIMain.experimentService.deviceDatapointNumbers[dummyOverlay.name] = numPoints
                         }
                         for (f in 0 until numAIChannels) {
                             val dummyOverlay = EllipseOverlay()
@@ -1999,6 +2005,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                         val getTraceDataMethodNIDAQ =
                             GUIMain.acquisitionMethodService.getAcquisitionMethod("Trace Data Method NIDAQ")
                                     as AcquisitionMethodService.TraceMethod
+
                         if (GUIMain.experimentService.expConfig.NIDAQ.bRepeat){
                             val akkaSource = Source.repeat(1)
                                 .map {
@@ -2966,8 +2973,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
         try {
             for (flow in expConfig.flowConfig.flows) {
                 if (flow.inputType.toLowerCase() == ExperimentConstants.ConfigurationProperties.IMAGE_INPUT_TYPE.toLowerCase() &&
-                    flow.outputType.toLowerCase() == ExperimentConstants.ConfigurationProperties.IMAGE_OUTPUT_TYPE.toLowerCase()
-                ) {//IMAGE TO IMAGE FLOW
+                    flow.outputType.toLowerCase() == ExperimentConstants.ConfigurationProperties.IMAGE_OUTPUT_TYPE.toLowerCase())
+                {//IMAGE TO IMAGE FLOW
                     val expFlow = ExperimentImageImageFlow(flow.flowName)
                     val threshhold = 1200.0
                     if (flow.flowType       == "ThreshholdImage"){
@@ -3200,9 +3207,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                     //IMAGE TO TRACE  ROI *************************************
                     val expFlow = ExperimentImageTraceFlow(flow.flowName)
 
-//for this flow, which has a flowName which is a field for each element in rois (to we can sort all of the rois associated with
-//a particular flow), for each roi construct an overlay - the name is automatically carried over from roi to overlay
-//we should associate rois with a flow rather than the raw camera image, because it is really an Image->Trace[] function
+                    //for this flow, which has a flowName which is a field for each element in rois (to we can sort all of the rois associated with
+                    //a particular flow), for each roi construct an overlay - the name is automatically carried over from roi to overlay
+                    //we should associate rois with a flow rather than the raw camera image, because it is really an Image->Trace[] function
                     //because we want to make an roi from a display
                     //
                     //could associate roi with camerawindow
@@ -3225,13 +3232,14 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                     //this flow will have the displaySink and allows all to be chosen from rois
                     //this could easily be a file
                     val roiForThisFlow = GUIMain.experimentService.expConfig.roiConfig.rois.filter { x -> x.flowName.toLowerCase() == flow.flowName.toLowerCase() }
-//there might be a set of rois which are associated with STRIMMImage
+                    //there might be a set of rois which are associated with STRIMMImage
                     for (roi in roiForThisFlow) {
                         val overlay = ROIManager.createOverlayFromROIObject(roi)
                         //find the associated sink for this flow
                         var displaySink  = GUIMain.experimentService.experimentStream.expConfig.sinkConfig.sinks.filter{snk-> snk.roiFlowName == flow.flowName}.first()
 
 
+                        //Setting colours for ROIs
                         var colNum =(GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[flow.flowName]) as Int
                         if (colNum < GUIMain.roiColours.size) {
                             var col : Color = GUIMain.roiColours[colNum]
@@ -3245,10 +3253,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                             overlay!!.fillColor = ColorRGB(100, 100, 100)
                             overlay!!.lineColor = ColorRGB(100, 100, 100)
                         }
+
                         if (overlay != null) {
-
                             var curVal : Int = GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[flow.flowName] as Int
-
                             GUIMain.actorService.routedRoiOverlays[overlay] = flow.flowName
                             GUIMain.strimmUIService.traceFromROICounter++
                             GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[flow.flowName] = curVal + 1
@@ -3479,9 +3486,6 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                         expFlow.inputType = flow.inputType
                         expFlow.outputType = flow.outputType
                         expFlow.flow = builder.add(akkaFlow)
-
-
-
                     }
 
                     experimentTraceTraceFlows.add(expFlow)
@@ -3776,10 +3780,8 @@ experimentImageSinks.add(expSink)
 //                            }
                             //seem to have done it again
                             if (experimentImageSources.isNotEmpty()) {
-
-                                traceActor?.tell(TellDeviceSamplingRate(10.0), ActorRef.noSender())
+                                traceActor?.tell(TellDeviceSamplingRate(10.0), ActorRef.noSender())//TODO hardcoded
                                 traceActor?.tell(TellSetNumDataPoints(), ActorRef.noSender())
-
                             }
                             //create the akka,
                             //this will receive tracedata list and will display it had hints previously about the datarate
