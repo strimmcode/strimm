@@ -31,7 +31,6 @@ import java.io.File
 import java.util.*
 import java.util.List
 import java.util.logging.Level
-import javax.swing.JOptionPane
 
 @Plugin(type = Service::class)
 class AcquisitionMethodService : AbstractService(), ImageJService {
@@ -171,7 +170,6 @@ class AcquisitionMethodService : AbstractService(), ImageJService {
                                         imgSizeFull.second!!.toLong()
                                     )
 
-
                                 //Proceed with iterating over a cursor for the ROI
                                 val ellipsoidMask = GeomMasks.closedEllipsoid(doubleArrayOf(x, y), doubleArrayOf(w, h))
                                 val ellipsoidInterval = Intervals.largestContainedInterval(ellipsoidMask)
@@ -224,7 +222,6 @@ class AcquisitionMethodService : AbstractService(), ImageJService {
                                 viewCursor = Regions.sample(iterableRegion, arrayImg).cursor()
                             }
                         }
-
                     } catch (ex: Exception) {
                         GUIMain.loggerService.log(
                             Level.SEVERE,
@@ -317,7 +314,6 @@ class AcquisitionMethodService : AbstractService(), ImageJService {
                             "Could not read rectangle overlay data. Error: " + ex.message
                         )
                     }
-
                 }
                 is PolygonOverlay -> {
                     //TODO this is a bit more complicated

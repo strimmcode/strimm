@@ -128,7 +128,6 @@ public class CameraConfigured extends Camera{
                         count++;
 
                         String MMMetadataTagName = "ElapsedTime-ms";
-                        JSONObject test = im.tags;
                         String timeStamp = (String)im.tags.get(MMMetadataTagName);
                         timeAcquired = Double.parseDouble(timeStamp);
                         break;

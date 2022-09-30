@@ -122,16 +122,20 @@ class TraceDataStoreActor : AbstractActor() {
     }
 
     private fun checkIfShouldStop(deviceLabel : String) : Boolean{
-        for(dataPointNumberPair in GUIMain.experimentService.deviceDatapointNumbers){
-            if(deviceLabel.contains(dataPointNumberPair.key)){
-                if(dataPointCounters.all { x -> x.value >= dataPointNumberPair.value}){
-                    GUIMain.loggerService.log(Level.INFO, "Stopping trace data store actor storing data")
-                    return true
+        return if(GUIMain.protocolService.isEpisodic){
+            GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
+        }
+        else{
+            for(dataPointNumberPair in GUIMain.experimentService.deviceDatapointNumbers){
+                if(deviceLabel.contains(dataPointNumberPair.key)){
+                    if(dataPointCounters.all { x -> x.value >= dataPointNumberPair.value}){
+                        GUIMain.loggerService.log(Level.INFO, "Stopping trace data store actor storing data")
+                        return true
+                    }
                 }
             }
+            return false
         }
-        return false
-//        return GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
     }
 
     private fun sendData(){

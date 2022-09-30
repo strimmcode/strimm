@@ -78,45 +78,45 @@ class CameraDataStoreActor : AbstractActor() {
                 }
                 .match<STRIMMImage>(STRIMMImage::class.java) { image ->
                     if (acquiring) { //This flag prevents data store actors acquiring during preview mode
-                        val shouldStop = checkIfShouldStop(image.sourceCamera)
-                        if (!shouldStop) {
-                            println(GUIMain.experimentService.experimentStream.cameraDataStoreActors[getSelf()]  + " " + "  time: " + image.timeAcquired)
-                            when (image.pix) {
-                                is ByteArray -> {
-                                    imgStack.byteStack.add(
-                                        ByteImg(
-                                            image.pix,
-                                            image.w.toLong(),
-                                            image.h.toLong(),
-                                            image.sourceCamera
-                                        )
+                        println(GUIMain.experimentService.experimentStream.cameraDataStoreActors[getSelf()]  + " " + "  time: " + image.timeAcquired)
+                        when (image.pix) {
+                            is ByteArray -> {
+                                imgStack.byteStack.add(
+                                    ByteImg(
+                                        image.pix,
+                                        image.w.toLong(),
+                                        image.h.toLong(),
+                                        image.sourceCamera
                                     )
-                                }
-                                is ShortArray -> {
-                                        imgStack.shortStack.add(
-                                            ShortImg(
-                                                image.pix,
-                                                image.w.toLong(),
-                                                image.h.toLong(),
-                                                image.sourceCamera
-                                            )
-                                        )
-
-                                }
-                                is FloatArray -> {
-                                    imgStack.floatStack.add(
-                                        FloatImg(
-                                            image.pix,
-                                            image.w.toLong(),
-                                            image.h.toLong(),
-                                            image.sourceCamera
-                                        )
-                                    )
-                                }
+                                )
                             }
-                            imgStackInfo.add(CameraMetaDataStore(image.timeAcquired, image.sourceCamera, imageCounter))
-                            imageCounter++
-                        } else {
+                            is ShortArray -> {
+                                    imgStack.shortStack.add(
+                                        ShortImg(
+                                            image.pix,
+                                            image.w.toLong(),
+                                            image.h.toLong(),
+                                            image.sourceCamera
+                                        )
+                                    )
+
+                            }
+                            is FloatArray -> {
+                                imgStack.floatStack.add(
+                                    FloatImg(
+                                        image.pix,
+                                        image.w.toLong(),
+                                        image.h.toLong(),
+                                        image.sourceCamera
+                                    )
+                                )
+                            }
+                        }
+                        imgStackInfo.add(CameraMetaDataStore(image.timeAcquired, image.sourceCamera, imageCounter))
+                        imageCounter++
+
+                        val shouldStop = checkIfShouldStop(image.sourceCamera)
+                        if (shouldStop) {
                             println("CAMERA Send data")
                             sendData()
                             GUIMain.loggerService.log(Level.INFO, "Camera data store actor no longer acquiring")
@@ -133,26 +133,18 @@ class CameraDataStoreActor : AbstractActor() {
 
     private fun checkIfShouldStop(deviceLabel : String) : Boolean {
         //TODO configure this to be based on either an elapsed time or number of data points received
-
-
-        val bKeyPressed = GUIMain.protocolService.jdaq.GetKeyState(GUIMain.experimentService.expConfig.TerminateAcquisitionVirtualCode)  //1
-       // println("TERRY: checkIfShouldSop" + bKeyPressed.toString())
+        val bKeyPressed = GUIMain.protocolService.jdaq.GetKeyState(GUIMain.experimentService.expConfig.TerminateAcquisitionVirtualCode)
         if (bKeyPressed) {
             return true
         }
 
-//        for(dataPointNumberPair in GUIMain.experimentService.deviceDatapointNumbers){
-//            if(deviceLabel.contains(dataPointNumberPair.key)){
-//                if(imageCounter >= dataPointNumberPair.value){
-//                    println("camera data store actor shouldstop is true")
-//                    return true
-//                }
-//            }
-//        }
-//        return false
-
-        return GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
-//        return imageCounter >= GUIMain.experimentService.deviceDatapointNumbers[deviceLabel]!!
+        return if(GUIMain.protocolService.isEpisodic){
+            GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
+        }
+        else{
+            //Continuous
+            imageCounter >= GUIMain.experimentService.deviceDatapointNumbers[deviceLabel]!!
+        }
     }
 
     private fun sendData(){

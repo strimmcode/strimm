@@ -2,12 +2,14 @@ package uk.co.strimm.services
 
 
 //import com.fazecast.jSerialComm.SerialPort
+import com.fazecast.jSerialComm.SerialPort
 import net.imagej.ImageJService
 import org.scijava.plugin.Plugin
 import org.scijava.service.AbstractService
 import org.scijava.service.Service
 import uk.co.strimm.experiment.ExperimentConfiguration
 import uk.co.strimm.gui.GUIMain
+import java.util.logging.Level
 
 @Plugin(type = Service::class)
 class ProtocolService : AbstractService(), ImageJService  {
@@ -38,11 +40,32 @@ class ProtocolService : AbstractService(), ImageJService  {
     //
     //
     //
-    var bNIDAQUsed = false;
+    var bNIDAQUsed = false
+    var isEpisodic = false
     public var jdaq = JDAQ()
     var bStartExperiment = false
     public var experimentStartTime = 0.0
-   // var COMPort =  SerialPort.getCommPort("COM5")
+    private var COMPort : SerialPort? = null
+
+    /**
+     * Singleton so an instance of the COM port is only created once
+     * @return A SerialPort object that can be null. Need to check for null when this is called
+     */
+    fun COMPort() : SerialPort? {
+        if(COMPort == null){
+            COMPort =  SerialPort.getCommPort("COM5") //TODO hardcoded should come from experiment config
+            return if (COMPort!!.openPort()) {
+                GUIMain.loggerService.log(Level.INFO, "COM port opened")
+                COMPort
+            }
+            else{
+                null
+            }
+        } else{
+            return COMPort
+        }
+    }
+
     var szFolder = ".\\Protocols\\" //TODO hardcoded
 
     init{
@@ -51,10 +74,6 @@ class ProtocolService : AbstractService(), ImageJService  {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            println("hi there")
-
-
-
         }
     }
     fun Init(expConfig : ExperimentConfiguration) : Int {

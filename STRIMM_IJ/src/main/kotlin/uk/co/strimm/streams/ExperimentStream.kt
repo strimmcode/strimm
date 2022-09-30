@@ -1961,6 +1961,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                     //also the source can be further parameterised with param1, param2, ... , param4
                     if (source.sourceType == "NIDAQSource") {
                         GUIMain.protocolService.SetNIDAQUsed(true)
+                        GUIMain.protocolService.isEpisodic = true
                         var numAOChannels = GUIMain.protocolService.GetNumChannels(0)
                         var numAIChannels = GUIMain.protocolService.GetNumChannels( 1)
                         var numDOChannels = GUIMain.protocolService.GetNumChannels( 2)
@@ -1986,6 +1987,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                             dummyOverlay.name =
                                 expSource.traceSourceName + " " + "ai" + chan.toString() + " " + Random().nextInt(1000)
                             dummyAI.add(dummyOverlay)
+
+                            val numPoints = GUIMain.protocolService.GetNumberOfDataPoints()
+                            GUIMain.experimentService.deviceDatapointNumbers[dummyOverlay.name] = numPoints
                         }
                         for (f in 0 until numDOChannels) {
                             val dummyOverlay = EllipseOverlay()
@@ -1993,6 +1997,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                             dummyOverlay.name =
                                 expSource.traceSourceName + " " + "do" + chan.toString() + " " + Random().nextInt(1000)
                             dummyDO.add(dummyOverlay)
+
+                            val numPoints = GUIMain.protocolService.GetNumberOfDataPoints()
+                            GUIMain.experimentService.deviceDatapointNumbers[dummyOverlay.name] = numPoints
                         }
                         for (f in 0 until numDIChannels) {
                             val dummyOverlay = EllipseOverlay()
@@ -2000,6 +2007,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                             dummyOverlay.name =
                                 expSource.traceSourceName + " " + "di" + chan.toString() + " " + Random().nextInt(1000)
                             dummyDI.add(dummyOverlay)
+
+                            val numPoints = GUIMain.protocolService.GetNumberOfDataPoints()
+                            GUIMain.experimentService.deviceDatapointNumbers[dummyOverlay.name] = numPoints
                         }
 
                         val getTraceDataMethodNIDAQ =
@@ -2214,18 +2224,29 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
     //just sends the incoming byte data to the Arduino
         var dat = data[0]
         var incomingData = dat[0].data.second.toInt()
+        val COMPort = GUIMain.protocolService.COMPort()
     //println("*********** " + incomingData)
-//        if (incomingData >= 0  && incomingData <= 200){
-//            //pass it through the serial connector to the program running on the Arduino
-//                try {
-//                    GUIMain.protocolService.COMPort.outputStream.write(byteArrayOf(incomingData.toByte()))
-//                } catch(ex : Exception){
-//                    println("ARDUINO_FAIL")
-//                    println(ex.message)
-//                }
-//        }
+        if (incomingData in 0..200){
+            //pass it through the serial connector to the program running on the Arduino
+            try {
+                val dataToWrite = byteArrayOf(incomingData.toByte())
+                if(dataToWrite.isNotEmpty()) {
+                    if(COMPort != null) {
+                        COMPort.outputStream.write(dataToWrite)
+                    }
+                    else{
+                        throw Exception("COM Port is null")
+                    }
+                }
+            }
+            catch(ex : Exception){
+                GUIMain.loggerService.log(Level.SEVERE, "Error in sending data to arduino over COM port. Message: ${ex.message}" )
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+            }
+        }
         return data
     }
+
     private fun Threshold_Flow_Controller(data : List<List<TraceData>>, threshold : Double, channel : Int, type : Int ): List<List<TraceData>> {
         var dat = data[0]
         var len = dat.size
@@ -3237,7 +3258,6 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig 
                         val overlay = ROIManager.createOverlayFromROIObject(roi)
                         //find the associated sink for this flow
                         var displaySink  = GUIMain.experimentService.experimentStream.expConfig.sinkConfig.sinks.filter{snk-> snk.roiFlowName == flow.flowName}.first()
-
 
                         //Setting colours for ROIs
                         var colNum =(GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[flow.flowName]) as Int
