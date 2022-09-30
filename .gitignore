@@ -3,14 +3,17 @@ Launch_STRIMM
 STRIMM/target/*
 STRIMM/*.log
 STRIMM/.idea/*
+STRIMM/.idea/**
 
 STRIMM_IJ/target
 STRIMM_IJ/target/*
 STRIMM_IJ/.idea/*
+STRIMM_IJ/.idea/**
 STRIMM_IJ/log/*
 STRIMM_JNI/target
 STRIMM_JNI/target/*
 STRIMM_JNI/.idea/*
+STRIMM_JNI/.idea/**
 
 Test/.vs/*
 Project2/*
@@ -19,6 +22,8 @@ CreateCSV/.vs/*
 .idea/*
 WorkingDirectory/log/*
 WorkingDirectory/*.log
+WorkingDirectory/ExperimentOutput/**
+WorkingDirectory/ExperimentOutput/*
 target/*
 **.bak
 *.bak
@@ -32,7 +37,7 @@ settings.json
 *.h5
 **.h5
 *.desc
-ExperimentOutput/*
+
 Akkatest/*
 Akkatest
 package/STRIMM.app/*
