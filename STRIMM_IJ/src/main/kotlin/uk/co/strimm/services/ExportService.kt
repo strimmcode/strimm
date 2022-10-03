@@ -14,7 +14,7 @@ import org.scijava.service.AbstractService
 import org.scijava.service.Service
 import uk.co.strimm.*
 import uk.co.strimm.gui.GUIMain
-import uk.co.strimm.gui.TraceSeries
+import uk.co.strimm.TraceSeries
 import java.io.File
 import java.io.FileWriter
 import java.text.DecimalFormat
@@ -22,7 +22,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.logging.Level
-import kotlin.experimental.and
 
 @Plugin(type = Service::class)
 class ExportService : AbstractService(), ImageJService {

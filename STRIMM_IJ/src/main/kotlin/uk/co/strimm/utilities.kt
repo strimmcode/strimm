@@ -2,11 +2,11 @@ package uk.co.strimm
 
 import com.google.common.collect.HashBiMap
 import com.google.gson.annotations.SerializedName
+import javafx.scene.chart.XYChart
 import net.imagej.overlay.Overlay
 import org.scijava.module.*
 import org.scijava.plugin.PluginInfo
 import uk.co.strimm.MicroManager.MMCameraDevice
-import uk.co.strimm.gui.TraceSeries
 import uk.co.strimm.plugins.DataDescription
 import uk.co.strimm.plugins.PipelinePlugin
 import uk.co.strimm.services.LoggerService
@@ -167,3 +167,15 @@ data class ResizeValues(val x : Long?, val y : Long?, val w : Long?, val h : Lon
 data class ExportSettings(val result: Boolean, val extension: String, val delimiter: String?, val seriesExport : HashMap<TraceSeries, Pair<Double, Double>>)
 
 data class TraceDataWithFrameNumbers(val data : Pair<List<Int>,List<ArrayList<TraceData>>>)
+
+/**
+ * This is used with the TraceWindow class
+ */
+data class TraceSeries(var xLowerTimeIndex : Int = 0,
+                       var xUpperTimeIndex : Int = 0,
+                       var xLowerDataIndex : Int = 0,
+                       var xUpperDataIndex : Int = 0,
+                       var series : XYChart.Series<Number, Number>, //javaFx series
+                       var frameNumbers : ArrayList<Int>,
+                       val roi : Overlay?, // IJ overlay
+                       val seriesName : String)
