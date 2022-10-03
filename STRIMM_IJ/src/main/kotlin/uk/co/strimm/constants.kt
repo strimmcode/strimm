@@ -28,6 +28,7 @@ class Paths{
         const val TRACE_DATA_PREFIX = "traceoutput"
         const val LUTS_FOLDER = "./luts"
         const val DEVICE_ADAPTERS_FOLDER = "./DeviceAdapters"
+        const val PROTOCOLS_FOLDER = ".\\Protocols\\" //Slashes have to be backward to work with NIDAQ
     }
 
     class Icons{
