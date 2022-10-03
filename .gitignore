@@ -4,6 +4,7 @@ STRIMM/target/*
 STRIMM/*.log
 STRIMM/.idea/*
 STRIMM/.idea/**
+STRIMM/.idea/workspace.xml
 
 STRIMM_IJ/target
 STRIMM_IJ/target/*
