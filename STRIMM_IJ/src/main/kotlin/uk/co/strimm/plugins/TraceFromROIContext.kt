@@ -34,7 +34,6 @@ import javax.swing.*
 import javax.swing.plaf.basic.BasicArrowButton
 import kotlin.collections.ArrayList
 
-var debugTW = false
 /**
  * This class will handle the "Trace from ROI" right click event from overlays on image feeds. Upon right clicking on an
  * image feed and selecting "Trace from ROI", either a new trace window will be created or the trace will be added to
@@ -42,10 +41,10 @@ var debugTW = false
  * of the main experiment graph
  */
 @Plugin(type = Command::class,
-        menu=[(Menu(label = "Trace from ROI"))],
+        menu = [(Menu(label = "Trace from ROI"))],
         menuRoot = "context-ImageDisplay",
         headless = true,
-        attrs = [Attr(name="no-legacy")])
+        attrs = [Attr(name = "no-legacy")])
 class TraceFromROIContextDisplay : ContextCommand() {
     companion object {
         const val DIALOG_HEIGHT = 200
@@ -59,57 +58,55 @@ class TraceFromROIContextDisplay : ContextCommand() {
     /**
      * This method will create and show a new dialog to specify the relevant settings for the new trace feed
      */
-    fun setUpDialog(){
+    fun setUpDialog() {
         val dialogLayout = FlowLayout()
         val panel = JPanel()
         panel.layout = dialogLayout
-        panel.preferredSize = Dimension(150,50)
+        panel.preferredSize = Dimension(150, 50)
 
         val result = JOptionPane.showConfirmDialog(GUIMain.strimmUIService.strimmFrame, panel, "Confirm Trace from ROI", JOptionPane.OK_CANCEL_OPTION)
-        if(result == JOptionPane.OK_OPTION){
+        if (result == JOptionPane.OK_OPTION) {
             val displaySinkName = GUIMain.actorService.getPertainingDisplaySinkNameFromDockableTitle(GUIMain.strimmUIService.currentFocusedDockableTitle)
-            println("Pertaining displaysink name " + displaySinkName)
-            var curVal = 0
-            var sink : uk.co.strimm.experiment.Sink? = null
+            val curVal: Int
+            val sink: uk.co.strimm.experiment.Sink?
             var sinkName = ""
-            if (displaySinkName != null){
+            if (displaySinkName != null) {
                 //retrieve the Sink for associated with the docking window in focus
-                sink = GUIMain.experimentService.experimentStream.expConfig.sinkConfig.sinks.filter{src->src.sinkName == displaySinkName}.first()
-                //each sink knows its roiFlowName and then can find the current next colourValue
-                println("sink associated found with name " + sink.sinkName)
-                println("this is associated with roiFlow " + sink.roiFlowName)
-                if (sink.roiFlowName != ""){
-                curVal  = GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[sink.roiFlowName] as Int
-                println("current number of traces with this roiFlow " + curVal.toString())
-                //the overlayService maintains an array of overlays
-                var ixLatestOverlay = GUIMain.overlayService.overlays.size - 1
-                if (ixLatestOverlay < 0) ixLatestOverlay = 0
-                var sel : Overlay?= GUIMain.overlayService.overlays[ixLatestOverlay ]
-                    //println("Total  number of applied ROIs " + GUIMain.strimm]
-                println("Total  number of applied ROIs " + GUIMain.strimmUIService.traceFromROICounter)
-                println("Total number reported by the overlayService " + GUIMain.overlayService.overlays.size)
-                println("Get the last attached Overlay from the overlayService")
-                // can see a problem here with multiple traces this has not been changes
-                if (curVal < GUIMain.roiColours.size) {
-                    var col : Color = GUIMain.roiColours[curVal]
-                    sel!!.fillColor = ColorRGB((255.0 * col.red).toInt(), (255.0 * col.green).toInt(), (255.0 * col.blue).toInt())
-                   // sel!!.lineColor = ColorRGB(255,0,0)   //these clash at the moment
-                }
-                else {
-                    sel!!.fillColor = ColorRGB(100, 100, 100)
-                  // sel!!.lineColor = ColorRGB(100, 100, 100)
-                }
+                sink = GUIMain.experimentService.experimentStream.expConfig.sinkConfig.sinks.filter { src -> src.sinkName == displaySinkName }.first()
 
-                GUIMain.actorService.routedRoiOverlays[sel] = sink.roiFlowName
-                var ddd = GUIMain.strimmUIService.traceColourByFlowAndOverlay[sink.roiFlowName] as ArrayList<Pair<Overlay, Int>>
-                ddd.add(Pair(sel, curVal))
-                GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[sink.roiFlowName] = curVal + 1
+                //each sink knows its roiFlowName and then can find the current next colourValue
+                if (sink.roiFlowName != "") {
+                    curVal = GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[sink.roiFlowName] as Int
+
+                    //the overlayService maintains an array of overlays
+                    var ixLatestOverlay = GUIMain.overlayService.overlays.size - 1
+                    if (ixLatestOverlay < 0) {
+                        ixLatestOverlay = 0
+                    }
+
+                    val sel: Overlay? = GUIMain.overlayService.overlays[ixLatestOverlay]
+                    GUIMain.loggerService.log(Level.INFO, "Total  number of applied ROIs is " + GUIMain.strimmUIService.traceFromROICounter)
+                    GUIMain.loggerService.log(Level.INFO,"Total number reported by the overlayService is " + GUIMain.overlayService.overlays.size)
+
+                    // can see a problem here with multiple traces this has not been changes
+                    if (curVal < GUIMain.roiColours.size) {
+                        val col: Color = GUIMain.roiColours[curVal]
+                        sel!!.fillColor = ColorRGB((255.0 * col.red).toInt(), (255.0 * col.green).toInt(), (255.0 * col.blue).toInt())
+                        // sel!!.lineColor = ColorRGB(255,0,0)   //these clash at the moment
+                    } else {
+                        sel!!.fillColor = ColorRGB(100, 100, 100)
+                        // sel!!.lineColor = ColorRGB(100, 100, 100)
+                    }
+
+                    GUIMain.actorService.routedRoiOverlays[sel] = sink.roiFlowName
+                    val overlayDetailsList = GUIMain.strimmUIService.traceColourByFlowAndOverlay[sink.roiFlowName] as ArrayList<Pair<Overlay, Int>>
+                    overlayDetailsList.add(Pair(sel, curVal))
+                    GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[sink.roiFlowName] = curVal + 1
                 }
                 else {
-                    println("No trace plot associated with this Display")
+                    GUIMain.loggerService.log(Level.WARNING,"No trace plot associated with this Display")
                 }
             }
-
         }
     }
 
@@ -120,10 +117,10 @@ class TraceFromROIContextDisplay : ContextCommand() {
      * @param currentStream The currently loaded and running experiment stream
      * @param isStore The option of if the trace from ROI data should be stored also
      */
-    fun createTraceFeedForROI(selectedFlowsModel : DefaultListModel<String>,
-                              windowOptionList : JComboBox<String>,
-                              currentStream : ExperimentStream,
-                              isStore : Boolean){
+    fun createTraceFeedForROI(selectedFlowsModel: DefaultListModel<String>,
+                              windowOptionList: JComboBox<String>,
+                              currentStream: ExperimentStream,
+                              isStore: Boolean) {
         /*
             Note - we can't get the overlay from the active image display via imageDisplayService.activeImageDisplay.
             This is because activeImageDisplay is the most recently active image display. So when there is more than
@@ -132,50 +129,47 @@ class TraceFromROIContextDisplay : ContextCommand() {
          */
 
         //Get the ROI that has been right click -> Trace from ROI
-        var selectedROI : Overlay? = null
+        var selectedROI: Overlay? = null
         try {
             //overlayService maintains a list of overlays, the last one must be the one selected
             selectedROI = GUIMain.overlayService.overlays[GUIMain.strimmUIService.traceFromROICounter]
             GUIMain.strimmUIService.traceFromROICounter++
-        }
-        catch(ex : IndexOutOfBoundsException){
+        } catch (ex: IndexOutOfBoundsException) {
             GUIMain.loggerService.log(Level.SEVERE, "traceFromROICounter out of bounds of overlayService.overlays list")
         }
 
         //Get the pertaining camera and camera device label
-        //
         val cameraActor = GUIMain.actorService.getPertainingCameraActorFromDockableTitle(GUIMain.strimmUIService.currentFocusedDockableTitle)
 
-//the camera actor has a device label which will be used to id the source
+        //the camera actor has a device label which will be used to id the source
         //this is used to go upstream from the sink
         val cameraDeviceLabel = GUIMain.actorService.getPertainingCameraDeviceLabelForActor(cameraActor!!)
-//
+
         //Get the corresponding source
         selectedROI!!.name = cameraDeviceLabel + "TraceROI" + Random().nextInt(1000) //TODO magic string
         var source = ExperimentImageSource("", "")
         try {
             source = currentStream.experimentImageSources.first { x -> cameraActor.path().name().contains(x.deviceLabel) }
-        }
-        catch(ex : Exception){
+        } catch (ex: Exception) {
             GUIMain.loggerService.log(Level.SEVERE, "Could not find image source for camera actor ${cameraActor.path().name()}")
         }
-//we will now add an roi to this source how we do this depends on whether we need to add another tracedisplay
-        //or add it to an existing one also whether we need to save the trace
-        val traceActor : ActorRef?
 
-        if(windowOptionList.selectedItem.toString() == ExperimentConstants.ConfigurationProperties.NEW_WINDOW){
+        //we will now add an roi to this source how we do this depends on whether we need to add another tracedisplay
+        //or add it to an existing one also whether we need to save the trace
+        val traceActor: ActorRef?
+
+        if (windowOptionList.selectedItem.toString() == ExperimentConstants.ConfigurationProperties.NEW_WINDOW) {
             //New window means new actor and new trace window plugin
 
             val pluginCreation = currentStream.createTracePluginWithActor(cameraDeviceLabel!!)
             //first is ActorRef and second is DockableWindowPlugin
             pluginCreation.second?.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
             //traceActor is part of the pluginCreation  strange to search for it
-            traceActor = currentStream.traceActors.filter { x -> x.key.path().name() == pluginCreation.first!!.path().name()}.keys.first()
+            traceActor = currentStream.traceActors.filter { x -> x.key.path().name() == pluginCreation.first!!.path().name() }.keys.first()
 
             //now have the traceActor for the new plot as well as the plugin which will have the tracewindow
             //the trace actor is now set to receive messages from the akka graph
-        }
-        else {
+        } else {
             //Existing window means find the trace actor that already exists
             selectedROI.name = GUIMain.experimentService.makeUniqueROIName(cameraDeviceLabel!!)
 
@@ -183,25 +177,18 @@ class TraceFromROIContextDisplay : ContextCommand() {
             val allTraceActors = GUIMain.actorService.getActorsOfType(TraceActor::class.java)
             //finds the traceActor via the name supplied in the dialog box
 
-            traceActor = allTraceActors.first{ x -> GUIMain.actorService.getActorPrettyName(x.path().name()).toLowerCase() == selectedActorName }
+            traceActor = allTraceActors.first { x -> GUIMain.actorService.getActorPrettyName(x.path().name()).toLowerCase() == selectedActorName }
         }
-    //either way either have a traceactor which is already in the akka graph or one which is fully connected
+        //either way either have a traceactor which is already in the akka graph or one which is fully connected
         //to a window but is not in the graph
-
-
         //Due to image sources being broadcast hubs, we can dynamically create another stream from the existing
         //sinks. See populateSources() in ExperimentStream for where the broadcast hub is specified
-
-
         //so as expected we have found the source and then add another bit of a graph to it.
         //so does it suspend the current akka processing for the change and then resume?
-        if(source.deviceLabel.isNotEmpty()){
-
-            //this manages this
+        if (source.deviceLabel.isNotEmpty()) {
             runTraceROIGraph(traceActor, currentStream, selectedROI, source, isStore,
-                cameraActor, windowOptionList.selectedItem.toString())
-        }
-        else{
+                    cameraActor, windowOptionList.selectedItem.toString())
+        } else {
             GUIMain.loggerService.log(Level.SEVERE, "Could not find the source node pertaining to the roi display")
         }
     }
@@ -216,12 +203,12 @@ class TraceFromROIContextDisplay : ContextCommand() {
      * @param isStore The option of if the trace from ROI data should be stored also
      * @param cameraActor The camera actor pertaining to the image feed where the ROI has been drawn
      */
-    private fun runTraceROIGraph(traceActor : ActorRef,
+    private fun runTraceROIGraph(traceActor: ActorRef,
                                  currentStream: ExperimentStream,
-                                 selectedROI : Overlay,
-                                 source : ExperimentImageSource,
+                                 selectedROI: Overlay,
+                                 source: ExperimentImageSource,
                                  isStore: Boolean,
-                                 cameraActor: ActorRef, windowOption : String){
+                                 cameraActor: ActorRef, windowOption: String) {
         val baseFlowName = source.imgSourceName + "TraceROIFlow"
         val flowName = GUIMain.experimentService.makeUniqueFlowName(baseFlowName).second
         //Even though the experiment stream will be rebuilt once the user is done specifying ROIs, we will still use
@@ -232,10 +219,10 @@ class TraceFromROIContextDisplay : ContextCommand() {
 
         //so you could have another statistic
         val akkaFlow = Flow.of(STRIMMImage::class.java)
-            .map { image -> averageROIAcquisitionMethod.runMethod(image, flowName) }
-            .groupedWithin(ExperimentConstants.ConfigurationProperties.TRACE_GROUPING_AMOUNT,
-                Duration.ofMillis(ExperimentConstants.ConfigurationProperties.TRACE_GROUPING_DURATION_MS))
-            .async()
+                .map { image -> averageROIAcquisitionMethod.runMethod(image, flowName) }
+                .groupedWithin(ExperimentConstants.ConfigurationProperties.TRACE_GROUPING_AMOUNT,
+                        Duration.ofMillis(ExperimentConstants.ConfigurationProperties.TRACE_GROUPING_DURATION_MS))
+                .async()
 
         val akkaSink: Sink<List<ArrayList<TraceData>>, NotUsed> = Sink.actorRefWithAck(traceActor, StartStreamingTraceROI(),
                 Acknowledgement.INSTANCE, CompleteStreamingTraceROI()) { ex -> FailStreamingTraceROI(ex) }
@@ -255,7 +242,6 @@ class TraceFromROIContextDisplay : ContextCommand() {
 //        GUIMain.actorService.cameraActorDisplays.forEach { name, actorRef ->
 //            actorRef.tell(TellCameraIsAcquiring(true), ActorRef.noSender())
 //        }
-//        GUIMain.experimentService.calculateNumberOfDataPointsFromInterval(selectedROI.name, source.intervalMs)
         GUIMain.experimentService.calculateNumberOfDataPointsFromFrequency(selectedROI.name, 10.0)//TODO hardcoded
         createAndAddToNewConfig(source, isStore, selectedROI, currentStream, windowOption, traceActor)
     }
@@ -270,7 +256,7 @@ class TraceFromROIContextDisplay : ContextCommand() {
      * @param windowOption The destination trace feed of the new trace ROI (new window or existing)
      * @param traceActor The trace actor relating to the target trace feed display
      */
-    fun createAndAddToNewConfig(sourceNode : ExperimentImageSource, isStore : Boolean, selectedROI : Overlay, currentStream: ExperimentStream, windowOption : String, traceActor: ActorRef){
+    fun createAndAddToNewConfig(sourceNode: ExperimentImageSource, isStore: Boolean, selectedROI: Overlay, currentStream: ExperimentStream, windowOption: String, traceActor: ActorRef) {
         //Create a new config first by copying the existing one
         GUIMain.experimentService.createNewConfigFromExisting()
 
@@ -302,7 +288,7 @@ class TraceFromROIContextDisplay : ContextCommand() {
 
         val isNewTraceFeed = isAddingToNewTraceFeed(traceActor, currentStream)
 
-        if(isStore) {
+        if (isStore) {
             val storeSinkToAdd = uk.co.strimm.experiment.Sink()
             val baseStoreSinkName = sourceNode.imgSourceName + "TraceROIStore"
             storeSinkToAdd.sinkName = GUIMain.experimentService.makeUniqueSinkName(baseStoreSinkName)
@@ -313,8 +299,7 @@ class TraceFromROIContextDisplay : ContextCommand() {
             storeSinkToAdd.actorPrettyName = GUIMain.actorService.getActorPrettyName(traceActor.path().name())
 
             GUIMain.experimentService.addSinksToNewConfig(listOf(displaySinkToAdd, storeSinkToAdd), windowOption, isNewTraceFeed)
-        }
-        else{
+        } else {
             GUIMain.experimentService.addSinksToNewConfig(listOf(displaySinkToAdd), windowOption, isNewTraceFeed)
         }
 
@@ -331,7 +316,7 @@ class TraceFromROIContextDisplay : ContextCommand() {
      * @param currentStream The current experiment stream
      * @return If the target feed has been created in a trace from ROI context
      */
-    fun isAddingToNewTraceFeed(traceActor : ActorRef, currentStream: ExperimentStream) : Boolean{
+    fun isAddingToNewTraceFeed(traceActor: ActorRef, currentStream: ExperimentStream): Boolean {
         return traceActor.path().name() in currentStream.newTraceROIActors.map { x -> x.key.path().name() }
     }
 
@@ -342,7 +327,7 @@ class TraceFromROIContextDisplay : ContextCommand() {
      * @param nodeList The list of available flows
      * @param selectedFlowsModel The list
      */
-    private fun addArrowButtonListener(arrowButton: BasicArrowButton, nodeList : JList<String>, selectedFlowsModel : DefaultListModel<String>){
+    private fun addArrowButtonListener(arrowButton: BasicArrowButton, nodeList: JList<String>, selectedFlowsModel: DefaultListModel<String>) {
         arrowButton.addActionListener {
             //TODO specify enable/disable logic here i.e. what nodes can go to what other nodes
             val selectedNode = nodeList.selectedValue

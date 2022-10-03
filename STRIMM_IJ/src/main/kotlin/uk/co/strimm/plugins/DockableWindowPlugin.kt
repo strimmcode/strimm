@@ -29,7 +29,7 @@ import javax.swing.JPanel
 abstract class AbstractDockableWindow : DockableWindowPlugin {
     lateinit var windowPanel: JPanel
     val dockableFactoryId = "strimm-dockable-factory"
-    var associatedActor : ActorRef? = null
+    var associatedActor: ActorRef? = null
 
     /**
      * In the docking frames framework, the grid is a static feature. It is meant to be a specification that doesn't
@@ -39,10 +39,10 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
      * More info can be found at https://forum.byte-welt.net/t/common-finding-dockables-positioned-relative-to-dockable/1896/7
      * @param newDockable The new dockable to add to the grid, null if the redeployment follows a window being closed
      */
-    override fun redeployGrid(newDockable : MultipleCDockable?) {
+    override fun redeployGrid(newDockable: MultipleCDockable?) {
         //Go through the existing dockables, add them to a new grid
         val newGrid = CGrid(GUIMain.strimmUIService.dockableControl)
-        if(GUIMain.strimmUIService.dockableControl.cDockableCount > 0) {
+        if (GUIMain.strimmUIService.dockableControl.cDockableCount > 0) {
             for (i in 0 until GUIMain.strimmUIService.dockableControl.cDockableCount) {
 
                 val currentDockable = GUIMain.strimmUIService.dockableControl.getCDockable(i)
@@ -63,7 +63,7 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
             }
         }
 
-        if(newDockable != null){
+        if (newDockable != null) {
             addNewDockableToGrid(newGrid, newDockable)
         }
 
@@ -74,9 +74,8 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
     /**
      * Class so we can know which window is currently in focus based on it's title
      */
-    class FocusListenerClass : CFocusListener{
-        override fun focusLost(p0: CDockable?) {
-        }
+    class FocusListenerClass : CFocusListener {
+        override fun focusLost(p0: CDockable?) {}
 
         override fun focusGained(p0: CDockable?) {
             val dockableWindow = p0!! as DefaultMultipleCDockable
@@ -89,10 +88,10 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
      * @param newGrid The new dockable window grid
      * @param newDockable The new dockable window
      */
-    private fun addNewDockableToGrid(newGrid : CGrid, newDockable: MultipleCDockable?){
+    private fun addNewDockableToGrid(newGrid: CGrid, newDockable: MultipleCDockable?) {
         //Calculate the position of the new dockable and add it to the new grid
         val position = calculateDockablePosition(GUIMain.strimmUIService.dockableControl.cDockableCount)
-        newGrid.add(position.x,position.y,position.width,position.height, newDockable)
+        newGrid.add(position.x, position.y, position.width, position.height, newDockable)
     }
 
     /**
@@ -101,23 +100,22 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
      * @param currentNumDockables The current number of dockables (excludes new one)
      * @return A class representing the dockable window x,y,w,h values
      */
-    private fun calculateDockablePosition(currentNumDockables : Int) : DockableWindowPosition{
+    private fun calculateDockablePosition(currentNumDockables: Int): DockableWindowPosition {
         val x: Double
         val y: Double
         val w = 1.0
         val h = 2.0
 
-        if(currentNumDockables % 2 == 0){ //First column
+        if (currentNumDockables % 2 == 0) { //First column
             x = 1.0
-            y = currentNumDockables+1.toDouble()
-        }
-        else{ //Second column
+            y = currentNumDockables + 1.toDouble()
+        } else { //Second column
             x = 2.0
-            y = Math.ceil((currentNumDockables/2).toDouble())
+            y = Math.ceil((currentNumDockables / 2).toDouble())
         }
 
         //NOTE - Position values are relative and based on a grid
-        return DockableWindowPosition(x,y,w,h)
+        return DockableWindowPosition(x, y, w, h)
     }
 
     /**
@@ -125,18 +123,13 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
      * This then redeploys the grid to reflect the change
      * @param dockingControl The main docking frames control
      */
-    inner class CustomCloseAction(dockingControl : CControl?) : CCloseAction(dockingControl) {
+    inner class CustomCloseAction(dockingControl: CControl?) : CCloseAction(dockingControl) {
         override fun close(dockable: CDockable?) {
             GUIMain.loggerService.log(Level.INFO, "Closing multiple dockable window")
             val dockableFrame = dockable as DefaultMultipleCDockable
 
             //Detach the window controller from the actor
             associatedActor?.tell(DetatchController(), Actor.noSender())
-
-            //TW 4_10_21 the next line causes a crash when changing experiment which has a different camera
-            //removing it seems to stop the issue - but I dont know why.
-            //dockableFrame.isVisible = false   //REMOVED 4_10_21
-
 
             super.close(dockable)
             GUIMain.strimmUIService.dockableControl.removeDockable(dockableFrame)
@@ -151,19 +144,17 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
      * @param title The title of the dockable window (must be unique)
      * @return The new dockable window
      */
-    override fun createDock(title: String) : DefaultMultipleCDockable {
+    override fun createDock(title: String): DefaultMultipleCDockable {
         windowPanel = JPanel()
 
         //Setting the layout to null prevents a bug where the image jolts when clicking/drawing an ROI
-//        windowPanel.layout = null
         windowPanel.layout = GridLayout(0, 1)
         windowPanel.isOpaque = true
         windowPanel.background = CAMERA_FEED_BACKGROUND_COLOUR
 
-
         //MultipleDockables always require a factory
-        if(GUIMain.strimmUIService.dockableControl.getMultipleDockableFactory(dockableFactoryId) == null) {
-            GUIMain.loggerService.log(Level.INFO,"Dockable factory is null. Creating factory...")
+        if (GUIMain.strimmUIService.dockableControl.getMultipleDockableFactory(dockableFactoryId) == null) {
+            GUIMain.loggerService.log(Level.INFO, "Dockable factory is null. Creating factory...")
             GUIMain.strimmUIService.dockableControl.addMultipleDockableFactory(dockableFactoryId, GUIMain.dockableWindowPluginService.multipleDockableFactory)
         }
 
@@ -181,13 +172,13 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
      * @param frame STRIMM's main JFrame
      * @return Boolean value for successful or failed docking
      */
-    override fun dock(control : CControl, frame : JFrame?) : Boolean{
+    override fun dock(control: CControl, frame: JFrame?): Boolean {
         //Add the dockable content area to STRIMM's main JFrame (important)
         frame?.add(GUIMain.strimmUIService.dockableControl.contentArea)
 
         //Wrap the grid redeployment in an invoke later call. This will prevent a concurrent modification exception
         java.awt.EventQueue.invokeLater {
-            run{
+            run {
                 //Now that a new window has been added, redeploy the grid so it can be added in a new position
                 redeployGrid(dockableWindowMultiple)
             }
@@ -199,12 +190,12 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
 
         //Add a custom close action to ensure we do what we need when closing
         val action = CustomCloseAction(control)
-        dockableWindowMultiple.putAction(MultipleCDockable.ACTION_KEY_CLOSE,action)
+        dockableWindowMultiple.putAction(MultipleCDockable.ACTION_KEY_CLOSE, action)
         dockableWindowMultiple.addFocusListener(FocusListenerClass())
         return true
     }
 
-    override fun close(){
+    override fun close() {
         this.CustomCloseAction(GUIMain.strimmUIService.dockableControl).close(dockableWindowMultiple)
     }
 
@@ -218,13 +209,13 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
 /**
  * This is the interface for all dockable window plugins
  */
-interface DockableWindowPlugin : ImageJPlugin{
-    fun createDock(title : String) : DefaultMultipleCDockable
-    fun dock(control : CControl, frame : JFrame?) : Boolean
-    fun redeployGrid(newDockable : MultipleCDockable?)
-    var dockableWindowMultiple : DefaultMultipleCDockable
-    var title : String
-    fun setCustomData(data : Any?) = Unit
+interface DockableWindowPlugin : ImageJPlugin {
+    fun createDock(title: String): DefaultMultipleCDockable
+    fun dock(control: CControl, frame: JFrame?): Boolean
+    fun redeployGrid(newDockable: MultipleCDockable?)
+    var dockableWindowMultiple: DefaultMultipleCDockable
+    var title: String
+    fun setCustomData(data: Any?) = Unit
     fun initialise() = Unit
     fun close() = Unit
 }

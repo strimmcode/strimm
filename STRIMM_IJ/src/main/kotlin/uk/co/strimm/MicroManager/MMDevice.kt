@@ -6,54 +6,56 @@ import mmcorej.PropertyType
 import uk.co.strimm.gui.GUIMain
 import uk.co.strimm.services.MMCoreService
 import java.io.Closeable
+import java.util.logging.Level
 
-private fun rn(name : String) = name + java.util.UUID.randomUUID().toString()
+private fun rn(name: String) = name + java.util.UUID.randomUUID().toString()
 
-sealed class MMDevice(val devName : String, val library : String, var label : String, val loaded : Boolean) : Closeable {
-    public var core = MMCoreService.core
-    init {
-    }
-    public fun setCameraCore(cor : CMMCore){
+sealed class MMDevice(val devName: String, val library: String, var label: String, val loaded: Boolean) : Closeable {
+    var core = MMCoreService.core
+
+    fun setCameraCore(cor: CMMCore) {
         core = cor
     }
-    public fun loadDevice(){
+
+    fun loadDevice() {
         core.loadDevice(label, library, devName)
     }
-    public fun loadConfiguration(szConfig : String){
+
+    fun loadConfiguration(szConfig: String) {
         core.loadSystemConfiguration(szConfig)
     }
+
     override fun close() {
         core.unloadDevice(label)
     }
 
     fun getProperties() =
         core.getDevicePropertyNames(label)
-            .map { propName ->
-                val type = core.getPropertyType(label, propName)
-                when (type) {
-                    PropertyType.Float -> MMFloatProperty(label, propName)
-                    PropertyType.Integer -> MMIntProperty(label, propName)
-                    PropertyType.String -> MMStringProperty(label, propName)
-                    else -> MMUnknownProperty(label, propName)
+                .map { propName ->
+                    val type = core.getPropertyType(label, propName)
+                    when (type) {
+                        PropertyType.Float -> MMFloatProperty(label, propName)
+                        PropertyType.Integer -> MMIntProperty(label, propName)
+                        PropertyType.String -> MMStringProperty(label, propName)
+                        else -> MMUnknownProperty(label, propName)
+                    }
                 }
-            }
 
     fun initialise() {
         try {
             core.initializeDevice(label)
 
         }
-        catch(ex : Exception){}
+        catch (ex: Exception) {
+            GUIMain.loggerService.log(Level.SEVERE, "Error initialising camera device. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
     }
 
     fun isBusy() = core.deviceBusy(label)
-
-    companion object {
-        val deviceType : DeviceType = DeviceType.UnknownType
-    }
 }
 
-class MMAutoFocusDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+class MMAutoFocusDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
@@ -61,31 +63,29 @@ class MMAutoFocusDevice(name : String, library: String, label : String = rn(name
     }
 }
 
-class MMCameraDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
-    : MMDevice(name, library, label, loaded){
-    constructor(cam : uk.co.strimm.services.Camera?) : this(cam!!.name, cam.library, cam.label,false){
+class MMCameraDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
+    : MMDevice(name, library, label, loaded) {
+    constructor(cam: uk.co.strimm.services.Camera?) : this(cam!!.name, cam.library, cam.label, false) {
         setCameraCore(cam.core)
     }
 
-    enum class MMBytesPerPixel(val bytesPerPixel: Long)
-    {
+    enum class MMBytesPerPixel(val bytesPerPixel: Long) {
         Bit8(1),
         Bit16(2),
         Bit32(4),
         Unknown(-1)
     }
 
-
-    private fun <T>tempActivate(func : () -> T) : T =
+    private fun <T> tempActivate(func: () -> T): T =
         if (MMCoreService.core.cameraDevice == label) func()
         else MMCoreService.core.cameraDevice
-            .let { prevCam ->
-                MMCoreService.core.cameraDevice = label
+                .let { prevCam ->
+                    MMCoreService.core.cameraDevice = label
 
-                func().apply {
-                    MMCoreService.core.cameraDevice = prevCam
+                    func().apply {
+                        MMCoreService.core.cameraDevice = prevCam
+                    }
                 }
-            }
 
     private var live = false
     private var previewMode = false
@@ -93,18 +93,15 @@ class MMCameraDevice(name : String, library: String, label : String = rn(name), 
     private var acquisitionInterval = 0.0
     private var MMMetadataTagName = "ElapsedTime-ms"
 
-    var isActive = false  //TW 19_7_21
-//        get() = core.cameraDevice == label
-//        set(value) { if (value) core.cameraDevice = label else core.cameraDevice = null}
-
+    var isActive = false
 
     val isImageAvailable
         get() = !isBusy() && MMCoreService.core.remainingImageCount > 0
 
-    fun startLivePreview(interval : Double){
+    fun startLivePreview(interval: Double) {
     }
 
-    fun startLiveAcquisition(interval : Double) {
+    fun startLiveAcquisition(interval: Double) {
         //        core.snapImage();
 //            TaggedImage im = core.getTaggedImage();
 //            short[] data = (short[])im.pix; //worked at 70 fps
@@ -116,13 +113,12 @@ class MMCameraDevice(name : String, library: String, label : String = rn(name), 
     }
 
     fun stopLive() {
-        println("stop Live")
-       // core.stopSequenceAcquisition()
+        // core.stopSequenceAcquisition()
         live = false
         GUIMain.expStartStopButton.isSelected = false
     }
 
-    fun snapImage() : Pair<Any, Double>{
+    fun snapImage(): Pair<Any, Double> {
 //        //TW this is not used
 //        if(previewMode) {
 //            while(core.remainingImageCount < 1){}
@@ -158,8 +154,9 @@ class MMCameraDevice(name : String, library: String, label : String = rn(name), 
     val imageWidth get() = core.imageWidth
     val imageHeight get() = core.imageHeight
     val numberOfChannels get() = core.numberOfCameraChannels
-    val bytesPerPixel get() =
-        MMBytesPerPixel.values().find { core.bytesPerPixel == it.bytesPerPixel } ?: MMBytesPerPixel.Unknown
+    val bytesPerPixel
+        get() =
+            MMBytesPerPixel.values().find { core.bytesPerPixel == it.bytesPerPixel } ?: MMBytesPerPixel.Unknown
     val bitDepth get() = core.imageBitDepth
 
     var exposure
@@ -169,7 +166,6 @@ class MMCameraDevice(name : String, library: String, label : String = rn(name), 
             core.setExposure(label, value)
         }
 
-
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.CameraDevice
@@ -177,7 +173,7 @@ class MMCameraDevice(name : String, library: String, label : String = rn(name), 
 
 }
 
-class MMGalvoDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+class MMGalvoDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
@@ -185,96 +181,109 @@ class MMGalvoDevice(name : String, library: String, label : String = rn(name), l
     }
 }
 
-class MMSLMDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+class MMSLMDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.SLMDevice
     }
 }
-class MMSerialDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMSerialDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.SerialDevice
     }
 }
-class MMShutterDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMShutterDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.ShutterDevice
     }
 }
-class MMSignalIODevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMSignalIODevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.SignalIODevice
     }
 }
-class MMStageDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMStageDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.StageDevice
     }
 }
-class MMStateDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMStateDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.StageDevice
     }
 }
-class MMXYStageDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMXYStageDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.XYStageDevice
     }
 }
-class MMAnyDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMAnyDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.AnyType
     }
 }
-class MMCoreDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMCoreDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.CoreDevice
     }
 }
-class MMGenericDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMGenericDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.GenericDevice
     }
 }
-class MMHubDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMHubDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.HubDevice
     }
 }
-class MMImageProcessorDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMImageProcessorDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.ImageProcessorDevice
     }
 }
-class MMMagnifierDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMMagnifierDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded) {
     companion object {
         @JvmStatic
         val deviceType: DeviceType = DeviceType.MagnifierDevice
     }
 }
-class MMUnknownDevice(name : String, library: String, label : String = rn(name), loaded: Boolean = false)
+
+class MMUnknownDevice(name: String, library: String, label: String = rn(name), loaded: Boolean = false)
     : MMDevice(name, library, label, loaded)
