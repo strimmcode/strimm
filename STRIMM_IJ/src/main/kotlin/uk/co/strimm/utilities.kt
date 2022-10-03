@@ -145,8 +145,6 @@ data class CameraDeviceInfo(var device : MMCameraDevice,  var live : Boolean, va
 
 data class DisplayInfo(var primaryDevice : String, var bitDepth : Long,  var width : Long, var height : Long, var feedName : String)
 
-data class CameraDeviceInfoTW(var bitDepth : Long,  var width : Long, var height : Long, var feedName : String)
-
 /**
  * This data class is used when resizing a camera feed
  * @param x The origin x coordinate
