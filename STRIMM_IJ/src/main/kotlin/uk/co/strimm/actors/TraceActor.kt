@@ -45,26 +45,28 @@ class TraceActor(val plugin: TraceWindowPlugin) : AbstractActor(){
     var associatedAnalogueDataStream : AnalogueDataStream? = null
     var sinkName : String = ""
 
+    var dataPointCounter = 0
+    var firstROIFrameStartTime = 0.0
+
     override fun createReceive(): Receive {
-        //println("TraceActor::createReceive")
         return receiveBuilder()
             .match<Message>(Message::class.java) { message ->
                 GUIMain.loggerService.log(Level.INFO,"Trace actor receiving message")
             }
-            .match<StartStreamingTraceROI>(StartStreamingTraceROI::class.java){ startStreamingTraceROIMessage ->
+            .match<StartStreamingTraceROI>(StartStreamingTraceROI::class.java){
                 GUIMain.loggerService.log(Level.INFO,"Trace actor starting trace ROI streaming")
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
-            .match<CompleteStreamingTraceROI>(CompleteStreamingTraceROI::class.java){ stopStreamingTraceROIMessage ->
+            .match<CompleteStreamingTraceROI>(CompleteStreamingTraceROI::class.java){
                 GUIMain.loggerService.log(Level.INFO,"Trace actor complete trace ROI streaming")
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
-            .match<FailStreamingTraceROI>(FailStreamingTraceROI::class.java){ it ->
-                GUIMain.loggerService.log(Level.SEVERE, "Trace from ROI stream failed. Error message: ${it.ex.message}")
-                GUIMain.loggerService.log(Level.SEVERE, it.ex.stackTrace)
+            .match<FailStreamingTraceROI>(FailStreamingTraceROI::class.java){ failStreamingMessage ->
+                GUIMain.loggerService.log(Level.SEVERE, "Trace from ROI stream failed. Error message: ${failStreamingMessage.ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, failStreamingMessage.ex.stackTrace)
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
-            .match<AttachController>(AttachController::class.java){ attachControllerMessage ->
+            .match<AttachController>(AttachController::class.java){
                 GUIMain.loggerService.log(Level.INFO, "Attaching trace controller")
                 controllerAttach = true
             }
@@ -72,7 +74,7 @@ class TraceActor(val plugin: TraceWindowPlugin) : AbstractActor(){
                 deviceSamplingRateHz = devSampRateMsg.samplingRateHz
             }
             .match<TellDisplaySinkName>(TellDisplaySinkName::class.java){displaySinkNameMsg->
-                sinkName = displaySinkNameMsg.sinkName  //should have been told this when it was created
+                sinkName = displaySinkNameMsg.sinkName
             }
             .match<TellSetNumDataPoints>(TellSetNumDataPoints::class.java){ setNumDataPointsMsg ->
                 val numIncommingPointsPerSec = deviceSamplingRateHz
@@ -110,9 +112,7 @@ class TraceActor(val plugin: TraceWindowPlugin) : AbstractActor(){
                         sendDataToController(incomingDataList)
                     }
                 }
-                else{
-                    //println("incoming data empty")
-                }
+
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .matchAny{
@@ -134,9 +134,6 @@ class TraceActor(val plugin: TraceWindowPlugin) : AbstractActor(){
         return downsampledData.toList()
     }
 
-    var dataPointCounter = 0
-    var firstROIFrameStartTime = 0.0
-
     /**
      * This method sends the data to the trace window one data point at a timeAcquired. Due to the grouping of the data stream
      * this actor receives a list of lists. The inner list's size will be the number of ROIs that have been routed.
@@ -144,7 +141,6 @@ class TraceActor(val plugin: TraceWindowPlugin) : AbstractActor(){
      * @param incomingDataList The list of lists of ROI data.
      */
     fun sendDataToController(incomingDataList : List<List<TraceData>>){
-        //println("TraceActor::sendDataToController")
         try {
             for (listOfTraceData in incomingDataList) {
                 if(listOfTraceData.isNotEmpty()) {

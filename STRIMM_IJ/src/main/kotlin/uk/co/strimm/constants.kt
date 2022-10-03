@@ -47,6 +47,12 @@ class Paths{
 
         }
     }
+
+    class Files{
+        companion object {
+            const val ACQUISITION_FILE_PREFIX = "strimm_exp"
+        }
+    }
 }
 
 class SettingKeys{
@@ -164,6 +170,7 @@ class FileExtensions{
     companion object {
         const val TEXT_FILE = "txt"
         const val CSV_FILE = "csv"
+        const val H5_FILE = ".h5"
         val COMMA_DELIMITER = Pair("Comma",",")
         val TAB_DELIMITER = Pair("Tab","\t")
         val SEMICOLON_DELIMITER = Pair("Semicolon",";")
@@ -185,6 +192,7 @@ class ExperimentConstants{
             const val SNAP_IMAGE_METHOD_NAME = "snapImage"
             const val GENERATE_IMAGE_METHOD_NAME = "generateImage"
             const val GET_TRACE_DATA_METHOD_NAME = "getTraceData"
+            const val TIMES_DATASET_SUFFIX = "_Times"
         }
     }
     class Commands{
@@ -225,7 +233,6 @@ class ExperimentConstants{
             const val ANALOGUE_OUT_TYPE = 2
             const val DIGITAL_IN_TYPE = 3
             const val DIGITAL_OUT_TYPE = 4
-
         }
     }
 }

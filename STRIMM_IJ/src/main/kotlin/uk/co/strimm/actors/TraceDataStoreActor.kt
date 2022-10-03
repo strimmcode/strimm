@@ -43,15 +43,15 @@ class TraceDataStoreActor : AbstractActor() {
      */
     override fun createReceive(): Receive {
         return receiveBuilder()
-            .match<Message>(Message::class.java) { message ->
+            .match<Message>(Message::class.java) {
                 GUIMain.loggerService.log(Level.INFO, "Trace data store actor receiving message")
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
-            .match<StartTraceDataStoring>(StartTraceDataStoring::class.java){ startTraceDataStoring ->
+            .match<StartTraceDataStoring>(StartTraceDataStoring::class.java){
                 GUIMain.loggerService.log(Level.INFO, "Trace data store actor starting data storing")
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
-            .match<CompleteTraceDataStoring>(CompleteTraceDataStoring::class.java){ completeTraceDataStoring ->
+            .match<CompleteTraceDataStoring>(CompleteTraceDataStoring::class.java){
                 GUIMain.loggerService.log(Level.INFO, "Trace data store actor completing data storing")
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
@@ -63,7 +63,6 @@ class TraceDataStoreActor : AbstractActor() {
             .match<AbortStream>(AbortStream::class.java){
                 GUIMain.loggerService.log(Level.INFO, "Camera data store actor aborting (user invoked)")
                 traceStore = false
-                println("abort+++++++++++++++++++++")
                 sendData()
             }
             .match<StartTraceStore>(StartTraceStore::class.java){
@@ -101,18 +100,18 @@ class TraceDataStoreActor : AbstractActor() {
                             roi = traceData.data.first,
                             roiVal = traceData.data.second,
                             dataPointNumber = dataPointCounters[traceData.data.first!!.name]!!,
-                            flowName = "", //is this a problem
-                            roiNumber = 1 //is this a problem
+                            flowName = "", //TODO is this a problem?
+                            roiNumber = 1 //TODO is this a problem?
                         )
                         this.traceData.add(newStoreObject)
                         dataPointCounters[traceData.data.first!!.name] = dataPointCounters[traceData.data.first!!.name]!!+1
+                    }
 
-                        val shouldStop = checkIfShouldStop(traceData.data.first!!.name)
-                        if(shouldStop){
-                            sendData()
-                            GUIMain.loggerService.log(Level.INFO, "Trace data store actor no longer acquiring")
-                            acquiring = false
-                        }
+                    val shouldStop = checkIfShouldStop(incomingData.first().data.first!!.name)
+                    if(shouldStop){
+                        sendData()
+                        GUIMain.loggerService.log(Level.INFO, "Trace data store actor ${self.path().name()} no longer acquiring")
+                        acquiring = false
                     }
                 }
 
@@ -139,12 +138,8 @@ class TraceDataStoreActor : AbstractActor() {
     }
 
     private fun sendData(){
-        GUIMain.loggerService.log(Level.INFO, "Trace data store actor sending data")
+        GUIMain.loggerService.log(Level.INFO, "Trace data store actor ${self.path().name()} sending data")
         GUIMain.actorService.fileWriterActor.tell(TellTraceData(traceData, isTraceFromROI), ActorRef.noSender())
         traceStore = false
-    }
-
-    private fun sendPoisonPill(){
-        self.tell(PoisonPill.getInstance(), ActorRef.noSender())
     }
 }

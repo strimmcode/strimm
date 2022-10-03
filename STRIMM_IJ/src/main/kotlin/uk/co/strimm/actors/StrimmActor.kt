@@ -35,6 +35,7 @@ class StrimmActor(actorMap : HashMap<Class<out Any>, Class<out ActorMessage>>) :
     override fun createReceive(): Receive {
         return receiveBuilder()
             .match<Message>(Message::class.java) { message -> GUIMain.loggerService.log(Level.INFO,"Message sent to STRIMM Actor: ${message.content}") }
+                //TODO should trace data store and camera data store actors be created via this actor also?
             .match<CreateTraceActor>(CreateTraceActor::class.java){ message -> createTraceActor(message)}
             .match<CreateCameraActor>(CreateCameraActor::class.java){ message -> createCameraActor(message)}
             .match<CreateMetaDataActor>(CreateMetaDataActor::class.java){ message -> createMetaDataActor(message)}
@@ -51,7 +52,6 @@ class StrimmActor(actorMap : HashMap<Class<out Any>, Class<out ActorMessage>>) :
             .build()
     }
 
-
     private fun createFileWriterActor(){
         if(!fileWriterActorCreated) {
             val actorName = GUIMain.actorService.makeActorName(ActorConstants.FILE_WRITE_ACTOR_NAME)
@@ -67,14 +67,6 @@ class StrimmActor(actorMap : HashMap<Class<out Any>, Class<out ActorMessage>>) :
         val traceActor = GUIMain.actorService.createActor(TraceActor.props(plugin), actorName, TraceActor::class.java)
         GUIMain.loggerService.log(Level.INFO,"Created trace actor $actorName")
         traceActor.tell(Message(plugin), self)
-    }
-
-    private fun createTraceDataStoreActor(createMessage: CreateTraceActor){
-        //Test method here
-    }
-
-    private fun createCameraDataStoreActor(createMessage: CreateTraceActor){
-        //Test method here
     }
 
     private fun createCameraActor(create : CreateCameraActor){

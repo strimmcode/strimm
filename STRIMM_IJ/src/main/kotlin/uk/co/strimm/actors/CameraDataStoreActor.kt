@@ -16,10 +16,6 @@ import uk.co.strimm.actors.messages.tell.TellCameraData
 import uk.co.strimm.gui.GUIMain
 import java.util.logging.Level
 
-//data class ByteImg(var stack : ArrayImg<UnsignedByteType,net.imglib2.img.basictypeaccess.array.ByteArray>)
-//data class ShortImg(var stack : ArrayImg<UnsignedShortType,net.imglib2.img.basictypeaccess.array.ShortArray>)
-//data class FloatImg(var stack : ArrayImg<FloatType,net.imglib2.img.basictypeaccess.array.FloatArray>)
-
 open class CameraImg(val type: String) //Superclass for generics help when dealing with the data
 data class ByteImg(var stack : ByteArray, val xDim : Long, val yDim : Long, val sourceCamera : String) : CameraImg("Byte")
 data class ShortImg(var stack : ShortArray, val xDim : Long, val yDim : Long, val sourceCamera : String): CameraImg("Short")
@@ -42,7 +38,6 @@ class CameraDataStoreActor : AbstractActor() {
     val imgStack = ArrayImgStore()
     val imgStackInfo = arrayListOf<CameraMetaDataStore>()
     var acquiring = false //This flag prevents data store actors acquiring during preview mode
-    val numDimensions = 3
 
     /**
      * Note: data flow will be terminated if the actor doesn't acknowledge data messages from the sender
@@ -50,20 +45,20 @@ class CameraDataStoreActor : AbstractActor() {
     override fun createReceive(): Receive {
         return receiveBuilder()
                 .match<Message>(Message::class.java) {
-                    GUIMain.loggerService.log(Level.INFO, "Camera data store actor receiving message")
+                    GUIMain.loggerService.log(Level.INFO, "Camera data store actor ${self.path().name()} receiving message")
                     sender().tell(Acknowledgement.INSTANCE, self())
                 }
                 .match<StartCameraDataStoring>(StartCameraDataStoring::class.java) {
-                    GUIMain.loggerService.log(Level.INFO, "Camera data store actor starting")
+                    GUIMain.loggerService.log(Level.INFO, "Camera data store actor ${self.path().name()} starting")
                     sender().tell(Acknowledgement.INSTANCE, self())
                 }
                 .match<CompleteCameraDataStoring>(CompleteCameraDataStoring::class.java) {
-                    GUIMain.loggerService.log(Level.INFO, "Camera data store actor storing complete")
+                    GUIMain.loggerService.log(Level.INFO, "Camera data store actor ${self.path().name()} storing complete")
                     acquiring = false
                     sender().tell(Acknowledgement.INSTANCE, self())
                 }
                 .match<AbortStream>(AbortStream::class.java){
-                    GUIMain.loggerService.log(Level.INFO, "Camera data store actor aborting (user invoked)")
+                    GUIMain.loggerService.log(Level.INFO, "Camera data store actor ${self.path().name()} aborting (user invoked)")
                     acquiring = false
                     sendData()
                 }
@@ -78,46 +73,37 @@ class CameraDataStoreActor : AbstractActor() {
                 }
                 .match<STRIMMImage>(STRIMMImage::class.java) { image ->
                     if (acquiring) { //This flag prevents data store actors acquiring during preview mode
-                        println(GUIMain.experimentService.experimentStream.cameraDataStoreActors[getSelf()]  + " " + "  time: " + image.timeAcquired)
+
+                        //Uncomment to check incomming frame times
+                        //println(GUIMain.experimentService.experimentStream.cameraDataStoreActors[getSelf()]  + " " + "  time: " + image.timeAcquired)
+
+                        //Make sure the correct data type is used for the incomming data
                         when (image.pix) {
                             is ByteArray -> {
-                                imgStack.byteStack.add(
-                                    ByteImg(
-                                        image.pix,
+                                imgStack.byteStack.add(ByteImg(image.pix,
                                         image.w.toLong(),
                                         image.h.toLong(),
-                                        image.sourceCamera
-                                    )
-                                )
+                                        image.sourceCamera))
                             }
                             is ShortArray -> {
-                                    imgStack.shortStack.add(
-                                        ShortImg(
-                                            image.pix,
-                                            image.w.toLong(),
-                                            image.h.toLong(),
-                                            image.sourceCamera
-                                        )
-                                    )
-
-                            }
-                            is FloatArray -> {
-                                imgStack.floatStack.add(
-                                    FloatImg(
-                                        image.pix,
+                                imgStack.shortStack.add(ShortImg(image.pix,
                                         image.w.toLong(),
                                         image.h.toLong(),
-                                        image.sourceCamera
-                                    )
-                                )
+                                        image.sourceCamera))
+                            }
+                            is FloatArray -> {
+                                imgStack.floatStack.add(FloatImg(image.pix,
+                                        image.w.toLong(),
+                                        image.h.toLong(),
+                                        image.sourceCamera))
                             }
                         }
+
                         imgStackInfo.add(CameraMetaDataStore(image.timeAcquired, image.sourceCamera, imageCounter))
                         imageCounter++
 
                         val shouldStop = checkIfShouldStop(image.sourceCamera)
                         if (shouldStop) {
-                            println("CAMERA Send data")
                             sendData()
                             GUIMain.loggerService.log(Level.INFO, "Camera data store actor no longer acquiring")
                             acquiring = false
@@ -132,7 +118,7 @@ class CameraDataStoreActor : AbstractActor() {
     }
 
     private fun checkIfShouldStop(deviceLabel : String) : Boolean {
-        //TODO configure this to be based on either an elapsed time or number of data points received
+        //Acquisitions can be stopped at any time from a keyboard press (key configured in the config property "TerminateAcquisitionVirtualCode")
         val bKeyPressed = GUIMain.protocolService.jdaq.GetKeyState(GUIMain.experimentService.expConfig.TerminateAcquisitionVirtualCode)
         if (bKeyPressed) {
             return true
@@ -149,12 +135,6 @@ class CameraDataStoreActor : AbstractActor() {
 
     private fun sendData(){
         GUIMain.loggerService.log(Level.INFO, "Sending camera data to file writer actor")
-
-//        println("****details**** " + imgStackInfo[0].cameraFeedName + "   b:" + imgStack.byteStack.size + "  f:" + imgStack.floatStack.size + "   s:" + imgStack.shortStack.size)
-//        println("****metadetails***" + imgStackInfo[0].cameraFeedName + "size " + imgStackInfo.size)
-        GUIMain.actorService.fileWriterActor.tell(TellCameraData(imgStack, imgStackInfo, GUIMain.experimentService.experimentStream.cameraDataStoreActors[getSelf()] as String), ActorRef.noSender())
+        GUIMain.actorService.fileWriterActor.tell(TellCameraData(imgStack, imgStackInfo, GUIMain.experimentService.experimentStream.cameraDataStoreActors[self] as String), ActorRef.noSender())
     }
-//    private fun sendPoisonPill(){
-//        self.tell(PoisonPill.getInstance(), ActorRef.noSender())
-//    }
 }
