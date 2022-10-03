@@ -196,7 +196,16 @@ class ExperimentConstants{
             const val SNAP_IMAGE_METHOD_NAME = "snapImage"
             const val GENERATE_IMAGE_METHOD_NAME = "generateImage"
             const val GET_TRACE_DATA_METHOD_NAME = "getTraceData"
+            const val CONFIGURED_CAMERA_METHOD_NAME = "ConfiguredCamera"
             const val TIMES_DATASET_SUFFIX = "_Times"
+            const val TRACE_DATA_NIDAQ_METHOD_NAME = "Trace Data Method NIDAQ"
+            const val TRACE_DATA_KEYBOARD_METHOD_NAME = "Trace Data Method Keyboard"
+            const val A_KEYBOARD_METHOD_NAME = "KeyboardA"
+            const val RANDOM_TRACE_SOURCE_METHOD_NAME = "RandomTraceSource"
+            const val CONSTANT_TRACE_SOURCE_METHOD_NAME = "ConstantTraceSource"
+            const val CONSTANT_VECTOR_SOURCE_METHOD_NAME = "ConstantVectorSource"
+            const val SINE_WAVE_SOURCE_METHOD_NAME = "SineWaveSource"
+            const val SQUARE_WAVE_SOURCE_METHOD_NAME = "SquareWaveSource"
         }
     }
     class Commands{
