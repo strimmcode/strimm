@@ -172,6 +172,7 @@ class FileExtensions{
         const val TEXT_FILE = "txt"
         const val CSV_FILE = "csv"
         const val H5_FILE = ".h5"
+        const val LOG_FILE_EXT = ".log"
         val COMMA_DELIMITER = Pair("Comma",",")
         val TAB_DELIMITER = Pair("Tab","\t")
         val SEMICOLON_DELIMITER = Pair("Semicolon",";")

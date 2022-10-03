@@ -1,9 +1,9 @@
 package uk.co.strimm.services;
 
 import uk.co.strimm.gui.GUIMain;
-
 import java.util.logging.Level;
 
+//TODO is this a service? If not can it be moved without things breaking?
 public class JDAQ {
     public int deviceID;
 
@@ -15,8 +15,6 @@ public class JDAQ {
             GUIMain.loggerService.log(Level.SEVERE, ex.getStackTrace());
         }
     }
-
-    //TODO can this method be deleted?
 
     public native int GetCameraMapStatus();
 
