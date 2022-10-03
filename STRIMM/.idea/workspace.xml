@@ -14,13 +14,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="AcquisitionMethodService.kt" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/services/AcquisitionMethodService.kt">
+      <file leaf-file-name="DockableWindowPluginService.kt" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/services/DockableWindowPluginService.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-67">
-              <caret line="703" column="98" selection-start-line="703" selection-start-column="98" selection-end-line="703" selection-end-column="98" />
+            <state relative-caret-position="114">
+              <caret line="164" column="95" selection-start-line="164" selection-start-column="95" selection-end-line="164" selection-end-column="95" />
               <folding>
-                <element signature="e#32#1117#0" expanded="true" />
+                <element signature="e#31#729#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -87,7 +87,6 @@
         <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/experiment/Source.kt" />
         <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/constants.kt" />
         <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/gui/CameraWindow.kt" />
-        <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/gui/GUIMain.kt" />
         <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/gui/SettingsWindow.kt" />
         <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/utilities.kt" />
         <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/gui/TraceWindow.kt" />
@@ -95,6 +94,9 @@
         <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/plugins/DockableWindowPlugin.kt" />
         <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/plugins/TraceFromROIContext.kt" />
         <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/services/AcquisitionMethodService.kt" />
+        <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/services/ActorService.kt" />
+        <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/gui/GUIMain.kt" />
+        <option value="$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/services/DockableWindowPluginService.kt" />
       </list>
     </option>
   </component>
@@ -297,18 +299,18 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info active="true" anchor="bottom" id="Messages" order="7" visible="true" weight="0.32624868" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.32624868" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" weight="0.16302083" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.33900106" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.33900106" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17604166" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17604166" />
       <window_info anchor="bottom" id="JProfiler" order="7" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.38682252" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -333,27 +335,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/actors/TraceDataStoreActor.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="614">
-          <caret line="143" column="5" selection-start-line="143" selection-start-column="5" selection-end-line="143" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/actors/CameraDataStoreActor.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="55" column="83" selection-start-line="55" selection-start-column="83" selection-end-line="55" selection-end-column="104" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/actors/TriggerCommandActor.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="7" column="6" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/common/FileFormat.kt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -551,16 +532,6 @@
       </provider>
       <provider editor-type-id="JavaFX-Scene-Builder" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/gui/GUIMain.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-8767">
-          <caret line="197" column="19" selection-start-line="197" selection-start-column="19" selection-end-line="197" selection-end-column="19" />
-          <folding>
-            <element signature="n#!!doc;n#lutService#0;n#!!block;n#Companion#0;n#!!block;n#GUIMain#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/gui/MetaDataWindow.kt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -671,10 +642,41 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/services/AcquisitionMethodService.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-67">
-          <caret line="703" column="98" selection-start-line="703" selection-start-column="98" selection-end-line="703" selection-end-column="98" />
+        <state relative-caret-position="413">
+          <caret line="715" lean-forward="true" selection-start-line="715" selection-end-line="715" />
           <folding>
             <element signature="e#32#1117#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/services/ActorService.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-466">
+          <caret line="213" column="13" lean-forward="true" selection-start-line="213" selection-start-column="13" selection-end-line="213" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/services/DebugService.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="9" column="12" lean-forward="true" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/gui/GUIMain.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="197" column="24" lean-forward="true" selection-start-line="197" selection-start-column="24" selection-end-line="197" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../STRIMM_IJ/src/main/kotlin/uk/co/strimm/services/DockableWindowPluginService.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="164" column="95" selection-start-line="164" selection-start-column="95" selection-end-line="164" selection-end-column="95" />
+          <folding>
+            <element signature="e#31#729#0" expanded="true" />
           </folding>
         </state>
       </provider>

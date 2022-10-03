@@ -11,20 +11,18 @@ import org.scijava.plugin.Plugin
 import org.scijava.plugin.PluginInfo
 import org.scijava.service.Service
 import uk.co.strimm.ComponentTexts
-import uk.co.strimm.gui.CameraWindowPlugin
 import uk.co.strimm.gui.GUIMain
 import uk.co.strimm.plugins.DockableWindowPlugin
-import java.awt.Component
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.util.logging.Level
 
-/*
+/**
  * TODO - comments
  */
 @Plugin(type = Service::class)
 class DockableWindowPluginService : AbstractPTService<DockableWindowPlugin>(), ImageJService {
-    val multipleDockableFactory  = STRIMMDockableFactory()
+    val multipleDockableFactory = STRIMMDockableFactory()
     val dockableWindows = hashMapOf<String, DockableWindowPlugin>() //plugin title, plugin
 
     class STRIMMDockableLayout : MultipleCDockableLayout {
@@ -73,7 +71,7 @@ class DockableWindowPluginService : AbstractPTService<DockableWindowPlugin>(), I
 
     override fun getPluginType(): Class<DockableWindowPlugin> = DockableWindowPlugin::class.java
 
-    fun getPluginsOfType(type : Class<out DockableWindowPlugin>) : HashMap<String, DockableWindowPlugin>{
+    fun getPluginsOfType(type: Class<out DockableWindowPlugin>): HashMap<String, DockableWindowPlugin> {
         return HashMap(dockableWindows.filter { x -> x.value::class.java == type })
     }
 
@@ -84,10 +82,9 @@ class DockableWindowPluginService : AbstractPTService<DockableWindowPlugin>(), I
      * @param mainActor The main STRIMM actor
      * @param plugin The dockable window plugin being created
      */
-    private fun tellMainActor(mainActor : ActorRef, plugin : DockableWindowPlugin){
-        println("*TellMainActor")
+    private fun tellMainActor(mainActor: ActorRef, plugin: DockableWindowPlugin) {
         val messageClass = GUIMain.actorService.actorCreateMessages[plugin::class.java]
-        if(messageClass != null) { //Not all classes need an actor associated with them
+        if (messageClass != null) { //Not all classes need an actor associated with them
             val constructors = messageClass.constructors
             val newInstance = constructors[0].newInstance(plugin)
             //instructs the mainActor to make an Actor with this plugin
@@ -103,87 +100,36 @@ class DockableWindowPluginService : AbstractPTService<DockableWindowPlugin>(), I
      * @param withActor Flag to say if this plugin should be created with an actor
      * @return The plugin of type DockableWindowPlugin
      */
-    fun <P : DockableWindowPlugin?>createPlugin(pluginClass : Class<P>, data : Any?, withActor : Boolean, pluginTitle : String) : P{
-//creates a plugin of type Class<P>
-
-
-        //create and initialise the plugin
-        //then create an actor with this plugin
-        GUIMain.loggerService.log(
-            Level.SEVERE,
-            "TERRY :about to create(pluginClass)    " + pluginClass.toString()
-        )
+    fun <P : DockableWindowPlugin?> createPlugin(pluginClass: Class<P>, data: Any?, withActor: Boolean, pluginTitle: String): P {
+        //Create and initialise the plugin then create an actor with this plugin
         val plugin = create(pluginClass) //factory scijava
-        GUIMain.loggerService.log(
-            Level.SEVERE,
-            "TERRY :DID I GET HERE?" +
-                    ""
-        )
         if (plugin != null) {
-            GUIMain.loggerService.log(
-                Level.SEVERE,
-                "TERRY :made a plugin"
-            )
             val mainActor = GUIMain.actorService.createStrimmActorIfNotExists()
-            GUIMain.loggerService.log(
-                Level.SEVERE,
-                "TERRY :made a main actor"
-            )
-            //will polymorphically call the correct type of plugin
-            //so in the case of CameraPlugin will call these functions
-            plugin.setCustomData(data)
-            GUIMain.loggerService.log(
-                Level.SEVERE,
-                "TERRY :SetCustomData"
-            )
-            plugin.initialise()
-            GUIMain.loggerService.log(
-                Level.SEVERE,
-                "TERRY :plugin.initialise"
-            )
-            plugin.title = pluginTitle
-            //plugin now initialised
-            GUIMain.loggerService.log(
-                Level.SEVERE,
-                "TERRY :made a plugin"
-            )
 
-            if(withActor) {
+            //Will polymorphically call the correct type of plugin so in the case of CameraPlugin will call these functions
+            plugin.setCustomData(data)
+            plugin.initialise()
+            plugin.title = pluginTitle
+
+            if (withActor) {
                 //this creates the actor eg the CameraActor
-                GUIMain.loggerService.log(
-                    Level.SEVERE,
-                    "TERRY :tellMainActor"
-                )
                 tellMainActor(mainActor, plugin)
+
                 //this actor should now respond to its messages about its plugin
                 //TODO not good to do this, creating an actor takes a bit of timeAcquired - need to wait a bit so it can be found by the stream later on
                 Thread.sleep(750)
-                GUIMain.loggerService.log(
-                    Level.SEVERE,
-                    "TERRY :should have created an actor"
-                )
             }
-        }
-        else{
-            GUIMain.loggerService.log(
-                Level.SEVERE,
-                "TERRY : failed to create a plugin"
-            )
+        } else {
             GUIMain.loggerService.log(Level.WARNING, "Failed to create plugin $pluginClass!")
         }
-        //add the dockableWindow to the register
 
-        GUIMain.loggerService.log(
-            Level.SEVERE,
-            "TERRY : add to dockableWindows"
-        )
+        //add the dockableWindow to the register
         dockableWindows[pluginTitle] = plugin as DockableWindowPlugin
 
         return plugin
     }
 
-    fun createPlugin(info : PluginInfo<DockableWindowPlugin>, data : Any?, withActor: Boolean) : DockableWindowPlugin?{
-
+    fun createPlugin(info: PluginInfo<DockableWindowPlugin>, data: Any?, withActor: Boolean): DockableWindowPlugin? {
         val plugin = pluginService().createInstance(info)
 
         if (plugin != null) {
@@ -214,18 +160,16 @@ class DockableWindowPluginService : AbstractPTService<DockableWindowPlugin>(), I
      *  @param dockableWindowName The title of the dockable item to be created
      *  @return
      */
-    private fun exists(dockableWindowName : String) : Boolean {
-
+    private fun exists(dockableWindowName: String): Boolean {
         if (dockableWindowName == ComponentTexts.ExperimentBuilder.EXPERIMENT_BUILDER_WINDOW_TITLE
                 || dockableWindowName == ComponentTexts.SettingsWindow.SETTINGS_WINDOW_TITLE) {
-
             return dockableWindows.any { x -> x.key == dockableWindowName }
 
         }
         return false
     }
 
-    fun removeDockableWindowPlugin(pluginTitle : String){
+    fun removeDockableWindowPlugin(pluginTitle: String) {
         dockableWindows.remove(pluginTitle)
     }
 

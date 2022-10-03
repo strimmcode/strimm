@@ -192,9 +192,6 @@ class GUIMain : Command {
 
         @Parameter
         lateinit var protocolService: ProtocolService
-
-        @Parameter
-        lateinit var debugService: DebugService
         //endregion
     }
 
