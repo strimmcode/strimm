@@ -14,6 +14,7 @@ class Flow{
     var flowName = ""
     var flowType = ""
     var flowDetails = ""
+    //TODO these need to have proper names and descriptions
     var param1 = 0.0
     var param2 = 0.0
     var param3 = 0.0

@@ -9,7 +9,6 @@ class ROI{
     var cameraDeviceLabel = ""
     var ROIName = ""
     var flowName = ""
-
     var displaySink = ""
     var ROInum = 0
 }

@@ -26,6 +26,7 @@ class Paths{
         const val EXPERIMENT_OUTPUT_FOLDER = "./ExperimentOutput"
         const val CAMERA_METADATA_PREFIX = "camerametadata"
         const val TRACE_DATA_PREFIX = "traceoutput"
+        const val LUTS_FOLDER = "./luts"
     }
 
     class Icons{

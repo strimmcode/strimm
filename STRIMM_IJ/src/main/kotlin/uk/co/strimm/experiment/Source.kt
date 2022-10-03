@@ -18,24 +18,16 @@ class Source{
     var isGreyScale = true
     var description = ""
     var exposureMs = 0.0
-
     var isBusy = false
-
-
     var isTimeLapse = true
     var intervalMs = 0.0
     var isTriggered = true
     var isImageSnapped = true
-
     var isKeyboardSnapEnabled = false
     var SnapVirtualCode : Int = 0
-
     var framesInCircularBuffer = 20
     var timeLastCaptured = 0.0
-
     var previewInterval = 0.2
-
-
     var outputType = ""
     var samplingFrequencyHz = 0.0
     var x = 0.0

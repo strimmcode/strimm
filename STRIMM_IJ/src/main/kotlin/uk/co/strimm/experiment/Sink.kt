@@ -21,7 +21,6 @@ class Sink{
     val roiSz = ""
     var roiFlowName = ""
     var autoscale = true
-    var isROI = false;
+    var isROI = false
     var lut = ""
-
 }

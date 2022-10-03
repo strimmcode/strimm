@@ -27,7 +27,7 @@ class SettingsWindowPlugin : AbstractDockableWindow() {
     override var title = ComponentTexts.SettingsWindow.SETTINGS_WINDOW_TITLE
 
     override fun initialise() {
-        this.createDock(title).apply{
+        this.createDock(title).apply {
             val fxPanel = JFXPanel()
             add(fxPanel)
             this.titleText = title
@@ -43,12 +43,12 @@ class SettingsWindowPlugin : AbstractDockableWindow() {
     }
 }
 
-class SettingsWindow{
+class SettingsWindow {
     //Components
     var settingsPane = HBox()
     lateinit var treeView: TreeView<String>
     @FXML
-    lateinit var mainContainer : HBox
+    lateinit var mainContainer: HBox
     var settingsDisplay = StackPane()
     val generalSettingsPane = VBox()
     val traceSettingsPane = VBox()
@@ -67,9 +67,9 @@ class SettingsWindow{
         populateSettingsTree()
         settingsPane.children.add(treeView)
         settingsPane.children.add(settingsDisplay)
-        populateSettingsGroup(GUIMain.strimmSettingsService.settings.generalSettings.settings,generalSettingsPane)
-        populateSettingsGroup(GUIMain.strimmSettingsService.settings.traceSettings.settings,traceSettingsPane)
-        populateSettingsGroup(GUIMain.strimmSettingsService.settings.cameraSettings.settings,cameraSettingsPane)
+        populateSettingsGroup(GUIMain.strimmSettingsService.settings.generalSettings.settings, generalSettingsPane)
+        populateSettingsGroup(GUIMain.strimmSettingsService.settings.traceSettings.settings, traceSettingsPane)
+        populateSettingsGroup(GUIMain.strimmSettingsService.settings.cameraSettings.settings, cameraSettingsPane)
         generalSettingsPane.isVisible = true
         traceSettingsPane.isVisible = false
         cameraSettingsPane.isVisible = false
@@ -82,14 +82,14 @@ class SettingsWindow{
         val contentVBox = VBox()
         contentVBox.children.addAll(settingsDisplay, buttonsPane)
 
-        buttonsPane.children.addAll(saveButton,saveAndExitButton,exitButton)
-        mainContainer.children.addAll(treeView,contentVBox)
+        buttonsPane.children.addAll(saveButton, saveAndExitButton, exitButton)
+        mainContainer.children.addAll(treeView, contentVBox)
     }
 
     /**
      * Method to add listener to save  button click
      */
-    fun addSaveButtonListener(){
+    fun addSaveButtonListener() {
         saveButton.setOnMouseClicked {
             saveAllSettingsToFile()
         }
@@ -98,7 +98,7 @@ class SettingsWindow{
     /**
      * Method to add listener to save and exit button click
      */
-    fun addSaveAndExitButtonListener(){
+    fun addSaveAndExitButtonListener() {
         saveAndExitButton.setOnMouseClicked {
             saveAllSettingsToFile()
             //TODO programmatically close this settings window
@@ -108,31 +108,30 @@ class SettingsWindow{
     /**
      * The method to call to save all settings to file
      */
-    fun saveAllSettingsToFile(){
+    fun saveAllSettingsToFile() {
         GUIMain.loggerService.log(Level.INFO, "Saving general settings")
         val generalSettingsSuccess = saveSettingsGroup(generalSettingsPane)
-        if(!generalSettingsSuccess){
+        if (!generalSettingsSuccess) {
             GUIMain.loggerService.log(Level.INFO, "One or more settings from \"General\" may not have been saved")
         }
         GUIMain.loggerService.log(Level.INFO, "Saving trace settings")
         val traceSettingsSuccess = saveSettingsGroup(traceSettingsPane)
-        if(!traceSettingsSuccess){
+        if (!traceSettingsSuccess) {
             GUIMain.loggerService.log(Level.INFO, "One or more settings from \"Trace\" may not have been saved")
         }
         GUIMain.loggerService.log(Level.INFO, "Saving camera settings")
         val cameraSettingsSuccess = saveSettingsGroup(cameraSettingsPane)
         GUIMain.strimmSettingsService.saveSettingsToFile(GUIMain.strimmSettingsService.settings)
-        if(!cameraSettingsSuccess){
+        if (!cameraSettingsSuccess) {
             GUIMain.loggerService.log(Level.INFO, "One or more settings from \"Camera\" may not have been saved")
         }
 
         val alert = Alert(Alert.AlertType.INFORMATION)
         alert.title = "Saving settings"
         alert.headerText = null
-        if(!generalSettingsSuccess || !traceSettingsSuccess || !cameraSettingsSuccess){
+        if (!generalSettingsSuccess || !traceSettingsSuccess || !cameraSettingsSuccess) {
             alert.contentText = "One or more of the settings could not be saved. See logs for details"
-        }
-        else{
+        } else {
             alert.contentText = "Saving settings succeeded"
         }
 
@@ -147,28 +146,28 @@ class SettingsWindow{
      * @return The outcome of updating settings for this group. True if all settings were found and updated. False if
      * one or more settings were not found or updated
      */
-    fun saveSettingsGroup(settingsPane : VBox) : Boolean {
+    fun saveSettingsGroup(settingsPane: VBox): Boolean {
         var outcome = true
         val settingsChildren = settingsPane.children
-        for(settingsChild in settingsChildren){
+        for (settingsChild in settingsChildren) {
             val hbox = settingsChild as HBox
-            var settingName : String? = null
-            var settingValue : Any? = null
-            for(component in hbox.children){
-                if(component.userData != null){
+            var settingName: String? = null
+            var settingValue: Any? = null
+            for (component in hbox.children) {
+                if (component.userData != null) {
                     settingName = component.userData as String?
                 }
 
-                if(component is TextField){
+                if (component is TextField) {
                     settingValue = component.text
                 }
 
-                if(settingName != null && settingValue != null) {
+                if (settingName != null && settingValue != null) {
                     val updateSuccessful = GUIMain.strimmSettingsService.updateSetting(settingName, settingValue)
                     settingName = null
                     settingValue = null
 
-                    if(!updateSuccessful){
+                    if (!updateSuccessful) {
                         outcome = false
                     }
                 }
@@ -194,8 +193,8 @@ class SettingsWindow{
     /**
      * When a top level tree node is clicked, switch the view to the one that has been clicked
      */
-    fun addTreeViewSelectedListener(){
-        treeView.selectionModel.selectedItemProperty().addListener({ observable, oldValue, newValue ->
+    fun addTreeViewSelectedListener() {
+        treeView.selectionModel.selectedItemProperty().addListener { observable, oldValue, newValue ->
             val selectedItem = newValue as TreeItem
             when {
                 selectedItem.value.toLowerCase() == SettingKeys.TraceSettings.GROUP_NAME.toLowerCase() -> {
@@ -214,14 +213,14 @@ class SettingsWindow{
                     cameraSettingsPane.isVisible = false
                 }
             }
-        })
+        }
     }
 
     /**
      * Get as list of top level nodes for the settings groups
      * @return a list of tree nodes for the settings groups
      */
-    fun getAllSettingCategories() : List<TreeItem<String>>{
+    fun getAllSettingCategories(): List<TreeItem<String>> {
         val settingGroupNames = arrayListOf<TreeItem<String>>()
         settingGroupNames.add(TreeItem(GUIMain.strimmSettingsService.settings.generalSettings.settingGroupName))
         settingGroupNames.add(TreeItem(GUIMain.strimmSettingsService.settings.traceSettings.settingGroupName))
@@ -234,12 +233,11 @@ class SettingsWindow{
      * @param settingsList The list of settings for a settings group
      * @param pane The graphical pane to add the settings to
      */
-    fun populateSettingsGroup(settingsList : List<Setting>, pane: VBox){
-        for(setting in settingsList){
-            if(setting.value is Number){
+    fun populateSettingsGroup(settingsList: List<Setting>, pane: VBox) {
+        for (setting in settingsList) {
+            if (setting.value is Number) {
                 addNumericSetting(pane, setting)
-            }
-            else{
+            } else {
                 addTextSetting(pane, setting)
             }
         }
@@ -251,13 +249,13 @@ class SettingsWindow{
      * @param settingPane The pane to add these components to
      * @param setting The setting
      */
-    fun addNumericSetting(settingPane : VBox, setting : Setting){
+    fun addNumericSetting(settingPane: VBox, setting: Setting) {
         val settingLabel = Label("${setting.displayName}: ")
         settingLabel.userData = setting.name
         val numberField = TextField(setting.value.toString())
         val toolTipLabel = setToolTip(setting)
         val hBox = HBox()
-        hBox.children.addAll(settingLabel,numberField,toolTipLabel)
+        hBox.children.addAll(settingLabel, numberField, toolTipLabel)
         settingPane.children.add(hBox)
     }
 
@@ -266,13 +264,13 @@ class SettingsWindow{
      * @param settingPane The pane to add these components to
      * @param setting The setting
      */
-    fun addTextSetting(settingPane : VBox, setting : Setting){
+    fun addTextSetting(settingPane: VBox, setting: Setting) {
         val settingLabel = Label("${setting.displayName}: ")
         settingLabel.userData = setting.name
         val numberField = TextField(setting.value.toString())
         val toolTipLabel = setToolTip(setting)
         val hBox = HBox()
-        hBox.children.addAll(settingLabel,numberField,toolTipLabel)
+        hBox.children.addAll(settingLabel, numberField, toolTipLabel)
         settingPane.children.add(hBox)
     }
 
@@ -281,20 +279,19 @@ class SettingsWindow{
      * @param setting The setting containing the tooltip text
      * @return A label with the tooltip
      */
-    fun setToolTip(setting : Setting): Label{
+    fun setToolTip(setting: Setting): Label {
         val toolTipLabel = Label("")
         val toolTip = Tooltip(setting.toolTip)
 
-        var image : Image? = null
+        var image: Image? = null
         try {
-            image = Image(javaClass.getResourceAsStream(Paths.Icons.TOOLTIP_ICON), 17.0,17.0,true,true)
-        }
-        catch (ex : Exception){
+            image = Image(javaClass.getResourceAsStream(Paths.Icons.TOOLTIP_ICON), 17.0, 17.0, true, true)
+        } catch (ex: Exception) {
             GUIMain.loggerService.log(Level.WARNING, "Failed to load tool tip icon. Error: ${ex.message}")
             GUIMain.loggerService.log(Level.WARNING, ex.stackTrace)
         }
 
-        if(image != null) {
+        if (image != null) {
             toolTipLabel.graphic = ImageView(image)
         }
 
