@@ -21,6 +21,7 @@ import org.scijava.plugin.Plugin
 import org.scijava.service.AbstractService
 import org.scijava.service.Service
 import uk.co.strimm.ExperimentConstants
+import uk.co.strimm.Paths.Companion.DEVICE_ADAPTERS_FOLDER
 import uk.co.strimm.ResizeValues
 import uk.co.strimm.STRIMMImage
 import uk.co.strimm.TraceData
@@ -81,7 +82,7 @@ class AcquisitionMethodService : AbstractService(), ImageJService {
 
     private fun populateConfiguredCameras() {
         val pathnames: Array<String>
-        val files = File("DeviceAdapters/CameraMMConfigs")
+        val files = File("$DEVICE_ADAPTERS_FOLDER/CameraMMConfigs")
         pathnames = files.list()
         for (pathname in pathnames) {
             configuredCameras[pathname] = CameraConfigured(pathname)

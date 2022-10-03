@@ -27,6 +27,7 @@ class Paths{
         const val CAMERA_METADATA_PREFIX = "camerametadata"
         const val TRACE_DATA_PREFIX = "traceoutput"
         const val LUTS_FOLDER = "./luts"
+        const val DEVICE_ADAPTERS_FOLDER = "./DeviceAdapters"
     }
 
     class Icons{
