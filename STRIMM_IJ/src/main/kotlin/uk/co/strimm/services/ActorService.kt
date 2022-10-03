@@ -35,62 +35,59 @@ class ActorService : AbstractService(), ImageJService {
     val mailboxConfig = com.typesafe.config.ConfigFactory.parseString("control-aware-dispatcher { mailbox-type = \"akka.dispatch.UnboundedControlAwareMailbox\" }")
     var actorSystem = ActorSystem.create("STRIMMAkkaSystem", mailboxConfig)
     val materializer = ActorMaterializer.create(ActorMaterializerSettings.create(actorSystem).withInputBuffer(1, 1), actorSystem)
-    val actorCreateMessages = hashMapOf<Class<out Any>,Class<out ActorMessage>>()
-    val allActors = hashMapOf<ActorRef,Pair<String,Class<out Actor>>>()
+    val actorCreateMessages = hashMapOf<Class<out Any>, Class<out ActorMessage>>()
+    val allActors = hashMapOf<ActorRef, Pair<String, Class<out Actor>>>()
     val cameraActorDisplays = hashMapOf<String, ActorRef>()//dataset name, actor ref
 
     //There needs to be one shared killswitch per graph instance
     var sharedKillSwitch = KillSwitches.shared("strimm-shared-killswitch")
 
-    //
-    //tw
+    //TODO need to determine if these are equivalent or are both needed
     var routedRoiList = hashMapOf<Overlay, Pair<ActorRef, String>>()
     var routedRoiOverlays = hashMapOf<Overlay, String>()
-    //
-    //
-    lateinit var mainActor : ActorRef
-    lateinit var fileWriterActor : ActorRef
+    lateinit var mainActor: ActorRef
+    lateinit var fileWriterActor: ActorRef
     var deadActors = arrayListOf<ActorRef>()
 
     init {
         createActorMessageMap()
     }
 
-    fun createFWActor(props: Props, name : String, actorClass: Class<out Actor>) {
+    fun createFWActor(props: Props, name: String, actorClass: Class<out Actor>) {
         GUIMain.loggerService.log(Level.INFO, "Creating File Writer actor...")
         fileWriterActor = createActor(props, name, actorClass)
         fileWriterActor.tell(Message(""), ActorRef.noSender())
     }
 
-    fun createActor(props : Props, name : String, actorClass : Class<out Actor>) : ActorRef {
-        GUIMain.loggerService.log(Level.INFO,"Registering actor: $name")
+    fun createActor(props: Props, name: String, actorClass: Class<out Actor>): ActorRef {
+        GUIMain.loggerService.log(Level.INFO, "Registering actor: $name")
         //Create every actor with a control aware dispatcher. This functions like default settings but will give
         //priority to any message that implements akka.dispatch.ControlMessage. This will mostly be used to send
         //high priority stop or kill messages
-        val actorRef = actorSystem.actorOf(props.withDispatcher("control-aware-dispatcher"),name)
+        val actorRef = actorSystem.actorOf(props.withDispatcher("control-aware-dispatcher"), name)
 
-        if(name != ActorConstants.MAIN_ACTOR_NAME) {
+        if (name != ActorConstants.MAIN_ACTOR_NAME) {
             val msg = WatchThisActor(actorRef)
             mainActor.tell(msg, ActorRef.noSender())
         }
 
-        allActors[actorRef] = Pair(name,actorClass)
+        allActors[actorRef] = Pair(name, actorClass)
         return actorRef
     }
 
-    fun removeActor(actorToRemove : ActorRef){
+    fun removeActor(actorToRemove: ActorRef) {
         allActors.remove(actorToRemove)
     }
 
-    fun getActorByName(actorName : String) : ActorRef?{
-        var ref : ActorRef? = null
-        for(actor in allActors){
-            if(actor.value.first == actorName){
+    fun getActorByName(actorName: String): ActorRef? {
+        var ref: ActorRef? = null
+        for (actor in allActors) {
+            if (actor.value.first == actorName) {
                 ref = actor.key
                 break
             }
 
-            if(getActorPrettyName(actor.value.first) == actorName){
+            if (getActorPrettyName(actor.value.first) == actorName) {
                 ref = actor.key
                 break
             }
@@ -103,10 +100,10 @@ class ActorService : AbstractService(), ImageJService {
      * @param actorClass The class of the actor
      * @return An array list of all actors with the actorClass (as ActorRef objects)
      */
-    fun <P : Actor?>getActorsOfType(actorClass : Class<P>) : ArrayList<ActorRef> {
+    fun <P : Actor?> getActorsOfType(actorClass: Class<P>): ArrayList<ActorRef> {
         val actorsOfType = arrayListOf<ActorRef>()
-        for(actor in allActors){
-            if(actor.value.second == actorClass){
+        for (actor in allActors) {
+            if (actor.value.second == actorClass) {
                 actorsOfType.add(actor.key)
             }
         }
@@ -119,23 +116,22 @@ class ActorService : AbstractService(), ImageJService {
      * time a dockable window plugin is created. We only need create this main actor once
      * @return The main actor as an ActorRef object
      */
-    fun createStrimmActorIfNotExists() : ActorRef {
+    fun createStrimmActorIfNotExists(): ActorRef {
         mainActor = try {
             val selection = actorSystem.actorSelection("/user/StrimmActor")
             val timeOut = Timeout(200, TimeUnit.MILLISECONDS)
             val asker = AskableActorSelection(selection)
-            val future = asker.ask(Identify(1),timeOut)
+            val future = asker.ask(Identify(1), timeOut)
             val identity = Await.result(future, timeOut.duration()) as ActorIdentity
             val ref = identity.actorRef
             ref.get() //This line should cause an error if a StrimmActor doesn't exist
-        }
-        catch(ex : NoSuchElementException){
-            GUIMain.loggerService.log(Level.INFO,"Main STRIMM actor does not exist, creating...")
+        } catch (ex: NoSuchElementException) {
+            GUIMain.loggerService.log(Level.INFO, "Main STRIMM actor does not exist, creating...")
             createActor(StrimmActor.props(actorCreateMessages), ActorConstants.MAIN_ACTOR_NAME, StrimmActor::class.java)
         }
 
         // Only one instance of FileWriterActor is required per STRIMM session, so this can be created here
-        synchronized(this){
+        synchronized(this) {
             mainActor.tell(CreateFileWriterActor(""), ActorRef.noSender())
         }
 
@@ -146,7 +142,7 @@ class ActorService : AbstractService(), ImageJService {
      * For any dockable window plugin that has an associated actor, make a note of which create message to use. Note
      * that data store actors are not registered here as they do not have an associated dockable window plugin
      */
-    private fun createActorMessageMap(){
+    private fun createActorMessageMap() {
         actorCreateMessages[TraceWindowPlugin::class.java] = CreateTraceActor::class.java
         actorCreateMessages[CameraWindowPlugin::class.java] = CreateCameraActor::class.java
         actorCreateMessages[MetaDataWindowPlugin::class.java] = CreateMetaDataActor::class.java
@@ -159,7 +155,7 @@ class ActorService : AbstractService(), ImageJService {
      * @param baseActorName The actor name without any GUID
      * @return The unique actor name
      */
-    fun makeActorName(baseActorName : String) : String{
+    fun makeActorName(baseActorName: String): String {
         val uniqueID = UUID.randomUUID().toString()
         val sanitizedName = GUIMain.utilsService.sanitiseNameForPlugin(baseActorName)
         return "$sanitizedName-ID-$uniqueID"
@@ -170,29 +166,30 @@ class ActorService : AbstractService(), ImageJService {
      * @param fullActorName The full actor name including GUID
      * @return The base actor name
      */
-    fun getActorPrettyName(fullActorName : String) : String{
+    fun getActorPrettyName(fullActorName: String): String {
         val split = fullActorName.split("-")
         return split.first()
     }
 
-    fun getPertainingDisplaySinkNameFromDockableTitle(activeDisplaySz : String) : String?{
+    fun getPertainingDisplaySinkNameFromDockableTitle(activeDisplaySz: String): String? {
         val cameraActor = getPertainingCameraActorFromDockableTitle(activeDisplaySz)
-        if (cameraActor != null){
+        if (cameraActor != null) {
             //use cameraActor to get sink.name
             val future = PatternsCS.ask(cameraActor, AskDisplaySinkName(), 5000).toCompletableFuture()
-            val sinkName : String = future.toCompletableFuture().get() as String
+            val sinkName: String = future.toCompletableFuture().get() as String
             return sinkName
         }
         return null
     }
+
     /**
      * This code will be run from a right click on a camera feed. Find the camera actor relating to this context
      * @param activeDisplay The ImageDisplay currently in focus
      * @return The reference to the pertaining camera actor
      */
-    fun getPertainingCameraActorFromDisplay(activeDisplay : ImageDisplay) : ActorRef?{
+    fun getPertainingCameraActorFromDisplay(activeDisplay: ImageDisplay): ActorRef? {
         val cameraActors = getActorsOfType(CameraActor::class.java)
-        for(cameraActor in cameraActors){
+        for (cameraActor in cameraActors) {
             //TODO determine optimal timeout
             val future = PatternsCS.ask(cameraActor, AskDisplayName(), 5000).toCompletableFuture()
             //TODO do we need a completed/isDone check?
@@ -205,15 +202,13 @@ class ActorService : AbstractService(), ImageJService {
         return null
     }
 
-    fun getPertainingCameraActorFromDockableTitle(dockableTitle : String) : ActorRef?{
+    fun getPertainingCameraActorFromDockableTitle(dockableTitle: String): ActorRef? {
         val cameraActors = getActorsOfType(CameraActor::class.java)
-        for(cameraActor in cameraActors){
+        for (cameraActor in cameraActors) {
             //TODO determine optimal timeout
             val future = PatternsCS.ask(cameraActor, AskDisplayName(), 5000).toCompletableFuture()
             //TODO do we need a completed/isDone check?
             val cameraActorDisplayName = future.toCompletableFuture().get() as String
-//            val split = cameraActorDisplayName.split("-")
-//            val cameraName = split[1] //TODO this needs to be improved
             if (cameraActorDisplayName in dockableTitle) {
                 return cameraActor
             }
@@ -222,18 +217,18 @@ class ActorService : AbstractService(), ImageJService {
         return null
     }
 
-    fun askFileWriterActorIfWriting() : Boolean?{
+    fun askFileWriterActorIfWriting(): Boolean? {
         val future = PatternsCS.ask(fileWriterActor, AskIsWriting(), 5000).toCompletableFuture()
-        if (future.toCompletableFuture().get() is Boolean){
+        if (future.toCompletableFuture().get() is Boolean) {
             return future.toCompletableFuture().get() as Boolean
         }
 
         return null
     }
 
-    fun askTraceActorIfIsTraceROI(traceActor : ActorRef) : Boolean?{
+    fun askTraceActorIfIsTraceROI(traceActor: ActorRef): Boolean? {
         val future = PatternsCS.ask(traceActor, AskIsTraceROI(), 5000).toCompletableFuture()
-        if (future.toCompletableFuture().get() is Boolean){
+        if (future.toCompletableFuture().get() is Boolean) {
             return future.toCompletableFuture().get() as Boolean
         }
 
@@ -245,18 +240,18 @@ class ActorService : AbstractService(), ImageJService {
      * @param cameraActor The camera actor for a display
      * @return The camera device label
      */
-    fun getPertainingCameraDeviceLabelForActor(cameraActor : ActorRef) : String?{
+    fun getPertainingCameraDeviceLabelForActor(cameraActor: ActorRef): String? {
         val future = PatternsCS.ask(cameraActor, AskCameraStreamSource(), 5000).toCompletableFuture()
         val deviceLabel = future.toCompletableFuture().get()
         return deviceLabel as? String
     }
 
-    fun getPertainingDatasetForCameraDevice(cameraDeviceLabel : String) : String?{
-        val allCameraActors = allActors.filter { x -> x.value.second == CameraActor::class.java}
-        for(actor in allCameraActors){
+    fun getPertainingDatasetForCameraDevice(cameraDeviceLabel: String): String? {
+        val allCameraActors = allActors.filter { x -> x.value.second == CameraActor::class.java }
+        for (actor in allCameraActors) {
             val askDeviceLabelFuture = PatternsCS.ask(actor.key, AskCameraDeviceLabel(), 5000).toCompletableFuture()
             val actorCameraDeviceLabel = askDeviceLabelFuture.toCompletableFuture().get()
-            if(cameraDeviceLabel == actorCameraDeviceLabel){
+            if (cameraDeviceLabel == actorCameraDeviceLabel) {
                 val askDatasetNameFuture = PatternsCS.ask(actor.key, AskDatasetName(), 5000).toCompletableFuture()
                 val datasetName = askDatasetNameFuture.toCompletableFuture().get()
                 return datasetName as? String
