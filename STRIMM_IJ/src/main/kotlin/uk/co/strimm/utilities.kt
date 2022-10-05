@@ -55,7 +55,7 @@ fun setIcon(width: Int, height: Int, path: String, title: String = "",
     }
     catch (ex : Exception) {
         val addMsg = if (isButton) { title.plus(" button icon") } else { title }
-        loggerService.log(Level.WARNING, "Could not load ".plus(addMsg))
+        loggerService.log(Level.WARNING, "Could not load $addMsg from path $path. Error message: ${ex.message}")
         loggerService.log(Level.WARNING, ex.stackTrace)
     }
     return null
