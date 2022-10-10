@@ -166,7 +166,13 @@ $Files =
     "$env:USERPROFILE/.m2/repository/org/jetbrains/kotlin/kotlin-runtime/1.2.61/kotlin-runtime-1.2.61.jar",
     "$env:USERPROFILE/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar",
     "$env:USERPROFILE/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.2.61/kotlin-stdlib-jdk8-1.2.61.jar",
-    "$env:USERPROFILE/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.2.61/kotlin-stdlib-jdk7-1.2.61.jar"
+    "$env:USERPROFILE/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.2.61/kotlin-stdlib-jdk7-1.2.61.jar",
+	"$env:USERPROFILE/.m2/repository/com/opencsv/opencsv/4.0/opencsv-4.0.jar",
+	"$env:USERPROFILE/.m2/repository/com/fazecast/jSerialComm/2.9.2/jSerialComm-2.9.2.jar",
+	"../hdfjava/jarhdf5-3.3.2.jar",
+	"../hdfjava/slf4j-api-1.7.5.jar",
+	"../hdfjava/slf4j-nop-1.7.5.jar",
+	"../hdfjava/slf4j-simple-1.7.5.jar"
 
 function createDir
 {
@@ -245,21 +251,37 @@ if (Test-Path -Path $OutputDir) {
 createDir $OutputDir
 
 createDir "$OutputDir/jars"
+createDir "$OutputDir/ExperimentConfigurations"
+createDir "$OutputDir/ExperimentOutput"
+createDir "$OutputDir/DeviceAdapters"
+createDir "$OutputDir/logo"
+createDir "$OutputDir/luts"
+createDir "$OutputDir/Protocols"
+
 $Files | foreach { copyFile -From $_ -To "$OutputDir/jars/" }
 copyMavenJar -Location "../STRIMM_IJ/target" -Name "STRIMM_IJ"
 copyMavenJar -Location "../STRIMM_JNI/target" -Name "STRIMM_JNI"
 
-createDir "$OutputDir/DAQs"
-copyFolderContents -From "../WorkingDirectory/DAQs" -To "$OutputDir/DAQs"
-
-createDir "$OutputDir/DeviceAdapters"
 copyFolderContents -From "../WorkingDirectory/DeviceAdapters" -To "$OutputDir/DeviceAdapters"
+copyFolderContents -From "../WorkingDirectory/DeviceAdapters/CameraMMConfigs" -To "$OutputDir/DeviceAdapters/CameraMMConfigs"
+copyFolderContents -From "../WorkingDirectory/DeviceAdapters/CameraMMConfigsTrigger" -To "$OutputDir/DeviceAdapters/CameraMMConfigsTrigger"
+copyFolderContents -From "../logo" -To "$OutputDir/logo"
+copyFolderContents -From "../WorkingDirectory/ExperimentConfigurations" -To "$OutputDir/ExperimentConfigurations"
+copyFolderContents -From "../WorkingDirectory/Protocols" -To "$OutputDir/Protocols"
+copyFolderContents -From "../WorkingDirectory/luts" -To "$OutputDir/luts"
 
 Write-Host "Copying loose files" -ForegroundColor Cyan
 copyFile -From "../WorkingDirectory/MMCoreJ_wrap.dll" -To "$OutputDir"
+copyFile -From "../WorkingDirectory/Test.dll" -To "$OutputDir"
 copyFile -From "splash.png" -To "$OutputDir"
 
+Write-Host "Creating Launcher" -ForegroundColor Cyan
+cl /EHsc launcher.cpp /link /subsystem:windows /entry:mainCRTStartup /out:STRIMM.exe
+copyFile -From "STRIMM.exe" -To "$OutputDir"
 
+Write-Host "Deleting compilation files" -ForegroundColor Red
+Remove-Item "STRIMM.exe"
+Remove-Item "launcher.obj"
 
 Write-Host
 Write-Host "Packinging Successful" -ForegroundColor Green
