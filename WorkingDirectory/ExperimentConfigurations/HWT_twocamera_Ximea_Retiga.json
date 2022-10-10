@@ -1,0 +1,190 @@
+{
+	"experimentConfigurationName" : "TestConfig1",
+	"experimentMode" : "Acquisition",
+	"experimentDurationMs" : "10000",
+	"HDF5Save" : "True",
+	"ROIAdHoc" : "False",
+	"NIDAQ" : {
+		"deviceLabel" : "NIDAQ6343",
+		"deviceID" : 4,
+		"protocolName" : "strimmtestingAO0_AO1.csv",
+		"szFolder" : "C:\\strimm\\Mino version\\STRIMM\\CreateCSV\\CreateCSV\\",
+		"bCompound" : False,
+		"bStartTrigger" : False,
+		"bRisingEdge" : True,
+		"timeoutSec" : 100.0,
+		"pFIx" : 0,
+		"bRepeat" : False,
+		"minV" :  -10.0,
+		"maxV" :   10.0,
+		"timingMethod" : 0,
+		"virtualChannels" : [
+			{
+				"channelName" : "ao0",
+				"physicalChannels" : [
+					{
+					 "bAnalog" : True,
+					 "bOutput" : True,
+					 "channel" : 0
+					},
+					{
+					 "bAnalog" : True,
+					 "bOutput" : True,
+					 "channel" : 1
+					}
+				]
+			}
+		]
+	},
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "TraceSource",
+				"sourceType" : "NIDAQSource",
+				"deviceLabel" : "NIDAQ6343",
+				"outputType" : "Trace",
+				"deviceSamplingRateHz" : 10
+			},
+			{
+				"sourceName" : "Ximea",
+				"deviceLabel" : "Ximea",
+				"sourceCfg" : "Ximea.cfg",
+				"isImageSnapped" : False,
+				"isTriggered" : True,
+				"isTimeLapse" : False,
+				"intervalMs" :1000.0,
+				"exposureMs" : 100.0,
+				"framesInCircularBuffer" : -1,
+				"previewFps" : 10.0,
+				"outputType" : "Image"
+			},
+			{
+				"sourceName" : "Retiga R1",
+				"deviceLabel" : "Retiga R1",
+				"sourceCfg" : "RetigaR1.cfg",
+				"isImageSnapped" : False,
+				"isTriggered" : True,
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0,
+				"exposureMs" : 100.0,
+				"framesInCircularBuffer" : -1,
+				"previewFps" : 10.0,
+				"outputType" : "Image"
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "Null_NIDAQ",
+				"flowType" : "Identity",
+				"flowDetails" : "",
+				"inputNames" : [
+					"TraceSource"
+				],
+				"inputType" : "Trace",
+				"outputType" : "Trace",
+				"description" : "simply copies input to output, needed in order to add a broadcast hub"
+			},
+			{
+				"flowName" : "SelectTrigger",
+				"flowType" : "ChannelSelector",
+				"flowDetails" : "ao0",
+				"inputNames" : [
+					"Null_NIDAQ"
+				],
+				"inputType" : "Trace",
+				"outputType" : "Trace",
+				"description" : "takes all the channels from the NIDAQ as input and filters them down to a few"
+			},
+			{
+				"flowName" : "XimeaCamFlow1",
+				"inputNames" : [
+					"Ximea"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			},
+			{
+				"flowName" : "RetigaCamFlow1",
+				"inputNames" : [
+					"Retiga R1"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "NIDAQDisplay",
+				"sinkType" : "",
+				"inputNames" : [
+					"SelectTrigger"
+				],
+				"primaryDevice" : "NIDAQ6343",
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "NIDAQStore",
+				"sinkType" : "",
+				"inputNames" : [
+					"SelectTrigger"
+				],
+				"primaryDevice" : "NIDAQ6343",
+				"outputType" : "Trace",
+				"displayOrStore" : "Store"
+			},
+			{
+				"sinkName" : "XimeaCam1Display1",
+				"sinkType" : "",
+				"inputNames" : [
+					"XimeaCamFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+				"imageWidth" : 1280,
+				"imageHeight" : 1024,
+				"bitDepth" : 8,
+				"lut" : "",
+				"primaryDevice" : "Ximea"
+			},
+			{
+				"sinkName" : "XimeaCam1Store",
+				"sinkType" : "",
+				"inputNames" : [
+					"XimeaCamFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Store",
+				"primaryDevice" : "Ximea"
+			},
+			{
+				"sinkName" : "RetigaCam1Display1",
+				"sinkType" : "",
+				"inputNames" : [
+					"RetigaCamFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+				"imageWidth" : 1376,
+				"imageHeight" : 1024,
+				"bitDepth" : 16,
+				"lut" : "",
+				"primaryDevice" : "Retiga"
+			},
+			{
+				"sinkName" : "RetigaCam1Store",
+				"sinkType" : "",
+				"inputNames" : [
+					"RetigaCamFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Store",
+				"primaryDevice" : "Retiga"
+			}
+		]
+	}
+}

@@ -84,8 +84,10 @@ class AcquisitionMethodService : AbstractService(), ImageJService {
         val pathnames: Array<String>
         val files = File("$DEVICE_ADAPTERS_FOLDER/CameraMMConfigs")
         pathnames = files.list()
-        for (pathname in pathnames) {
-            configuredCameras[pathname] = CameraConfigured(pathname)
+        if (pathnames != null) {
+            for (pathname in pathnames) {
+                configuredCameras[pathname] = CameraConfigured(pathname)
+            }
         }
     }
 

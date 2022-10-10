@@ -2,6 +2,8 @@ package uk.co.strimm
 
 import net.imagej.ImageJ
 import uk.co.strimm.gui.GUIMain
+import java.io.FileOutputStream
+import java.io.PrintStream
 
 /**
  * Main class. Everything starts here
@@ -15,6 +17,7 @@ open class Main {
          */
         @JvmStatic
         fun main(args: Array<String>) {
+            System.setOut(PrintStream(FileOutputStream("startup.txt",true)))
             val ij = ImageJ()
             ij.launch(".")
             ij.command().run(GUIMain::class.java, true)
