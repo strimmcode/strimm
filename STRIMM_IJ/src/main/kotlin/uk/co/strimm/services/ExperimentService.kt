@@ -496,7 +496,14 @@ class ExperimentService : AbstractService(), ImageJService {
     }
 
     fun calculateNumberOfDataPointsFromInterval(deviceName: String, interval: Double) {
-        val numDataPoints = BigDecimal(experimentStream.durationMs / interval).setScale(1, RoundingMode.FLOOR).toInt()
+        val experimentSource = experimentStream.expConfig.sourceConfig.sources.first{ x-> x.deviceLabel == deviceName}
+        val numDataPoints = if(interval < experimentSource.exposureMs){
+            BigDecimal(experimentStream.durationMs/experimentSource.exposureMs).setScale(1, RoundingMode.FLOOR).toInt()
+        }
+        else {
+            BigDecimal(experimentStream.durationMs / interval).setScale(1, RoundingMode.FLOOR).toInt()
+        }
+
         deviceDatapointNumbers[deviceName] = numDataPoints
         GUIMain.loggerService.log(Level.INFO, "Device $deviceName should have $numDataPoints data points")
     }

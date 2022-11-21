@@ -1,0 +1,195 @@
+{
+	"experimentConfigurationName" : "TestConfig1",
+	"experimentMode" : "Live",
+	"experimentDurationMs" : "300000",
+	"HDF5Save" : "True",
+	"ROIAdHoc" : "False",
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "Ximea",
+				"deviceLabel" : "Ximea",
+				"sourceCfg" : "Ximea.cfg",
+				"outputType" : "Image",
+				"isImageSnapped" : False,
+				"isTriggered" : False,
+				"isTimeLapse" : False,
+				"intervalMs" : 0.0,
+				"exposureMs" : 50.0,
+				"framesInCircularBuffer" : -1,
+				"previewFps" : 20.0,
+				"x" : 512,
+				"y" : 512,
+				"w" : 900,
+				"h" : 768,
+				"outputType" : "Image"
+			},
+			{
+				"sourceName" : "Retiga R1",
+				"deviceLabel" : "Retiga R1",
+				"sourceCfg" : "RetigaR1.cfg",
+				"outputType" : "Image",
+				"isImageSnapped" : False,
+				"isTriggered" : True,
+				"isTimeLapse" : False,
+				"intervalMs" : 0.0,
+				"exposureMs" : 50.0,
+				"framesInCircularBuffer" : -1,
+				"previewFps" : 20.0,
+				"x" : 80,
+				"y" : 275,
+				"w" : 440,
+				"h" : 140
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "XimeaFlow",
+				"inputNames" : [
+					"Ximea"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			},
+			{
+				"flowName" : "RetigaR1Flow",
+				"inputNames" : [
+					"Retiga R1"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			},
+			{
+				"flowName" : "XimeaROIFlow",
+				"inputNames" : [
+					"XimeaFlow"
+				],
+				"inputType" : "Image",
+				"outputType" : "Trace"
+			},
+			{
+				"flowName" : "MyThreshold",
+				"flowType" : "Threshold_Flow",
+				"inputNames" : [
+					"XimeaROIFlow"
+				],
+				"param1" : 11.0,
+				"param2" : 3.0,
+				"param3" : 1.0,
+				"inputType" : "Trace",
+				"outputType" : "Trace"
+			},
+			{
+				"flowName" : "arduino",
+				"flowType" : "Arduino_Digital_Output",
+				"inputNames" : [
+					"MyThreshold"
+				],
+				"inputType" : "Trace",
+				"outputType" : "Trace"
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "XimeaFlowDisplay",
+				"inputNames" : [
+					"XimeaFlow"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+				"imageWidth" : 900,
+				"imageHeight" : 768,
+				"bitDepth" : 8,
+				"roiFlowName" : "XimeaROIFlow",
+				"lut" : ""
+			},
+			{
+				"sinkName" : "XimeaFlowStore",
+				"inputNames" : [
+					"XimeaFlow"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Store",
+				"isROI" : True,
+				"terminatingCond" : "time"
+			},
+			{
+				"sinkName" : "RetigaR1Display",
+				"sinkType" : "",
+				"inputNames" : [
+					"RetigaR1Flow"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+				"imageWidth" : 440,
+				"imageHeight" : 140,
+				"bitDepth" : 16,
+				"roiFlowName" : "",
+				"lut" : ""
+			},
+			{
+				"sinkName" : "RetigaStore",
+				"sinkType" : "",
+				"inputNames" : [
+					"RetigaR1Flow"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Store",
+				"terminatingCond" : "keyboard",
+				"terminatingKey" : "Z"
+			},
+			{
+				"sinkName" : "XimeaROIDisplay",
+				"inputNames" : [
+					"XimeaROIFlow"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "XimeaROIStore",
+				"inputNames" : [
+					"XimeaROIFlow"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Store",
+				"isROI" : True,
+				"terminatingCond" : "time"
+			},
+			{
+				"sinkName" : "MySink",
+				"inputNames" : [
+					"arduino"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "MySinkStore",
+				"inputNames" : [
+					"arduino"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Store",
+				"terminatingCond" : "time"
+			}
+		]
+	},
+ 	"roiConfig": {
+		"rois": [
+		    {
+			  "x": 780.0,
+			  "y": 135.0,
+			  "w": 8.0,
+			  "h": 475.0,
+			  "ROItype": "Rectangle",
+			  "flowName": "XimeaROIFlow",
+			  "ROIName" : "XimeaROI1"
+		    }
+		]
+	}
+}

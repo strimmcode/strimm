@@ -1,9 +1,9 @@
 {
 	"experimentConfigurationName" : "TestConfig1",
-	"experimentMode" : "Preview",
+	"experimentMode" : "Live",
 	"experimentDurationMs" : "10000",
 	"HDF5Save" : "True",
-	"ROIAdHoc" : "True",
+	"ROIAdHoc" : "False",
 	"sourceConfig":{ 
 		"sources" : [
 			{
@@ -11,13 +11,13 @@
 				"deviceLabel" : "Retiga R1",
 				"sourceCfg" : "RetigaR1.cfg",
 				"outputType" : "Image",
-				"isImageSnapped" : True,
+				"isImageSnapped" : False,
 				"isTriggered" : False,
 				"isTimeLapse" : False,
-				"intervalMs" : 100.0,
-				"exposureMs" : 100.0,
-				"framesInCircularBuffer" : -1,
-				"previewFps" : 10.0
+				"intervalMs" : 0.0,
+				"exposureMs" : 50.0,
+				"framesInCircularBuffer" : 200,
+				"previewFps" : 20.0
 			}
 		]
 	},
@@ -43,8 +43,8 @@
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Display",
-				"imageWidth" : 1376,
-				"imageHeight" : 1024,
+				"imageWidth" : 688,
+				"imageHeight" : 512,
 				"bitDepth" : 16,
 				"lut" : ""
 			},

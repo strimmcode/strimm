@@ -9,6 +9,7 @@ import uk.co.strimm.gui.GUIMain;
 
 import java.io.FileReader;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 
 public class CameraConfigured extends Camera{
@@ -21,11 +22,12 @@ public class CameraConfigured extends Camera{
         try {
             szCameraFile = szCamera;
             StrVector st = new StrVector();
-            st.add("./DeviceAdapters");
+            st.add("./DeviceAdapters");//TODO HARDCODED
             core.setDeviceAdapterSearchPaths(st);
-            core.loadSystemConfiguration(".\\DeviceAdapters\\CameraMMConfigs\\" + szCamera);
+            core.loadSystemConfiguration(".\\DeviceAdapters\\CameraMMConfigs\\" + szCamera);//TODO HARDCODED
             label = core.getCameraDevice();
             name = core.getDeviceName(label);
+
             library = core.getDeviceLibrary(label);
             System.out.println(label + " " + library + " " + name);
             //JOptionPane.showMessageDialog(null, label + " " + library + " " + name);
@@ -43,6 +45,7 @@ public class CameraConfigured extends Camera{
         bTriggered = bTrig;
         if (bTrig) {
             List <String[]> r = null;
+            //TODO hardcoded paths
             try (CSVReader reader = new CSVReader(new FileReader(".\\DeviceAdapters\\CameraMMConfigsTrigger\\" + szCameraFile))) {
                 System.out.println("TERRY Made a CSVReader at " + ".\\DeviceAdapters\\CameraMMConfigsTrigger\\" + szCameraFile);
                 r = reader.readAll();
@@ -129,7 +132,10 @@ public class CameraConfigured extends Camera{
 
                         String MMMetadataTagName = "ElapsedTime-ms";
                         String timeStamp = (String)im.tags.get(MMMetadataTagName);
-                        timeAcquired = Double.parseDouble(timeStamp);
+                        timeAcquired = Double.parseDouble(timeStamp)/1000.0;
+//                        if(label.toLowerCase().contains("retiga")){
+//                            System.out.println(timeAcquired);
+//                        }
                         break;
                     } catch (Exception ex) {
                         GUIMain.loggerService.log(Level.SEVERE, "Error getting image from circular buffer. Message " + ex.getMessage());
@@ -199,7 +205,7 @@ public class CameraConfigured extends Camera{
             }
         }
        // System.out.println("taken image:" + count);
-        return new STRIMMImage(label, pix, GUIMain.softwareTimerService.getTime(), count, (int) core.getImageWidth(), (int) core.getImageHeight());
+        return new STRIMMImage(label, pix, timeAcquired, count, (int) core.getImageWidth(), (int) core.getImageHeight());
     }
 }
 

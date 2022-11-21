@@ -48,6 +48,8 @@ class ProtocolService : AbstractService(), ImageJService {
     fun COMPort(): SerialPort? {
         if (COMPort == null) {
             COMPort = SerialPort.getCommPort("COM5") //TODO hardcoded should come from experiment config
+            COMPort!!.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY)
+            COMPort!!.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0)
             return if (COMPort!!.openPort()) {
                 GUIMain.loggerService.log(Level.INFO, "COM port opened")
                 COMPort

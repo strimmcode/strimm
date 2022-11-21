@@ -206,6 +206,9 @@ class ExperimentConstants{
             const val CONSTANT_VECTOR_SOURCE_METHOD_NAME = "ConstantVectorSource"
             const val SINE_WAVE_SOURCE_METHOD_NAME = "SineWaveSource"
             const val SQUARE_WAVE_SOURCE_METHOD_NAME = "SquareWaveSource"
+            const val TIME_TERMCOND = "time"
+            const val DATA_TERMCOND = "data"
+            const val KEYBOARD_TERMCOND = "keyboard"
         }
     }
     class Commands{

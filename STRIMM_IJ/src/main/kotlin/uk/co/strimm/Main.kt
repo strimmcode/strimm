@@ -17,7 +17,9 @@ open class Main {
          */
         @JvmStatic
         fun main(args: Array<String>) {
-            System.setOut(PrintStream(FileOutputStream("startup.txt",true)))
+            //This writes print statements to a text file. It's used before the logger service is instantiated
+//            System.setOut(PrintStream(FileOutputStream("startup_log.txt",true)))
+
             val ij = ImageJ()
             ij.launch(".")
             ij.command().run(GUIMain::class.java, true)

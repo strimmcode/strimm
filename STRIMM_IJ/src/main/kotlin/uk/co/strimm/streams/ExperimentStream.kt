@@ -25,6 +25,9 @@ import uk.co.strimm.ExperimentConstants.Acquisition.Companion.SINE_WAVE_SOURCE_M
 import uk.co.strimm.ExperimentConstants.Acquisition.Companion.SQUARE_WAVE_SOURCE_METHOD_NAME
 import uk.co.strimm.ExperimentConstants.Acquisition.Companion.TRACE_DATA_KEYBOARD_METHOD_NAME
 import uk.co.strimm.ExperimentConstants.Acquisition.Companion.TRACE_DATA_NIDAQ_METHOD_NAME
+import uk.co.strimm.ExperimentConstants.Acquisition.Companion.TIME_TERMCOND
+import uk.co.strimm.ExperimentConstants.Acquisition.Companion.DATA_TERMCOND
+import uk.co.strimm.ExperimentConstants.Acquisition.Companion.KEYBOARD_TERMCOND
 import uk.co.strimm.MicroManager.MMCameraDevice
 import uk.co.strimm.actors.CameraDataStoreActor
 import uk.co.strimm.actors.TraceDataStoreActor
@@ -48,6 +51,7 @@ import uk.co.strimm.services.AcquisitionMethodService
 import java.time.Duration
 import java.util.*
 import java.util.logging.Level
+import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.round
 
@@ -370,7 +374,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                // .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                 .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
                                         builder.from(imageSource.bcastObject).via(bufferFlow).toFanIn(outlet.mergeObject)
@@ -386,7 +390,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                //.buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
 
@@ -447,7 +451,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                //.buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
                                         builder.from(imageSource.source).via(bufferFlow).toFanIn(outlet.mergeObject)
@@ -463,7 +467,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                //.buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
                                         builder.from(imageSource.source).via(bufferFlow).to(outlet.sink)
@@ -641,7 +645,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                //.buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
                                         builder.from(traceImgFlow.bcastObject).via(bufferFlow).toFanIn(outlet.mergeObject)
@@ -657,7 +661,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                //.buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
                                         builder.from(traceImgFlow.bcastObject).via(bufferFlow).to(outlet.sink)
@@ -927,7 +931,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                //.buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
                                         builder.from(imgImgFlow.bcastObject).via(bufferFlow).toFanIn(outlet.mergeObject)
@@ -942,7 +946,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                //.buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
                                         builder.from(imgImgFlow.bcastObject).via(bufferFlow).to(outlet.sink)
@@ -957,7 +961,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                             }
                         }
                     }
-                } else {
+                }
+                else {
                     for (outlet in imgImgFlow.outs) {
                         when (outlet) {
                             is ExperimentImageImageFlow -> {
@@ -986,7 +991,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                //.buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
                                         builder.from(imgImgFlow.flow).via(bufferFlow).toFanIn(outlet.mergeObject)
@@ -1002,7 +1007,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     if (outlet.displayOrStore == ExperimentConstants.ConfigurationProperties.DISPLAY) {
                                         val bufferFlow = builder.add(Flow.of(STRIMMImage::class.java)
                                                 //TODO this was added in previously to fix a bug when using continuous mode
-                                                //.buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+                                                .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
                                                 .async()
                                                 .named("BufferFlow"))
                                         builder.from(imgImgFlow.flow).via(bufferFlow).to(outlet.sink)
@@ -1813,7 +1818,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                     source.camera!!.SetTriggered(source.isTriggered)
                     source.camera!!.SetFramesInCircularBuffer(source.framesInCircularBuffer)
                     source.camera!!.SetROI(source.x.toInt(), source.y.toInt(), source.w.toInt(), source.h.toInt())
-                    source.camera!!.Reset()
+//                    source.camera!!.Reset()
 
                     /**
                      * The isGreyScale setting is important for OpenCV. At present STRIMM does not support RGB however
@@ -1846,7 +1851,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                     expSource.outputType = ExperimentConstants.ConfigurationProperties.IMAGE_OUTPUT_TYPE
                     expSource.exposureMs = source.exposureMs
                     expSource.intervalMs = source.intervalMs
+
                     GUIMain.experimentService.calculateNumberOfDataPointsFromInterval(source.deviceLabel, intervalMs)
+
                     experimentImageSources.add(expSource)
                 } else if (source.outputType.toLowerCase() == ExperimentConstants.ConfigurationProperties.TRACE_OUTPUT_TYPE.toLowerCase()) {
                     val expSource = ExperimentTraceSource(source.sourceName, source.deviceLabel)
@@ -1942,7 +1949,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                     .named(source.sourceName)
                             expSource.source = builder.add(akkaSource)
                         }
-                    } else if (source.sourceType == "KeyboardABCSource") {
+                    }
+                    else if (source.sourceType == "KeyboardABCSource") {
                         val dummyKeys = mutableListOf<Overlay>()
                         val keys = arrayListOf('A'.toInt(), 'B'.toInt(), 'C'.toInt())
                         for (f in 0 until 3) {
@@ -1964,7 +1972,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                 .named(source.sourceName)
                         expSource.source = builder.add(akkaSource)
 
-                    } else if (source.sourceType == "KeyboardASource") {
+                    }
+                    else if (source.sourceType == "KeyboardASource") {
                         val key = 'A'.toInt()
                         val pollPeriod = source.param1.toInt()
                         val dummyOverlay = EllipseOverlay()
@@ -1984,7 +1993,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                 .named(source.sourceName)
                         expSource.source = builder.add(akkaSource)
 
-                    } else if (source.sourceType == "RandomTraceSource") {
+                    }
+                    else if (source.sourceType == "RandomTraceSource") {
                         val dummyOverlay = EllipseOverlay() //this dummyOverlay will be used as the id for this trace
                         dummyOverlay.name = expSource.traceSourceName + Random().nextInt(1000)
 
@@ -2000,7 +2010,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                 .named(source.sourceName)
                         expSource.source = builder.add(akkaSource)
 
-                    } else if (source.sourceType == "ConstantTraceSource") {
+                    }
+                    else if (source.sourceType == "ConstantTraceSource") {
                         val dummyOverlay = EllipseOverlay()
                         dummyOverlay.name = expSource.traceSourceName + Random().nextInt(1000)
                         val getTraceDataMethodConstantTraceSource =
@@ -2014,7 +2025,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                 .async()
                                 .named(source.sourceName)
                         expSource.source = builder.add(akkaSource)
-                    } else if (source.sourceType == "ConstantVectorSource") {
+                    }
+                    else if (source.sourceType == "ConstantVectorSource") {
                         val overlays = arrayListOf<Overlay>()
                         val dummyOverlay1 = EllipseOverlay() //id for the 1st component
                         dummyOverlay1.name = expSource.traceSourceName + 0
@@ -2034,7 +2046,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                 .async()  //async means that it has its own thread of execution
                                 .named(source.sourceName)
                         expSource.source = builder.add(akkaSource)
-                    } else if (source.sourceType == "SineWaveSource") {
+                    }
+                    else if (source.sourceType == "SineWaveSource") {
                         val dummyOverlay = EllipseOverlay()
                         dummyOverlay.name = expSource.traceSourceName + Random().nextInt(1000)
                         val getTraceDataMethodSineWaveSource =
@@ -2049,7 +2062,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                                 .named(source.sourceName)
                         expSource.source = builder.add(akkaSource)
 
-                    } else if (source.sourceType == "SquareWaveSource") {
+                    }
+                    else if (source.sourceType == "SquareWaveSource") {
                         val dummyOverlay = EllipseOverlay()
                         dummyOverlay.name = expSource.traceSourceName + Random().nextInt(1000)
                         val getTraceDataMethodSquareWaveSource =
@@ -2318,6 +2332,11 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
 
     //TODO this method is functionally unused. Can it be removed?
     private fun printFlow(data: STRIMMImage): STRIMMImage {
+        return data
+    }
+
+    private fun printTest(data: STRIMMImage) : STRIMMImage{
+//        println(data.timeAcquired)
         return data
     }
 
@@ -2912,7 +2931,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                         }
                         else -> { // flow.flowType == "Identity"
                             val akkaFlow = Flow.of(STRIMMImage::class.java)
-                                    .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+//                                    .buffer(ExperimentConstants.ConfigurationProperties.IMAGE_BUFFER_SIZE, OverflowStrategy.dropTail())
+//                                    .map{ x-> printTest(x)}
                                     .async()
                                     .named(flow.flowName)
                             expFlow.flow = builder.add(akkaFlow)
@@ -3298,6 +3318,20 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                          */
                         val expSink = ExperimentImageSink(sink.sinkName)
                         val cameraDataStoreActor = createCameraDataStoreActor(sink.sinkName)
+
+                        when {
+                            sink.terminatingCond.toLowerCase() == DATA_TERMCOND -> {
+                                cameraDataStoreActor.tell(TellTerminatingCondition(DATA_TERMCOND, ""), ActorRef.noSender())
+                            }
+                            sink.terminatingCond.toLowerCase() == KEYBOARD_TERMCOND -> {
+                                cameraDataStoreActor.tell(TellTerminatingCondition(KEYBOARD_TERMCOND, sink.terminatingKey), ActorRef.noSender())
+                            }
+                            else -> {
+                                //Termination by elapsed time is the default
+                                cameraDataStoreActor.tell(TellTerminatingCondition(TIME_TERMCOND, ""), ActorRef.noSender())
+                            }
+                        }
+
                         val akkaSink: Sink<STRIMMImage, NotUsed> = Sink.actorRefWithAck(cameraDataStoreActor, StartCameraDataStoring(),
                                 Acknowledgement.INSTANCE, CompleteCameraDataStoring()) { ex -> FailCameraDataStoring(ex) }
                         expSink.sink = builder.add(akkaSink)
@@ -3327,7 +3361,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                             traceActor?.tell(TellDisplaySinkName(sink.sinkName), traceActor)
 
                             if (experimentImageSources.isNotEmpty()) {
-                                traceActor?.tell(TellDeviceSamplingRate(10.0), ActorRef.noSender())//TODO hardcoded
+                                traceActor?.tell(TellDeviceSamplingRate(20.0), ActorRef.noSender())//TODO hardcoded
                                 traceActor?.tell(TellSetNumDataPoints(), ActorRef.noSender())
                             }
 
@@ -3348,6 +3382,20 @@ class ExperimentStream(val expConfig: ExperimentConfiguration, loadCameraConfig:
                             traceDataStoreActor.tell(TellIsTraceROIActor(), ActorRef.noSender())
                         }
                         traceDataStoreActor.tell(TellTraceSinkName(sink.sinkName), ActorRef.noSender())
+
+                        when {
+                            sink.terminatingCond.toLowerCase() == DATA_TERMCOND -> {
+                                traceDataStoreActor.tell(TellTerminatingCondition(DATA_TERMCOND, ""), ActorRef.noSender())
+                            }
+                            sink.terminatingCond.toLowerCase() == KEYBOARD_TERMCOND -> {
+                                traceDataStoreActor.tell(TellTerminatingCondition(KEYBOARD_TERMCOND, sink.terminatingKey), ActorRef.noSender())
+                            }
+                            else -> {
+                                //Termination by elapsed time is the default
+                                traceDataStoreActor.tell(TellTerminatingCondition(TIME_TERMCOND, ""), ActorRef.noSender())
+                            }
+                        }
+
                         val akkaSink: Sink<List<ArrayList<TraceData>>, NotUsed> = Sink.actorRefWithAck(traceDataStoreActor, StartTraceDataStoring(),
                                 Acknowledgement.INSTANCE, CompleteTraceDataStoring()) { ex -> FailTraceDataStoring(ex) }
                         expSink.sink = builder.add(akkaSink)

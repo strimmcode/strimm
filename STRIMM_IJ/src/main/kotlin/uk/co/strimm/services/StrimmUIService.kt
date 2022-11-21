@@ -15,10 +15,17 @@ import org.scijava.service.Service
 import org.scijava.util.ColorRGB
 import uk.co.strimm.ComponentTexts
 import uk.co.strimm.ResizeValues
+import uk.co.strimm.actors.CameraDataStoreActor
+import uk.co.strimm.actors.TraceDataStoreActor
 import uk.co.strimm.actors.messages.tell.TellCameraResize
 import uk.co.strimm.actors.messages.tell.TellFullView
+import uk.co.strimm.actors.messages.tell.TellKeyboardPress
 import uk.co.strimm.gui.CameraWindowPlugin
 import uk.co.strimm.gui.GUIMain
+import java.awt.KeyEventDispatcher
+import java.awt.KeyboardFocusManager
+import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
 import java.util.logging.Level
 import javax.swing.JFrame
 import javax.swing.JMenuBar
@@ -28,7 +35,7 @@ import javax.swing.JOptionPane
 class StrimmUIService : AbstractService(), ImageJService {
     var dockableControl = CControl()
     var cGrid = CGrid(dockableControl)
-    var strimmFrame = JFrame("STRIMM")
+    var strimmFrame = CustomFrame()
     var imageJMenuBar = JMenuBar()
     var autoScaleCheck = false
     var state = UIstate.IDLE
@@ -37,6 +44,35 @@ class StrimmUIService : AbstractService(), ImageJService {
     var traceFromROICounterPerDisplayROIFlow = hashMapOf<String, Int>() //indexed by ROIFlow name
     var traceColourByFlowAndOverlay = hashMapOf<String, List<Pair<Overlay, Int>>>()
     //indexed by ROIFlow to give the overlay and the color int
+
+    /**
+     * This class essentially adds a key listener to every component so no matter what components are present,
+     * you can detect a key press. A key press can be used to terminate a data storage sink. When a key is pressed,
+     * STRIMM checks with all data storage actors to see if it's the terminating key specified in the config.
+     * The actor can then handle the logic of stopping and sending data to the FileWriterActor
+     */
+    class CustomFrame : JFrame(){
+        private class MyDispatcher : KeyEventDispatcher{
+            override fun dispatchKeyEvent(e: KeyEvent?): Boolean {
+                when {
+                    e!!.id == KeyEvent.KEY_PRESSED -> {
+                        GUIMain.actorService.allActors.forEach { (t, u) ->
+                            if(u.second == CameraDataStoreActor::class.java || u.second == TraceDataStoreActor::class.java){
+                                t.tell(TellKeyboardPress(e.keyCode), ActorRef.noSender())
+                            }
+                        }
+                    }
+                }
+                return false
+            }
+
+        }
+
+        init {
+            val manager = KeyboardFocusManager.getCurrentKeyboardFocusManager()
+            manager.addKeyEventDispatcher(MyDispatcher())
+        }
+    }
 
     var traceColourNonROI = 0
 

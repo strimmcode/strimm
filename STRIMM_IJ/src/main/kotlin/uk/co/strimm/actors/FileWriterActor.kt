@@ -72,7 +72,7 @@ class FileWriterActor : AbstractActor() {
                     GUIMain.loggerService.log(Level.INFO, "Expected number of trace from ROI datasets is now: $expectedNumCamDatasets")
                 }
                 .match<TellCameraData>(TellCameraData::class.java) { images ->
-                    GUIMain.loggerService.log(Level.INFO, "FileWriterActor received camera data")
+                    GUIMain.loggerService.log(Level.INFO, "FileWriterActor received camera data from ${sender.path().name()}")
                     val sourceCamera = images.dataName
                     cameraData[sourceCamera] = images.imageStore
                     cameraMetaData[sourceCamera] = images.metaData

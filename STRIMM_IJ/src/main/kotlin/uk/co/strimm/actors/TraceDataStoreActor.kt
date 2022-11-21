@@ -5,6 +5,7 @@ import akka.actor.ActorRef
 import akka.actor.PoisonPill
 import akka.actor.Props
 import uk.co.strimm.Acknowledgement
+import uk.co.strimm.ExperimentConstants
 import uk.co.strimm.TraceData
 import uk.co.strimm.TraceDataStore
 import uk.co.strimm.actors.messages.Message
@@ -14,12 +15,10 @@ import uk.co.strimm.actors.messages.fail.FailTraceDataStoring
 import uk.co.strimm.actors.messages.start.StartTraceDataStoring
 import uk.co.strimm.actors.messages.start.StartTraceStore
 import uk.co.strimm.actors.messages.stop.AbortStream
-import uk.co.strimm.actors.messages.tell.TellAnalogueDataStream
-import uk.co.strimm.actors.messages.tell.TellIsTraceROIActor
-import uk.co.strimm.actors.messages.tell.TellTraceData
-import uk.co.strimm.actors.messages.tell.TellTraceSinkName
+import uk.co.strimm.actors.messages.tell.*
 import uk.co.strimm.gui.GUIMain
 import uk.co.strimm.services.AnalogueDataStream
+import java.awt.event.KeyEvent
 import java.util.*
 import java.util.logging.Level
 
@@ -37,6 +36,8 @@ class TraceDataStoreActor : AbstractActor() {
     private var isTraceFromROI = false
     var acquiring = false
     var sinkName : String = ""
+    var terminatingCondition = ExperimentConstants.Acquisition.TIME_TERMCOND //Elapsed time is the default terminating condition
+    var terminatingKey = ""
 
     /**
      * Note: data flow will be terminated if the actor doesn't acknowledge data messages from the sender
@@ -81,6 +82,20 @@ class TraceDataStoreActor : AbstractActor() {
             .match<AskIsTraceROI>(AskIsTraceROI::class.java){
                 sender().tell(isTraceFromROI, self())
             }
+            .match<TellTerminatingCondition>(TellTerminatingCondition::class.java){
+                terminatingCondition = it.terminatingCondition
+                if(terminatingCondition == ExperimentConstants.Acquisition.KEYBOARD_TERMCOND){
+                    terminatingKey = it.terminatingKey
+                }
+            }
+            .match<TellKeyboardPress>(TellKeyboardPress::class.java){
+                val terminate = keyboardTerminate(it.keyCode)
+                if(terminate && (terminatingCondition == ExperimentConstants.Acquisition.KEYBOARD_TERMCOND) && traceStore){
+                    sendData()
+                    GUIMain.loggerService.log(Level.INFO, "Trace data store actor terminated by keyboard, no longer acquiring")
+                    acquiring = false
+                }
+            }
             .matchAny {
                 val incomingDataList = it as List<List<TraceData>>
                 val incomingData = incomingDataList.flatten() //so just List<TraceData>
@@ -107,7 +122,7 @@ class TraceDataStoreActor : AbstractActor() {
                         dataPointCounters[traceData.data.first!!.name] = dataPointCounters[traceData.data.first!!.name]!!+1
                     }
 
-                    val shouldStop = checkIfShouldStop(incomingData.first().data.first!!.name)
+                    val shouldStop = checkIfShouldStop(incomingData.first().data.first!!.name, incomingData.first().timeAcquired)
                     if(shouldStop){
                         sendData()
                         GUIMain.loggerService.log(Level.INFO, "Trace data store actor ${self.path().name()} no longer acquiring")
@@ -120,19 +135,38 @@ class TraceDataStoreActor : AbstractActor() {
             .build()
     }
 
-    private fun checkIfShouldStop(deviceLabel : String) : Boolean{
+    private fun keyboardTerminate(keyCode : Int) : Boolean {
+        val keyCodeText = KeyEvent.getKeyText(keyCode)
+        if(keyCodeText == terminatingKey){
+            return true
+        }
+        return false
+    }
+
+    private fun checkIfShouldStop(deviceLabel : String, timeAcquired: Number) : Boolean{
         return if(GUIMain.protocolService.isEpisodic){
             GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
         }
         else{
-            for(dataPointNumberPair in GUIMain.experimentService.deviceDatapointNumbers){
-                if(deviceLabel.contains(dataPointNumberPair.key)){
-                    if(dataPointCounters.all { x -> x.value >= dataPointNumberPair.value}){
-                        GUIMain.loggerService.log(Level.INFO, "Stopping trace data store actor storing data")
-                        return true
+            when(terminatingCondition){
+                ExperimentConstants.Acquisition.DATA_TERMCOND -> {
+                    for(dataPointNumberPair in GUIMain.experimentService.deviceDatapointNumbers){
+                        if(deviceLabel.contains(dataPointNumberPair.key)){
+                            if(dataPointCounters.all { x -> x.value >= dataPointNumberPair.value}){
+                                GUIMain.loggerService.log(Level.INFO, "Stopping trace data store actor storing data")
+                                return true
+                            }
+                        }
                     }
                 }
+                ExperimentConstants.Acquisition.TIME_TERMCOND -> {
+                    return timeAcquired.toDouble() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
+                }
+                else -> {
+                    return false
+                }
             }
+
             return false
         }
     }

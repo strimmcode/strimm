@@ -519,7 +519,6 @@ class AcquisitionMethodService : AbstractService(), ImageJService {
         }
     }
 
-
     private class GetTraceDataKeyboard(override var name: String, override var description: String) : TraceMethod() {
         var clockCounter = 0.0
 

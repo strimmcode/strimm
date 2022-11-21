@@ -1,9 +1,9 @@
 {
 	"experimentConfigurationName" : "TestConfig1",
-	"experimentMode" : "Preview",
+	"experimentMode" : "Live",
 	"experimentDurationMs" : "10000",
 	"HDF5Save" : "True",
-	"ROIAdHoc" : "True",
+	"ROIAdHoc" : "False",
 	"sourceConfig":{ 
 		"sources" : [
 			{
@@ -14,10 +14,14 @@
 				"isImageSnapped" : False,
 				"isTriggered" : False,
 				"isTimeLapse" : False,
-				"intervalMs" : 100.0,
-				"exposureMs" : 100.0,
-				"framesInCircularBuffer" : -1,
-				"previewFps" : 10.0
+				"intervalMs" : 0.0,
+				"exposureMs" : 50.0,
+				"framesInCircularBuffer" : 200,
+				"previewFps" : 20.0,
+				"x" : 512,
+				"y" : 512,
+				"w" : 1024,
+				"h" : 1024
 			}
 		]
 	},
@@ -43,7 +47,7 @@
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Display",
-				"imageWidth" : 1280,
+				"imageWidth" : 1024,
 				"imageHeight" : 1024,
 				"bitDepth" : 8,
 				"lut" : ""

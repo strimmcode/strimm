@@ -3,8 +3,12 @@ package uk.co.strimm.actors
 import akka.actor.AbstractActor
 import akka.actor.ActorRef
 import akka.actor.Props
+import javafx.scene.input.KeyCode
 import uk.co.strimm.Acknowledgement
 import uk.co.strimm.CameraMetaDataStore
+import uk.co.strimm.ExperimentConstants.Acquisition.Companion.DATA_TERMCOND
+import uk.co.strimm.ExperimentConstants.Acquisition.Companion.KEYBOARD_TERMCOND
+import uk.co.strimm.ExperimentConstants.Acquisition.Companion.TIME_TERMCOND
 import uk.co.strimm.STRIMMImage
 import uk.co.strimm.actors.messages.Message
 import uk.co.strimm.actors.messages.complete.CompleteCameraDataStoring
@@ -13,8 +17,17 @@ import uk.co.strimm.actors.messages.start.StartAcquiring
 import uk.co.strimm.actors.messages.start.StartCameraDataStoring
 import uk.co.strimm.actors.messages.stop.AbortStream
 import uk.co.strimm.actors.messages.tell.TellCameraData
+import uk.co.strimm.actors.messages.tell.TellTerminatingCondition
 import uk.co.strimm.gui.GUIMain
+import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
 import java.util.logging.Level
+import scala.concurrent.duration.*
+import uk.co.strimm.actors.messages.tell.TellKeyboardPress
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
+
 
 open class CameraImg(val type: String) //Superclass for generics help when dealing with the data
 data class ByteImg(var stack : ByteArray, val xDim : Long, val yDim : Long, val sourceCamera : String) : CameraImg("Byte")
@@ -27,7 +40,7 @@ class ArrayImgStore{
     var floatStack = arrayListOf<FloatImg>()
 }
 
-class CameraDataStoreActor : AbstractActor() {
+class CameraDataStoreActor : AbstractActor(){
     companion object {
         fun props(): Props {
             return Props.create<CameraDataStoreActor>(CameraDataStoreActor::class.java) { CameraDataStoreActor() }
@@ -38,6 +51,8 @@ class CameraDataStoreActor : AbstractActor() {
     val imgStack = ArrayImgStore()
     val imgStackInfo = arrayListOf<CameraMetaDataStore>()
     var acquiring = false //This flag prevents data store actors acquiring during preview mode
+    var terminatingCondition = TIME_TERMCOND //Elapsed time is the default terminating condition
+    var terminatingKey = ""
 
     /**
      * Note: data flow will be terminated if the actor doesn't acknowledge data messages from the sender
@@ -71,6 +86,20 @@ class CameraDataStoreActor : AbstractActor() {
                     GUIMain.loggerService.log(Level.INFO, "Starting camera data storing")
                     acquiring = true
                 }
+                .match<TellTerminatingCondition>(TellTerminatingCondition::class.java){
+                    terminatingCondition = it.terminatingCondition
+                    if(terminatingCondition == KEYBOARD_TERMCOND){
+                        terminatingKey = it.terminatingKey
+                    }
+                }
+                .match<TellKeyboardPress>(TellKeyboardPress::class.java){
+                    val terminate = keyboardTerminate(it.keyCode)
+                    if(terminate && (terminatingCondition == KEYBOARD_TERMCOND) && acquiring){
+                        sendData()
+                        GUIMain.loggerService.log(Level.INFO, "Camera data store actor terminated by keyboard, no longer acquiring")
+                        acquiring = false
+                    }
+                }
                 .match<STRIMMImage>(STRIMMImage::class.java) { image ->
                     if (acquiring) { //This flag prevents data store actors acquiring during preview mode
 
@@ -99,10 +128,11 @@ class CameraDataStoreActor : AbstractActor() {
                             }
                         }
 
+//                        println("Frame $imageCounter from ${image.sourceCamera} acquired at: ${image.timeAcquired}")
                         imgStackInfo.add(CameraMetaDataStore(image.timeAcquired, image.sourceCamera, imageCounter))
                         imageCounter++
 
-                        val shouldStop = checkIfShouldStop(image.sourceCamera)
+                        val shouldStop = checkIfShouldStop(image.sourceCamera, image.timeAcquired)
                         if (shouldStop) {
                             sendData()
                             GUIMain.loggerService.log(Level.INFO, "Camera data store actor no longer acquiring")
@@ -117,24 +147,57 @@ class CameraDataStoreActor : AbstractActor() {
                 .build()
     }
 
-    private fun checkIfShouldStop(deviceLabel : String) : Boolean {
-        //Acquisitions can be stopped at any time from a keyboard press (key configured in the config property "TerminateAcquisitionVirtualCode")
+    private fun keyboardTerminate(keyCode : Int) : Boolean {
+        val keyCodeText = KeyEvent.getKeyText(keyCode)
+        if(keyCodeText == terminatingKey){
+            return true
+        }
+        return false
+    }
+
+    private fun checkIfShouldStop(deviceLabel : String, timeAcquired : Number) : Boolean {
         val bKeyPressed = GUIMain.protocolService.jdaq.GetKeyState(GUIMain.experimentService.expConfig.TerminateAcquisitionVirtualCode)
         if (bKeyPressed) {
             return true
         }
 
-        return if(GUIMain.protocolService.isEpisodic){
-            GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
+        /*
+        Note that this when statement doesn't consider keyboard terminating condition. This is because the keyboard
+        condition needs to handle a keypress at any point during the acuquisition, not just when data is being received
+        */
+        when(terminatingCondition){
+            DATA_TERMCOND -> {
+                return imageCounter >= GUIMain.experimentService.deviceDatapointNumbers[deviceLabel]!!
+            }
+            TIME_TERMCOND -> {
+                return timeAcquired.toDouble() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
+            }
+            else ->{
+                return false
+            }
         }
-        else{
-            //Continuous
-            imageCounter >= GUIMain.experimentService.deviceDatapointNumbers[deviceLabel]!!
-        }
+
+
+//        //Acquisitions can be stopped at any time from a keyboard press (key configured in the config property "TerminateAcquisitionVirtualCode")
+//        val bKeyPressed = GUIMain.protocolService.jdaq.GetKeyState(GUIMain.experimentService.expConfig.TerminateAcquisitionVirtualCode)
+//        if (bKeyPressed) {
+//            return true
+//        }
+//
+//
+//        return if(GUIMain.protocolService.isEpisodic){
+//            println("Camera $deviceLabel is using episodic")
+//            GUIMain.softwareTimerService.getTime() > GUIMain.experimentService.expConfig.experimentDurationMs/1000.0
+//        }
+//        else{
+//            //Continuous
+//            println("Camera $deviceLabel is NOT using episodic")
+//            imageCounter >= GUIMain.experimentService.deviceDatapointNumbers[deviceLabel]!!
+//        }
     }
 
     private fun sendData(){
-        GUIMain.loggerService.log(Level.INFO, "Sending camera data to file writer actor")
+        GUIMain.loggerService.log(Level.INFO, "Camera data store actor ${self.path().name()} sending data to file writer actor")
         GUIMain.actorService.fileWriterActor.tell(TellCameraData(imgStack, imgStackInfo, GUIMain.experimentService.experimentStream.cameraDataStoreActors[self] as String), ActorRef.noSender())
     }
 }

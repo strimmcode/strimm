@@ -1,0 +1,2191 @@
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+failed to load Ximea.cfg
+Line 7: Device,Ximea,XIMEACamera,52601550
+Failed to load device "52601550" from adapter module "XIMEACamera" [ Device adapter "XIMEACamera" failed to instantiate device "52601550" ]
+
+
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/11/2022 11:41:34.187] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-8da2dec0-521c-4131-ba47-54f1a3c6dfcf#-1440357068] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+failed to load Ximea.cfg
+Line 7: Device,Ximea,XIMEACamera,52601550
+Failed to load device "52601550" from adapter module "XIMEACamera" [ Device adapter "XIMEACamera" failed to instantiate device "52601550" ]
+
+
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/11/2022 11:47:07.028] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-ff6edc4a-83ef-4cb4-a554-b7a8e8cbdc44#419498765] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+Calling StartAcquisition()
+640  480   Cam1Display1   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/12/2022 11:33:06.761] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-1088e579-66a6-4b39-9cf4-44aee97b745d#1525377] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+failed to load Ximea.cfg
+Line 7: Device,Ximea,XIMEACamera,52601550
+Failed to load device "52601550" from adapter module "XIMEACamera" [ Device adapter "XIMEACamera" failed to instantiate device "52601550" ]
+
+
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/12/2022 15:30:03.137] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-57f034cd-a212-45eb-8566-f26570b7c300#1168010322] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/12/2022 16:01:48.807] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-fce18db8-ef99-4ac1-bcb9-dbb45869b497#1693553962] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+Calling StartAcquisition()
+640  480   Cam1Display1   32
+[INFO] Found 10 JHotDraw adapters.
+[ERROR] [10/12/2022 16:02:28.035] [STRIMMAkkaSystem-akka.actor.default-dispatcher-11] [akka://STRIMMAkkaSystem/user/CameraFlowROIDisplayTraceActor1-ID-034ba459-6a78-46fe-857d-df112f8c7187] Kill (akka.actor.ActorKilledException: Kill)
+[ERROR] [10/12/2022 16:02:28.038] [STRIMMAkkaSystem-akka.actor.default-dispatcher-11] [akka://STRIMMAkkaSystem/user/Cam1Display1-ID-0ef9670f-c7c1-4d48-990d-9e3ac9968b2c] Kill (akka.actor.ActorKilledException: Kill)
+TERRY : SetTriggered
+Calling StartAcquisition()
+[INFO] [10/12/2022 16:02:29.643] [STRIMMAkkaSystem-akka.actor.default-dispatcher-11] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-fce18db8-ef99-4ac1-bcb9-dbb45869b497#1693553962] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [2] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+640  480   Cam1Display1   32
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+OpenCV2 OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/12/2022 16:10:42.899] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-29083ab1-abd9-4202-a33a-cd78f26a4a49#805196361] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+OpenCV2 OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/12/2022 16:16:56.485] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-e677d3d5-3a7f-45ed-bec0-7843c9222a38#1403990600] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   Cam1Display1   32
+0  0   OpenCV2Display   0
+[ERROR] [10/12/2022 16:17:11.095] [STRIMMAkkaSystem-akka.actor.default-dispatcher-10] [akka://STRIMMAkkaSystem/user/OpenCV2Display-ID-9887eb8e-af87-4d08-b05d-f24ea78b1fd4] null cannot be cast to non-null type net.imagej.display.ImageDisplay
+kotlin.TypeCastException: null cannot be cast to non-null type net.imagej.display.ImageDisplay
+	at uk.co.strimm.gui.CameraWindow.createDatasetAndAddToPanel(CameraWindow.kt:179)
+	at uk.co.strimm.gui.CameraWindow.initialiseDisplay(CameraWindow.kt:98)
+	at uk.co.strimm.actors.CameraActor$createReceive$12.apply(CameraActor.kt:103)
+	at uk.co.strimm.actors.CameraActor$createReceive$12.apply(CameraActor.kt:29)
+	at akka.japi.pf.UnitCaseStatement.apply(CaseStatements.scala:26)
+	at akka.japi.pf.UnitCaseStatement.apply(CaseStatements.scala:21)
+	at scala.PartialFunction.applyOrElse(PartialFunction.scala:123)
+	at scala.PartialFunction.applyOrElse$(PartialFunction.scala:122)
+	at akka.japi.pf.UnitCaseStatement.applyOrElse(CaseStatements.scala:21)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:171)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at akka.actor.Actor.aroundReceive(Actor.scala:517)
+	at akka.actor.Actor.aroundReceive$(Actor.scala:515)
+	at akka.actor.AbstractActor.aroundReceive(AbstractActor.scala:180)
+	at akka.actor.ActorCell.receiveMessage(ActorCell.scala:588)
+	at akka.actor.ActorCell.invoke(ActorCell.scala:557)
+	at akka.dispatch.Mailbox.processMailbox(Mailbox.scala:258)
+	at akka.dispatch.Mailbox.run(Mailbox.scala:225)
+	at akka.dispatch.Mailbox.exec(Mailbox.scala:235)
+	at akka.dispatch.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260)
+	at akka.dispatch.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339)
+	at akka.dispatch.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979)
+	at akka.dispatch.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107)
+
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/12/2022 16:23:38.300] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-d7b0e4b0-9ffe-478b-8df4-705fe059ca4c#77726239] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   Cam1Display1   32
+0  0   testcamDisplay   0
+[ERROR] [10/12/2022 16:23:50.409] [STRIMMAkkaSystem-akka.actor.default-dispatcher-8] [akka://STRIMMAkkaSystem/user/testcamDisplay-ID-a1ef51ad-a11f-468b-90c9-3de9d81ec51a] null cannot be cast to non-null type net.imagej.display.ImageDisplay
+kotlin.TypeCastException: null cannot be cast to non-null type net.imagej.display.ImageDisplay
+	at uk.co.strimm.gui.CameraWindow.createDatasetAndAddToPanel(CameraWindow.kt:179)
+	at uk.co.strimm.gui.CameraWindow.initialiseDisplay(CameraWindow.kt:98)
+	at uk.co.strimm.actors.CameraActor$createReceive$12.apply(CameraActor.kt:103)
+	at uk.co.strimm.actors.CameraActor$createReceive$12.apply(CameraActor.kt:29)
+	at akka.japi.pf.UnitCaseStatement.apply(CaseStatements.scala:26)
+	at akka.japi.pf.UnitCaseStatement.apply(CaseStatements.scala:21)
+	at scala.PartialFunction.applyOrElse(PartialFunction.scala:123)
+	at scala.PartialFunction.applyOrElse$(PartialFunction.scala:122)
+	at akka.japi.pf.UnitCaseStatement.applyOrElse(CaseStatements.scala:21)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:171)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at scala.PartialFunction$OrElse.applyOrElse(PartialFunction.scala:172)
+	at akka.actor.Actor.aroundReceive(Actor.scala:517)
+	at akka.actor.Actor.aroundReceive$(Actor.scala:515)
+	at akka.actor.AbstractActor.aroundReceive(AbstractActor.scala:180)
+	at akka.actor.ActorCell.receiveMessage(ActorCell.scala:588)
+	at akka.actor.ActorCell.invoke(ActorCell.scala:557)
+	at akka.dispatch.Mailbox.processMailbox(Mailbox.scala:258)
+	at akka.dispatch.Mailbox.run(Mailbox.scala:225)
+	at akka.dispatch.Mailbox.exec(Mailbox.scala:235)
+	at akka.dispatch.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260)
+	at akka.dispatch.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339)
+	at akka.dispatch.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979)
+	at akka.dispatch.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107)
+
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/12/2022 16:28:38.832] [STRIMMAkkaSystem-akka.actor.default-dispatcher-5] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-a0719a86-c515-4c26-89a1-c67198a3f086#1080495520] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   testcamDisplay1   32
+640  480   Cam1Display1   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+[INFO] [10/12/2022 16:36:51.492] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-77d28188-3ba9-4ebb-a8c5-524ddcc96aa3#1369851931] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   Cam1Display1   32
+640  480   testcamDisplay1   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+DCam DemoCamera DCam912518
+OpenCV OpenCVgrabber OpenCVgrabber882634
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber486945
+Ximea XIMEACamera 52601550361831
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/12/2022 16:59:48.312] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-c9e73f99-463a-4337-b11c-ea3a327902cb#-1681019480] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   Cam1Display1   32
+640  480   testcamDisplay1   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam584983
+OpenCV OpenCVgrabber OpenCVgrabber780001
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber8804
+Ximea XIMEACamera 52601550924571
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/12/2022 17:02:55.354] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-20b74460-1285-42c9-b437-2f92c2aef55e#-2133590586] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   testcamDisplay1   32
+640  480   Cam1Display1   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam239593
+OpenCV OpenCVgrabber OpenCVgrabber707325
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber731954
+Ximea XIMEACamera 52601550800032
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/12/2022 17:06:05.166] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-4143bb39-ac79-4dbe-b508-ed79f143b8b9#1433646084] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   testcamDisplay1   32
+640  480   Cam1Display1   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam342447
+OpenCV OpenCVgrabber OpenCVgrabber133670
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber699313
+Ximea XIMEACamera 52601550488751
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/12/2022 17:12:03.913] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-6f78b857-66fa-4302-8093-413762c74a5b#-179997257] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   testcamDisplay1   32
+640  480   Cam1Display1   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/13/2022 11:42:31.595] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-b86fac08-e4ba-4abd-9567-44aabd86e867#234318626] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/13/2022 13:37:31.482] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-3001744e-f814-489b-adf7-a9447337bcda#-2131805146] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+1280  1024   XimeaDisplay   8
+1920  1080   OpenCVFlowDisplay   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+failed to load OpenCV.cfg
+Line 17: Property,Core,Initialize,1
+Error in device "OpenCV": Could not get an image from this camera (201)
+
+
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+failed to load testcam.cfg
+Line 17: Property,Core,Initialize,1
+Error in device "testcam": Could not get an image from this camera (201)
+
+
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/13/2022 13:42:29.830] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-175c1286-5c69-4d46-a784-7513aa25e603#412665849] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/13/2022 13:45:46.544] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-c63ddfcc-c136-47fb-b0e7-e5ee119b105a#1990369693] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/13/2022 16:49:45.276] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-63df3fa4-481b-4a8b-9c5b-8722df0aa123#1059917888] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+[INFO] [10/13/2022 17:04:55.989] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/user/OpenCVFlowDisplay-ID-07a33b5b-faaf-4f53-b7a4-a7151584a841] Message [uk.co.strimm.actors.messages.fail.FailCameraStreaming] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$a#-90794150] to Actor[akka://STRIMMAkkaSystem/user/OpenCVFlowDisplay-ID-07a33b5b-faaf-4f53-b7a4-a7151584a841#-1108810168] was not delivered. [2] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/OpenCVFlowDisplay-ID-07a33b5b-faaf-4f53-b7a4-a7151584a841#-1108810168]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[INFO] [10/13/2022 17:04:55.992] [STRIMMAkkaSystem-akka.actor.default-dispatcher-25] [akka://STRIMMAkkaSystem/user/OpenCVFlowStore-ID-fba85b81-7076-4a3a-8e5f-bf6be98b2361] Message [uk.co.strimm.actors.messages.fail.FailCameraDataStoring] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$b#2014063775] to Actor[akka://STRIMMAkkaSystem/user/OpenCVFlowStore-ID-fba85b81-7076-4a3a-8e5f-bf6be98b2361#1082366378] was not delivered. [3] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/OpenCVFlowStore-ID-fba85b81-7076-4a3a-8e5f-bf6be98b2361#1082366378]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[INFO] [10/13/2022 17:04:55.992] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/user/XimeaROIDisplayTraceActor1-ID-82b32214-656e-4a94-b32a-79da3ab606cd] Message [uk.co.strimm.actors.messages.fail.FailStreamingTraceROI] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$e#611078524] to Actor[akka://STRIMMAkkaSystem/user/XimeaROIDisplayTraceActor1-ID-82b32214-656e-4a94-b32a-79da3ab606cd#861212786] was not delivered. [4] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/XimeaROIDisplayTraceActor1-ID-82b32214-656e-4a94-b32a-79da3ab606cd#861212786]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[INFO] [10/13/2022 17:04:55.992] [STRIMMAkkaSystem-akka.actor.default-dispatcher-16] [akka://STRIMMAkkaSystem/user/XimeaROIStoreTraceDataStoreActor1-ID-cbcc5569-4de2-4b0f-a8e8-e547755f2d5e] Message [uk.co.strimm.actors.messages.fail.FailTraceDataStoring] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$f#763362364] to Actor[akka://STRIMMAkkaSystem/user/XimeaROIStoreTraceDataStoreActor1-ID-cbcc5569-4de2-4b0f-a8e8-e547755f2d5e#1909871277] was not delivered. [5] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/XimeaROIStoreTraceDataStoreActor1-ID-cbcc5569-4de2-4b0f-a8e8-e547755f2d5e#1909871277]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[INFO] [10/13/2022 17:04:55.993] [STRIMMAkkaSystem-akka.actor.default-dispatcher-16] [akka://STRIMMAkkaSystem/user/XimeaStore-ID-713744ab-496a-4eb4-ae89-75856d39d255] Message [uk.co.strimm.actors.messages.fail.FailCameraDataStoring] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$d#-1894388343] to Actor[akka://STRIMMAkkaSystem/user/XimeaStore-ID-713744ab-496a-4eb4-ae89-75856d39d255#1471306044] was not delivered. [6] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/XimeaStore-ID-713744ab-496a-4eb4-ae89-75856d39d255#1471306044]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[INFO] [10/13/2022 17:04:56.002] [STRIMMAkkaSystem-akka.actor.default-dispatcher-16] [akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-900348d5-a81c-45b0-b9d5-973b13ac5b3c] Message [uk.co.strimm.STRIMMImage] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$c#176719201] to Actor[akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-900348d5-a81c-45b0-b9d5-973b13ac5b3c#-1108981002] was not delivered. [7] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-900348d5-a81c-45b0-b9d5-973b13ac5b3c#-1108981002]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[INFO] [10/13/2022 17:04:56.004] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-900348d5-a81c-45b0-b9d5-973b13ac5b3c] Message [uk.co.strimm.actors.messages.fail.FailCameraStreaming] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$c#176719201] to Actor[akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-900348d5-a81c-45b0-b9d5-973b13ac5b3c#-1108981002] was not delivered. [8] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-900348d5-a81c-45b0-b9d5-973b13ac5b3c#-1108981002]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/13/2022 17:08:03.867] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-11c88649-a410-4f5b-9a99-61e80f6ca492#1902911231] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/13/2022 17:13:26.473] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-1e0ec798-303e-4dd3-aa4b-3fcd9973eb34#-2133624320] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/14/2022 11:57:50.871] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-95a48e12-cad2-4d97-906c-5aabd546f78a#342564395] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+1920  1080   OpenCVFlowDisplay   8
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/14/2022 13:37:04.875] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-de5704f7-f863-43aa-9244-f4d0a6725a6d#-1282281821] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+1920  1080   OpenCVFlowDisplay   8
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/14/2022 13:39:42.077] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-3c373a07-56af-4e43-a1a0-68452e823bc4#1903813666] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+1920  1080   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/14/2022 13:43:22.089] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-d32dbc8c-28ac-45dd-841e-bd587c93b19d#915620670] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+1920  1080   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+failed to load Ximea.cfg
+Line 7: Device,Ximea,XIMEACamera,52601550
+Failed to load device "52601550" from adapter module "XIMEACamera" [ Device adapter "XIMEACamera" failed to instantiate device "52601550" ]
+
+
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/14/2022 15:45:59.813] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-9ebbe379-6471-49ac-9415-95cb22fe54e3#-1616759491] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/14/2022 15:48:45.883] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-e51213c8-f36d-48e7-a39d-8e7db9f8fa58#-432875598] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/14/2022 15:57:22.636] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-e690ee9b-5ad7-42ec-b016-982c3b4456da#108450514] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/14/2022 16:01:52.004] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-5f0d793c-12d4-4b2c-8903-8bdc3b02f6d6#2042800659] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/14/2022 16:06:26.237] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-b5d96d27-6286-4812-868b-bf63f50e9453#1728864518] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+[ERROR] [10/14/2022 16:06:55.301] [STRIMMAkkaSystem-akka.actor.default-dispatcher-8] [akka://STRIMMAkkaSystem/user/OpenCVFlowDisplay-ID-66700252-7923-4e96-868c-283213916118] Kill (akka.actor.ActorKilledException: Kill)
+[ERROR] [10/14/2022 16:06:55.303] [STRIMMAkkaSystem-akka.actor.default-dispatcher-8] [akka://STRIMMAkkaSystem/user/XimeaROIDisplayTraceActor1-ID-1c3cc49c-128e-4f3e-9c90-4c52f2e98496] Kill (akka.actor.ActorKilledException: Kill)
+[INFO] [10/14/2022 16:06:55.307] [STRIMMAkkaSystem-akka.actor.default-dispatcher-8] [akka://STRIMMAkkaSystem/user/XimeaROIDisplayTraceActor1-ID-1c3cc49c-128e-4f3e-9c90-4c52f2e98496] Message [uk.co.strimm.actors.messages.fail.FailStreamingTraceROI] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$e#-271276642] to Actor[akka://STRIMMAkkaSystem/user/XimeaROIDisplayTraceActor1-ID-1c3cc49c-128e-4f3e-9c90-4c52f2e98496#444365521] was not delivered. [2] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/XimeaROIDisplayTraceActor1-ID-1c3cc49c-128e-4f3e-9c90-4c52f2e98496#444365521]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+[INFO] [10/14/2022 16:06:57.784] [STRIMMAkkaSystem-akka.actor.default-dispatcher-9] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-b5d96d27-6286-4812-868b-bf63f50e9453#1728864518] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [3] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[ERROR] [10/14/2022 16:06:58.273] [STRIMMAkkaSystem-akka.actor.default-dispatcher-13] [akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-eee5ddbd-4f31-435e-9a2e-5902317b4255] Kill (akka.actor.ActorKilledException: Kill)
+[INFO] [10/14/2022 16:06:58.273] [STRIMMAkkaSystem-akka.actor.default-dispatcher-13] [akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-eee5ddbd-4f31-435e-9a2e-5902317b4255] Message [uk.co.strimm.STRIMMImage] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$c#973777108] to Actor[akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-eee5ddbd-4f31-435e-9a2e-5902317b4255#-2139544117] was not delivered. [4] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-eee5ddbd-4f31-435e-9a2e-5902317b4255#-2139544117]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[INFO] [10/14/2022 16:06:58.274] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-eee5ddbd-4f31-435e-9a2e-5902317b4255] Message [uk.co.strimm.actors.messages.fail.FailCameraStreaming] from Actor[akka://STRIMMAkkaSystem/system/StreamSupervisor-0/$$c#973777108] to Actor[akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-eee5ddbd-4f31-435e-9a2e-5902317b4255#-2139544117] was not delivered. [5] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/user/XimeaDisplay-ID-eee5ddbd-4f31-435e-9a2e-5902317b4255#-2139544117]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 11:55:29.375] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-b906d238-420c-417a-827e-205e2f2ede04#-644723604] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   Cam1Display1   32
+640  480   testcamDisplay1   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam OpenCVgrabber OpenCVgrabber
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 11:59:03.127] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-a604a2b1-6a4f-42b0-98c3-224cabefdab3#1673763346] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   testcamDisplay1   8
+640  480   Cam1Display1   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam XIMEACamera 52601550
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 12:02:12.207] [STRIMMAkkaSystem-akka.actor.default-dispatcher-3] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-5771fd34-a443-464f-a581-dd0453d95aaa#-108049925] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+Calling StartAcquisition()
+640  480   Cam1Display1   8
+640  480   testcamDisplay1   8
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+[INFO] Found 10 JHotDraw adapters.
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+testcam exception
+Error in device "testcam": (Error message unavailable) (25)
+Ximea exception
+Error in device "Ximea": (Error message unavailable) (25)
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam XIMEACamera 52601550
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 12:07:44.886] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-e9ebf54f-f271-4f00-a9c2-01d157408d2b#408579003] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+1280  1024   XimeaCam1Display1   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam XIMEACamera 52601550
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 12:21:17.051] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-a8fdfc20-4499-4c70-9e76-d8d4db299403#-1076574765] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam XIMEACamera 52601550
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 12:23:23.238] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-52fd84e6-090f-4e24-a5ba-ee6ab3dc3a61#-565156135] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam XIMEACamera 52601550
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 12:27:50.673] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-08476231-9523-4777-a3f8-e70725745485#-1433159830] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+1280  1024   XimeaDisplay   8
+640  480   OpenCVFlowDisplay   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam XIMEACamera 52601550
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 12:28:50.793] [STRIMMAkkaSystem-akka.actor.default-dispatcher-4] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-1682b1a1-0718-4e6f-8bf0-f7053f2b527a#-1628032499] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+1280  1024   XimeaDisplay   8
+640  480   OpenCVFlowDisplay   32
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam XIMEACamera 52601550
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 12:34:41.867] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-9d70c661-52b7-45d7-be63-bf6da0b3ff8c#411343440] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+TERRY : SetTriggered
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+640  480   OpenCVFlowDisplay   32
+1280  1024   XimeaDisplay   8
+[INFO] Found 10 JHotDraw adapters.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+testcam XIMEACamera 52601550
+Ximea XIMEACamera 52601550
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [10/17/2022 12:39:53.887] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-253d7a59-0273-47ee-9620-886e27476496#-460311007] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.

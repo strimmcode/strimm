@@ -14,6 +14,7 @@ import net.imagej.display.ImageDisplayService
 import net.imagej.display.OverlayService
 import net.imagej.lut.LUTService
 import net.imagej.ops.OpService
+import net.imagej.overlay.EllipseOverlay
 import net.imagej.overlay.RectangleOverlay
 import org.scijava.`object`.ObjectService
 import org.scijava.command.Command
@@ -45,6 +46,10 @@ import uk.co.strimm.services.*
 import uk.co.strimm.setIcon
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.KeyboardFocusManager
+import java.awt.event.ActionEvent
+import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
 import java.awt.event.WindowAdapter
 import java.io.File
 import java.io.FileWriter
@@ -210,6 +215,8 @@ class GUIMain : Command {
         strimmUIService.dockableControl.contentArea.deploy(strimmUIService.cGrid)
         strimmUIService.strimmFrame.layout = BorderLayout()
 
+//        strimmUIService.strimmFrame.addKeyListener(KeyboardListener())
+
         val defaultUI = (uiService.defaultUI as SwingSDIUI)
         uiService.defaultUI.applicationFrame.setVisible(false)
         defaultUI.toolBar.isFloatable = false
@@ -227,6 +234,7 @@ class GUIMain : Command {
                 (uiService.defaultUI as SwingSDIUI).applicationFrame.rootPane.jMenuBar)
 
         strimmUIService.imageJMenuBar = (uiService.defaultUI as SwingSDIUI).applicationFrame.rootPane.jMenuBar
+
         Platform.setImplicitExit(false)
     }
 
@@ -386,16 +394,37 @@ class GUIMain : Command {
                 val roiFlow = strimmUIService.traceColourByFlowAndOverlay[flow.flowName]
                 if (roiFlow != null) {
                     for (roi in roiFlow) {
-                        val overlay = (roi.first) as RectangleOverlay
-                        val roiObject = ROI()
-                        roiObject.x = overlay.getOrigin(0)
-                        roiObject.y = overlay.getOrigin(1)
-                        roiObject.w = overlay.getExtent(0)
-                        roiObject.h = overlay.getExtent(1)
-                        roiObject.ROItype = "Rectangle" //TODO hardcoded
-                        roiObject.ROIName = ""
-                        roiObject.flowName = flow.flowName
-                        exp.roiConfig.rois.add(roiObject)
+                        when(roi.first){
+                            is RectangleOverlay -> {
+                                loggerService.log(Level.INFO, "Adding rectangle ROI")
+                                val overlay = (roi.first) as RectangleOverlay
+                                val roiObject = ROI()
+                                roiObject.x = overlay.getOrigin(0)
+                                roiObject.y = overlay.getOrigin(1)
+                                roiObject.w = overlay.getExtent(0)
+                                roiObject.h = overlay.getExtent(1)
+                                roiObject.ROItype = "Rectangle" //TODO hardcoded
+                                roiObject.ROIName = ""
+                                roiObject.flowName = flow.flowName
+                                exp.roiConfig.rois.add(roiObject)
+                            }
+                            is EllipseOverlay -> {
+                                loggerService.log(Level.INFO, "Adding ellipse ROI")
+                                val overlay = (roi.first) as EllipseOverlay
+                                val roiObject = ROI()
+                                roiObject.x = overlay.getOrigin(0)
+                                roiObject.y = overlay.getOrigin(1)
+                                roiObject.w = overlay.getRadius(0)
+                                roiObject.h = overlay.getRadius(1)
+                                roiObject.ROItype = "Ellipse" //TODO hardcoded
+                                roiObject.ROIName = ""
+                                roiObject.flowName = flow.flowName
+                                exp.roiConfig.rois.add(roiObject)
+                            }
+                            else -> {
+                                loggerService.log(Level.WARNING, "ROI type not supported")
+                            }
+                        }
                     }
                 }
             }

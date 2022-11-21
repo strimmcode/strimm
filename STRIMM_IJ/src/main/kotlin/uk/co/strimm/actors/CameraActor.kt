@@ -125,7 +125,8 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor() {
                         for (snk in GUIMain.experimentService.expConfig.sinkConfig.sinks) {
                             //identify the src from the sourceCamera field in the STRIMMImage
                             if (snk.sinkName == plugin.cameraWindowController.displayInfo!!.feedName) {
-                                if (image.timeAcquired.toDouble() > timeLast + snk.previewInterval) { //TODO why is this check needed?
+//                                println(image.imageCount.toString() + "   " + image.timeAcquired  )
+//                                if (image.timeAcquired.toDouble() > timeLast + snk.previewInterval) { //TODO why is this check needed?
                                     when (image.pix) {
                                         is ByteArray -> dataset.apply {
                                             var imgToUse = image.pix as ByteArray?
@@ -139,7 +140,7 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor() {
                                                 normaliseImageByte(image.pix)
                                             }
                                             else {
-                                                val minMax = image.pix.fold(Pair(Byte.MAX_VALUE.toDouble(), Byte.MIN_VALUE.toDouble())) { acc, v -> Pair(min(acc.first, v.toDouble()), max(acc.second, v.toDouble())) }
+                                                val minMax = imgToUse!!.fold(Pair(Byte.MAX_VALUE.toDouble(), Byte.MIN_VALUE.toDouble())) { acc, v -> Pair(min(acc.first, v.toDouble()), max(acc.second, v.toDouble())) }
                                                 plugin.cameraWindowController.view?.setChannelRange(0, minMax.first, minMax.second)
                                             }
 
@@ -191,7 +192,7 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor() {
                                     }
 
                                     timeLast = image.timeAcquired.toDouble()
-                                }
+//                                }
                             }
                         }
                     }

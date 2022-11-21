@@ -33,10 +33,10 @@ public class Camera {
 
 
 
-    double intervalMs = 100.0;
-    public double exposureMs = 0.5;
+    double intervalMs = 40.0;
+    public double exposureMs = 50.0;
     boolean bActive = false;
-    int framesInCircularBuffer = 20;
+    int framesInCircularBuffer = 200;
 
     boolean bGreyscale = false;
 
@@ -67,7 +67,7 @@ public class Camera {
                 if (memSize > 0) core.setCircularBufferMemoryFootprint(memSize);
 
                 core.initializeCircularBuffer(); //circular buffer
-
+                System.out.println("STARTING CONTINUOUS SEQUENCE ACQUISITION");
                 core.startContinuousSequenceAcquisition(0); //must be
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -126,6 +126,7 @@ public class Camera {
     public void SetExposureMs(double exp) throws Exception {
         exposureMs = exp;
         if (core != null){
+            System.out.println("Setting exposure to: " + exposureMs);
             core.setExposure(exposureMs);
         }
     }

@@ -236,13 +236,13 @@ class TraceFromROIContextDisplay : ContextCommand() {
             ClosedShape.getInstance()
         }
 
-        traceActor.tell(TellDeviceSamplingRate(40.0), ActorRef.noSender())//TODO hardcoded
+        traceActor.tell(TellDeviceSamplingRate(20.0), ActorRef.noSender())//TODO hardcoded
         traceActor.tell(TellSetNumDataPoints(), ActorRef.noSender())
         RunnableGraph.fromGraph(graph).run(GUIMain.actorService.materializer)
 //        GUIMain.actorService.cameraActorDisplays.forEach { name, actorRef ->
 //            actorRef.tell(TellCameraIsAcquiring(true), ActorRef.noSender())
 //        }
-        GUIMain.experimentService.calculateNumberOfDataPointsFromFrequency(selectedROI.name, 10.0)//TODO hardcoded
+        GUIMain.experimentService.calculateNumberOfDataPointsFromFrequency(selectedROI.name, 20.0)//TODO hardcoded
         createAndAddToNewConfig(source, isStore, selectedROI, currentStream, windowOption, traceActor)
     }
 

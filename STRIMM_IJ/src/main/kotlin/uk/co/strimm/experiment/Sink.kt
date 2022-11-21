@@ -23,4 +23,6 @@ class Sink{
     var autoscale = true
     var isROI = false
     var lut = ""
+    var terminatingCond = ""
+    var terminatingKey = ""
 }

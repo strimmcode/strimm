@@ -17,7 +17,7 @@ int main()
     char szDir[1024];
     GetCurrentDirectoryA(sizeof(szDir), szDir);
 
-    if (!CreateProcessA(nullptr, "javaw -Xmx16384m -Xms16384m -splash:./splash.png -cp ./jars/* uk.co.strimm.Main", nullptr, nullptr, false, 0, nullptr, szDir, &si, &pi))
+    if (!CreateProcessA(nullptr, "javaw -splash:splash.png -Xmx16384m -Xms16384m -cp ./jars/* uk.co.strimm.Main", nullptr, nullptr, false, 0, nullptr, szDir, &si, &pi))
     {
         std::cout << "Failed to launch STRIMM!" << std::endl;
         exit(EXIT_FAILURE);
