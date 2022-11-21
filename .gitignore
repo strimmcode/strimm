@@ -1,5 +1,4 @@
 STRIMM.app
-Launch_STRIMM
 STRIMM/target/*
 STRIMM/*.log
 STRIMM/.idea/*
@@ -16,16 +15,16 @@ STRIMM_JNI/target/*
 STRIMM_JNI/.idea/*
 STRIMM_JNI/.idea/**
 
-Test/.vs/*
-Project2/*
-CreateCSV/.vs/*
-
-.idea/*
 WorkingDirectory/log/*
 WorkingDirectory/*.log
 WorkingDirectory/ExperimentOutput/**
 WorkingDirectory/ExperimentOutput/*
-target/*
+
+Test/.vs/*
+Project2/*
+CreateCSV/.vs/*
+Launch_STRIMM
+.idea/*
 **.bak
 *.bak
 **.orig
@@ -42,5 +41,7 @@ settings.json
 Akkatest/*
 Akkatest
 package/STRIMM.app/*
+Arduino sketches
+Arduino sketches/*
 
 
