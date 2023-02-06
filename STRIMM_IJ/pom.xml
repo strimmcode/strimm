@@ -3,8 +3,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-
     <groupId>uk.co.strimm</groupId>
     <artifactId>STRIMM_IJ</artifactId>
     <version>0.0.0-SNAPSHOT</version>
@@ -18,7 +16,7 @@
     </parent>
 
     <name>STRIMM IJ</name>
-    <description>ImageJ Components for STRIMM (Synchronised Trace Recording in ImageJ and Micro-Manager)</description>
+    <description>ImageJ Components for STRIMM (Synchronised Trace Recording In ImageJ and Micro-Manager)</description>
     <inceptionYear>2018</inceptionYear>
     <organization>
         <name>Cairn Research Ltd.</name>
@@ -27,17 +25,23 @@
 
     <licenses>
         <license>
-            <name>TODO</name>
-            <url>TODO.org.uk</url>
-            <distribution>TODO</distribution>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
     <developers>
         <developer>
-            <id>jfray107</id>
+            <id>j-fray</id>
             <name>Jacob Francis</name>
-            <url>https://bitbucket.org/jfray107/</url>
+            <url>https://github.com/j-fray</url>
+            <roles>
+                <role>Lead Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Terry Wright</name>
         </developer>
         <developer>
             <id>esteele663</id>
@@ -48,43 +52,40 @@
 
     <contributors>
         <contributor>
-            <name>TODO</name>
+            <name>Jeremy Graham</name>
+        </contributor>
+        <contributor>
+            <name>Stefan Pulver</name>
+        </contributor>
+        <contributor>
+            <name>James Macleod</name>
+        </contributor>
+        <contributor>
+            <name>Ash Cadby</name>
+        </contributor>
+        <contributor>
+            <name>Olexandr Konovalov</name>
         </contributor>
     </contributors>
 
-    <mailingLists>
-        <mailingList>
-            <name>TODO</name>
-            <archive>TODO@TODO.org.uk</archive>
-        </mailingList>
-    </mailingLists>
-
-    <!--<scm>-->
-        <!--<connection>scm:git:ssh://git@bitbucket.org:jfray107/strimm.git</connection>-->
-        <!--<developerConnection>scm:git:ssh://git@bitbucket.org:jfray107/strimm.git</developerConnection>-->
-        <!--<tag>HEAD</tag>-->
-        <!--<url>https://bitbucket.org/jfray107/strimm</url>-->
-    <!--</scm>-->
-
-    <url>TODO.org.uk</url>
-
     <issueManagement>
-        <url>TODO.org.uk</url>
-        <system>Leave bugs in code. Send complaints to trash with filter</system>
+        <url>https://github.com/strimmcode/strimm/issues</url>
+        <system>GitHub</system>
     </issueManagement>
 
-    <ciManagement>
-        <system>None</system>
-        <url>None.net</url>
-    </ciManagement>
+    <!--<ciManagement>-->
+        <!--<system>None</system>-->
+        <!--<url>None.net</url>-->
+    <!--</ciManagement>-->
 
     <properties>
         <main-class>uk.co.strimm.Main</main-class>
         <kotlin.version>1.2.61</kotlin.version>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
         <scijava-common.version>2.75.0</scijava-common.version>
-        <license.licenseName>General Public TODO license (to kill)</license.licenseName>
-        <license.copyrightOwners>Me (oh and Jacob... but mostly me)</license.copyrightOwners>
+        <license.licenseName>GNU Lesser General Public License (LGPL) v3</license.licenseName>
+        <license.copyrightOwners>Jacob Francis. Stefan Pulver. Cairn Research Ltd. Elliot Steele. Ash Cadby. Terry Wright</license.copyrightOwners>
+        <license.licenseURL>https://www.gnu.org/licenses/lgpl-3.0.html</license.licenseURL>
         <junit.version>4.4</junit.version>
     </properties>
 
@@ -127,24 +128,6 @@
             <groupId>net.imagej</groupId>
             <artifactId>imagej</artifactId>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/net.imagej/imagej-common -->
-        <!--<dependency>-->
-        <!--<groupId>net.imagej</groupId>-->
-        <!--<artifactId>imagej-common</artifactId>-->
-        <!--<version>0.28.2</version>-->
-        <!--</dependency>-->
-        <!-- https://mvnrepository.com/artifact/net.imagej/imagej-ops -->
-        <!--<dependency>-->
-        <!--<groupId>net.imagej</groupId>-->
-        <!--<artifactId>imagej-ops</artifactId>-->
-        <!--<version>0.44.0</version>-->
-        <!--</dependency>-->
-        <!-- https://mvnrepository.com/artifact/net.imagej/imagej-legacy -->
-        <!--<dependency>-->
-        <!--<groupId>net.imagej</groupId>-->
-        <!--<artifactId>imagej-legacy</artifactId>-->
-        <!--<version>0.35.2</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
@@ -331,35 +314,6 @@
                     <workingDirectory>${basedir}\..\WorkingDirectory</workingDirectory>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-enforcer-plugin</artifactId>-->
-            <!--<version>3.0.0-M2</version>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<id>enforce-banned-dependencies</id>-->
-            <!--<goals>-->
-            <!--<goal>enforce</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-            <!--<rules>-->
-            <!--&lt;!&ndash;<bannedDependencies>&ndash;&gt;-->
-            <!--&lt;!&ndash;<includes>&ndash;&gt;-->
-            <!--&lt;!&ndash;<exclude></exclude>&ndash;&gt;-->
-            <!--&lt;!&ndash;</includes>&ndash;&gt;-->
-            <!--&lt;!&ndash;</bannedDependencies>&ndash;&gt;-->
-            <!--<bannedDependencies>-->
-            <!--<excludes>-->
-            <!--<exclude>com.typesafe.akka:*</exclude>-->
-            <!--</excludes>-->
-            <!--</bannedDependencies>-->
-            <!--<searchTransitive>false</searchTransitive>-->
-            <!--</rules>-->
-            <!--<fail>true</fail>-->
-            <!--</configuration>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--</plugin>-->
         </plugins>
     </build>
 </project>
