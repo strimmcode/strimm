@@ -50,10 +50,10 @@
   "sourceConfig": {
     "sources": [
       {
-        "sourceName": "OpenCV",
+        "sourceName": "DemoCamera",
         "sourceType": "",
-        "sourceCfg": "OpenCV.cfg",
-        "deviceLabel": "OpenCV",
+        "sourceCfg": "democam.cfg",
+        "deviceLabel": "DemoCamera",
         "sourceDetails": "",
         "param1": 0.0,
         "param2": 0.0,
@@ -61,10 +61,10 @@
         "param4": 0.0,
         "isGreyScale": true,
         "description": "",
-        "exposureMs": -6.0,
+        "exposureMs": 100.0,
         "isBusy": false,
-        "isTimeLapse": true,
-        "intervalMs": 100.0,
+        "isTimeLapse": false,
+        "intervalMs": 0.0,
         "isTriggered": false,
         "isImageSnapped": false,
         "isKeyboardSnapEnabled": false,
@@ -86,7 +86,7 @@
   "flowConfig": {
     "flows": [
       {
-        "flowName": "OpenCVFlow1",
+        "flowName": "DemoCameraFlow1",
         "flowType": "",
         "flowDetails": "",
         "param1": 0.0,
@@ -100,13 +100,13 @@
         "roiNumber": 0,
         "description": "",
         "inputNames": [
-          "OpenCV"
+          "DemoCamera"
         ],
         "inputType": "Image",
         "outputType": "Image"
       },
       {
-        "flowName": "CameraFlowROI",
+        "flowName": "DemoCameraROIFlow1",
         "flowType": "",
         "flowDetails": "",
         "param1": 0.0,
@@ -120,7 +120,7 @@
         "roiNumber": 0,
         "description": "",
         "inputNames": [
-          "OpenCVFlow1"
+          "DemoCameraFlow1"
         ],
         "inputType": "Image",
         "outputType": "Trace"
@@ -130,7 +130,7 @@
   "sinkConfig": {
     "sinks": [
       {
-        "sinkName": "CameraFlowROIDisplay",
+        "sinkName": "DemoCameraDisplay1",
         "sinkType": "",
         "sinkDetails": "",
         "param1": 0.0,
@@ -138,19 +138,19 @@
         "param3": 0.0,
         "param4": 0.0,
         "inputNames": [
-          "CameraFlowROI"
+          "DemoCameraFlow1"
         ],
         "primaryDevice": "",
         "primaryDeviceChannel": "",
-        "outputType": "Trace",
+        "outputType": "Image",
         "displayOrStore": "Display",
         "actorPrettyName": "",
-        "imageWidth": 0,
-        "imageHeight": 0,
-        "bitDepth": 0,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "bitDepth": 8,
         "previewInterval": 0.0,
         "roiSz": "",
-        "roiFlowName": "",
+        "roiFlowName": "DemoCameraROIFlow1",
         "autoscale": true,
         "isROI": false,
         "lut": "",
@@ -158,7 +158,7 @@
         "terminatingKey": ""
       },
       {
-        "sinkName": "CameraFlowROIStore",
+        "sinkName": "DemoCameraStore",
         "sinkType": "",
         "sinkDetails": "",
         "param1": 0.0,
@@ -166,11 +166,11 @@
         "param3": 0.0,
         "param4": 0.0,
         "inputNames": [
-          "CameraFlowROI"
+          "DemoCameraFlow1"
         ],
         "primaryDevice": "",
         "primaryDeviceChannel": "",
-        "outputType": "Trace",
+        "outputType": "Image",
         "displayOrStore": "Store",
         "actorPrettyName": "",
         "imageWidth": 0,
@@ -186,7 +186,7 @@
         "terminatingKey": ""
       },
       {
-        "sinkName": "Cam1Display1",
+        "sinkName": "DemoCameraROIDisplay",
         "sinkType": "",
         "sinkDetails": "",
         "param1": 0.0,
@@ -194,19 +194,19 @@
         "param3": 0.0,
         "param4": 0.0,
         "inputNames": [
-          "OpenCVFlow1"
+          "DemoCameraROIFlow1"
         ],
         "primaryDevice": "",
         "primaryDeviceChannel": "",
-        "outputType": "Image",
+        "outputType": "Trace",
         "displayOrStore": "Display",
         "actorPrettyName": "",
-        "imageWidth": 640,
-        "imageHeight": 480,
-        "bitDepth": 8,
+        "imageWidth": 0,
+        "imageHeight": 0,
+        "bitDepth": 0,
         "previewInterval": 0.0,
         "roiSz": "",
-        "roiFlowName": "CameraFlowROI",
+        "roiFlowName": "",
         "autoscale": true,
         "isROI": false,
         "lut": "",
@@ -214,7 +214,7 @@
         "terminatingKey": ""
       },
       {
-        "sinkName": "Cam1Store",
+        "sinkName": "DemoCameraROIStore",
         "sinkType": "",
         "sinkDetails": "",
         "param1": 0.0,
@@ -222,11 +222,11 @@
         "param3": 0.0,
         "param4": 0.0,
         "inputNames": [
-          "OpenCVFlow1"
+          "DemoCameraROIFlow1"
         ],
         "primaryDevice": "",
         "primaryDeviceChannel": "",
-        "outputType": "Image",
+        "outputType": "Trace",
         "displayOrStore": "Store",
         "actorPrettyName": "",
         "imageWidth": 0,
@@ -246,38 +246,14 @@
   "roiConfig": {
     "rois": [
       {
-        "x": 1.0,
-        "y": 1.0,
-        "w": 66.0,
-        "h": 70.0,
+        "x": 369.0,
+        "y": 160.0,
+        "w": 44.0,
+        "h": 21.0,
         "ROItype": "Rectangle",
         "cameraDeviceLabel": "",
         "ROIName": "",
-        "flowName": "CameraFlowROI",
-        "displaySink": "",
-        "ROInum": 0
-      },
-      {
-        "x": 100.0,
-        "y": 100.0,
-        "w": 20.0,
-        "h": 30.0,
-        "ROItype": "Ellipse",
-        "cameraDeviceLabel": "",
-        "ROIName": "",
-        "flowName": "CameraFlowROI",
-        "displaySink": "",
-        "ROInum": 0
-      },
-      {
-        "x": 155.0,
-        "y": 194.0,
-        "w": 43.0,
-        "h": 76.0,
-        "ROItype": "Rectangle",
-        "cameraDeviceLabel": "",
-        "ROIName": "",
-        "flowName": "CameraFlowROI",
+        "flowName": "DemoCameraROIFlow1",
         "displaySink": "",
         "ROInum": 0
       }

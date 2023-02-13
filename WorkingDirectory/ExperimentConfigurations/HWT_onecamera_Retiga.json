@@ -8,7 +8,7 @@
 			"deviceLabel" : "NIDAQ6343",
 			"deviceID" : 1,
 			"protocolName" : "1_DO.csv",
-			"szFolder" : "C:\\strimm\\Mino version\\STRIMM\\CreateCSV\\CreateCSV\\",
+			"szFolder" : "C:\\strimm\\STRIMM\\CreateCSV\\CreateCSV\\",
 			"bCompound" : False,
 			"bStartTrigger" : True,
 			"bRisingEdge" : True,
@@ -44,46 +44,92 @@
 				"intervalMs" : 100.0,
 				"exposureMs" : 100.0,
 				"framesInCircularBuffer" : -1,
-				"previewFps" : 10.0
+				"previewFps" : 10.0,
+				"x" : 0,
+				"y" : 0,
+				"w" : 1376,
+				"h" : 1024,
 			}
 		]
 	},
 	"flowConfig":{ 
 		"flows" : [
 			{
-				"flowName" : "RetigaCamFlow1",
+				"flowName" : "RetigaCamFlow",
 				"inputNames" : [
 					"Retiga R1"
 				],
 				"inputType" : "Image",
 				"outputType" : "Image"
+			},
+			{
+				"flowName" : "RetigaCamROIFlow",
+				"inputNames" : [
+					"RetigaCamFlow1"
+				],
+				"inputType" : "Image",
+				"outputType" : "Trace"
 			}
 		]
 	},
 	"sinkConfig":{ 
 		"sinks" : [
 			{
-				"sinkName" : "RetigaCam1Display1",
+				"sinkName" : "RetigaCamDisplay",
 				"sinkType" : "",
 				"inputNames" : [
-					"RetigaCamFlow1"
+					"RetigaCamFlow"
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Display",
 				"imageWidth" : 1376,
 				"imageHeight" : 1024,
-				"bitDepth" : 8,
-				"lut" : ""
+				"bitDepth" : 16,
+				"roiFlowName" : "RetigaCamROIFlow",
+				"lut" : "",
+				"isROI" : False
 			},
 			{
-				"sinkName" : "RetigaCam1Store",
+				"sinkName" : "RetigaCamStore",
 				"sinkType" : "",
 				"inputNames" : [
-					"RetigaCamFlow1"
+					"RetigaCamFlow"
 				],
 				"outputType" : "Image",
-				"displayOrStore" : "Store"
+				"displayOrStore" : "Store",
+				"terminatingCond" : "time"
+			},
+			{
+				"sinkName" : "RetigaROIDisplay",
+				"inputNames" : [
+					"RetigaCamROIFlow"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "RetigaROIStore",
+				"inputNames" : [
+					"RetigaCamROIFlow"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Store",
+				"isROI" : True,
+				"terminatingCond" : "time"
 			}
+		]
+	},
+ 	"roiConfig": {
+		"rois": [
+		    {
+			  "x": 605.0,
+			  "y": 145.0,
+			  "w": 8.0,
+			  "h": 390.0,
+			  "ROItype": "Rectangle",
+			  "flowName": "RetigaCamROIFlow",
+			  "ROIName" : "RetigaROI1"
+		    }
 		]
 	}
 }

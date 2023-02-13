@@ -1,7 +1,7 @@
 {
 	"experimentConfigurationName" : "TestConfig1",
 	"experimentMode" : "Live",
-	"experimentDurationMs" : "300000",
+	"experimentDurationMs" : "20000",
 	"HDF5Save" : "True",
 	"ROIAdHoc" : "False",
 	"sourceConfig":{ 
@@ -18,10 +18,10 @@
 				"exposureMs" : 50.0,
 				"framesInCircularBuffer" : -1,
 				"previewFps" : 20.0,
-				"x" : 512,
-				"y" : 512,
-				"w" : 900,
-				"h" : 768,
+				"x" : 1024,
+				"y" : 612,
+				"w" : 800,
+				"h" : 600,
 				"outputType" : "Image"
 			},
 			{
@@ -36,10 +36,10 @@
 				"exposureMs" : 50.0,
 				"framesInCircularBuffer" : -1,
 				"previewFps" : 20.0,
-				"x" : 80,
-				"y" : 275,
-				"w" : 440,
-				"h" : 140
+				"x" : 135,
+				"y" : 450,
+				"w" : 875,
+				"h" : 350
 			}
 		]
 	},
@@ -75,8 +75,8 @@
 				"inputNames" : [
 					"XimeaROIFlow"
 				],
-				"param1" : 11.0,
-				"param2" : 3.0,
+				"param1" : 6.98,
+				"param2" : 0.0,
 				"param3" : 1.0,
 				"inputType" : "Trace",
 				"outputType" : "Trace"
@@ -101,8 +101,8 @@
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Display",
-				"imageWidth" : 900,
-				"imageHeight" : 768,
+				"imageWidth" : 800,
+				"imageHeight" : 600,
 				"bitDepth" : 8,
 				"roiFlowName" : "XimeaROIFlow",
 				"lut" : ""
@@ -125,8 +125,8 @@
 				],
 				"outputType" : "Image",
 				"displayOrStore" : "Display",
-				"imageWidth" : 440,
-				"imageHeight" : 140,
+				"imageWidth" : 875,
+				"imageHeight" : 350,
 				"bitDepth" : 16,
 				"roiFlowName" : "",
 				"lut" : ""
@@ -182,10 +182,10 @@
  	"roiConfig": {
 		"rois": [
 		    {
-			  "x": 780.0,
-			  "y": 135.0,
+			  "x": 605.0,
+			  "y": 145.0,
 			  "w": 8.0,
-			  "h": 475.0,
+			  "h": 390.0,
 			  "ROItype": "Rectangle",
 			  "flowName": "XimeaROIFlow",
 			  "ROIName" : "XimeaROI1"

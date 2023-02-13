@@ -1,0 +1,93 @@
+{
+	"experimentConfigurationName" : "TestConfig1",
+	"experimentMode" : "Preview",
+	"experimentDurationMs" : "10000",
+	"HDF5Save" : "True",
+	"ROIAdHoc" : "True",
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "DemoCamera",
+				"deviceLabel" : "DemoCamera",
+				"sourceCfg" : "democam.cfg",
+				"outputType" : "Image",
+				"isImageSnapped" : False,
+				"isTriggered" : False,
+				"isTimeLapse" : False,
+				"intervalMs" : 0.0,
+				"exposureMs" : 100.0,
+				"framesInCircularBuffer" : -1,
+				"previewFps" : 10.0,
+				"x" : 512,
+				"y" : 512,
+				"w" : 512,
+				"h" : 512
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "DemoCameraFlow1",
+				"inputNames" : [
+					"DemoCamera"
+				],
+				"inputType" : "Image",
+				"outputType" : "Image"
+			},
+			{
+				"flowName" : "DemoCameraROIFlow1",
+				"inputNames" : [
+					"DemoCameraFlow1"
+				],
+				"inputType" : "Image",
+				"outputType" : "Trace"
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "DemoCameraDisplay1",
+				"sinkType" : "",
+				"inputNames" : [
+					"DemoCameraFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Display",
+				"imageWidth" : 512,
+				"imageHeight" : 512,
+				"bitDepth" : 8,
+				"lut" : "",
+				"roiFlowName" : "DemoCameraROIFlow1"
+			},
+			{
+				"sinkName" : "DemoCameraStore",
+				"sinkType" : "",
+				"inputNames" : [
+					"DemoCameraFlow1"
+				],
+				"outputType" : "Image",
+				"displayOrStore" : "Store"
+			},
+			{
+				"sinkName" : "DemoCameraROIDisplay",
+				"inputNames" : [
+					"DemoCameraROIFlow1"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Display"
+			},
+			{
+				"sinkName" : "DemoCameraROIStore",
+				"inputNames" : [
+					"DemoCameraROIFlow1"
+				],
+				"outputType" : "Trace",
+				"displayOrStore" : "Store",
+				"isROI" : True,
+				"terminatingCond" : "time"
+			}
+		]
+	}
+}
