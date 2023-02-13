@@ -42,11 +42,17 @@
         </developer>
         <developer>
             <name>Terry Wright</name>
+            <roles>
+                <role>Developer</role>
+            </roles>
         </developer>
         <developer>
             <id>esteele663</id>
             <name>Elliot Steele</name>
             <url>https://bitbucket.org/esteele663/</url>
+            <roles>
+                <role>Developer</role>
+            </roles>
         </developer>
     </developers>
 
@@ -238,6 +244,11 @@
             <version>1.7.5</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/../hdfjava/slf4j-api-1.7.5.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>11</version>
         </dependency>
     </dependencies>
     <build>

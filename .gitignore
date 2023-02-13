@@ -41,6 +41,7 @@ settings.json
 Akkatest/*
 Akkatest
 package/STRIMM.app/*
+package/*.zip
 Arduino sketches
 Arduino sketches/*
 
