@@ -6,7 +6,9 @@ import akka.stream.KillSwitches
 import akka.stream.javadsl.RunnableGraph
 import com.google.gson.GsonBuilder
 import net.imagej.ImageJService
+import net.imagej.overlay.EllipseOverlay
 import net.imagej.overlay.Overlay
+import net.imagej.overlay.RectangleOverlay
 import org.scijava.plugin.Plugin
 import org.scijava.service.AbstractService
 import org.scijava.service.Service
@@ -14,6 +16,7 @@ import uk.co.strimm.ExperimentConstants
 import uk.co.strimm.experiment.*
 import uk.co.strimm.gui.CameraWindowPlugin
 import uk.co.strimm.gui.GUIMain
+import uk.co.strimm.gui.GUIMain.Companion.experimentService
 import uk.co.strimm.gui.TraceWindowPlugin
 import uk.co.strimm.streams.ExperimentStream
 import java.io.File
@@ -346,83 +349,238 @@ class ExperimentService : AbstractService(), ImageJService {
      * @return The newly created experiment config file
      */
     fun writeNewConfig(isLive: Boolean): File {
+//        //Had to add this line in to fix issue 3 on github repository
+//        //Originally this was done from createNewConfigFromExisting() in this class
+//        configWithTraceROIs = GUIMain.experimentService.experimentStream.expConfig
+//
+//        if (isLive) {
+//            configWithTraceROIs!!.experimentMode = "Live"
+//            configWithTraceROIs!!.ROIAdHoc = "False"
+//            configWithTraceROIs!!.experimentConfigurationName.replace(previewString, "")
+//            val fileName = loadedConfigFile.name.replace(previewString, "")
+//            pathAndName = loadedConfigFile.canonicalPath.replace(loadedConfigFile.name, fileName.replace(".json", "") + liveString + ".json")
+//        } else {
+//            configWithTraceROIs!!.experimentMode = "Preview"
+//            configWithTraceROIs!!.ROIAdHoc = "True"
+//
+//            //We know that if this method is called and is going to preview mode, it has come from live mode
+//            configWithTraceROIs!!.experimentConfigurationName.replace(liveString, "")
+//            val fileName = loadedConfigFile.name.replace(liveString, "")
+//            pathAndName = loadedConfigFile.canonicalPath.replace(loadedConfigFile.name, fileName.replace(".json", "") + previewString + ".json")
+//        }
+//
+//        val newFile = File(pathAndName)
+//
+//        //Populate new flows
+//        if (configWithTraceROIs!!.flowConfig.flows.isEmpty()) {
+//            configWithTraceROIs!!.flowConfig.flows = flowsForTraceROIs
+//        } else {
+//            //This will remove duplicates. This usually occurs when going from live mode to preview mode
+//            for (flow in flowsForTraceROIs) {
+//                if (flow.flowName !in configWithTraceROIs!!.flowConfig.flows.map { x -> x.flowName }) {
+//                    configWithTraceROIs!!.flowConfig.flows.add(flow)
+//                    val roiFlow = GUIMain.strimmUIService.traceColourByFlowAndOverlay[flow.flowName]
+//                    if (roiFlow != null) {
+//                        for (roi in roiFlow) {
+//                            when(roi.first){
+//                                is RectangleOverlay -> {
+//                                    GUIMain.loggerService.log(Level.INFO, "Adding rectangle ROI")
+//                                    val overlay = (roi.first) as RectangleOverlay
+//                                    val roiObject = ROI()
+//                                    roiObject.x = overlay.getOrigin(0)
+//                                    roiObject.y = overlay.getOrigin(1)
+//                                    roiObject.w = overlay.getExtent(0)
+//                                    roiObject.h = overlay.getExtent(1)
+//                                    roiObject.ROItype = "Rectangle" //TODO hardcoded
+//                                    roiObject.ROIName = ""
+//                                    roiObject.flowName = flow.flowName
+//                                    configWithTraceROIs!!.roiConfig.rois.add(roiObject)
+//                                }
+//                                is EllipseOverlay -> {
+//                                    GUIMain.loggerService.log(Level.INFO, "Adding ellipse ROI")
+//                                    val overlay = (roi.first) as EllipseOverlay
+//                                    val roiObject = ROI()
+//                                    roiObject.x = overlay.getOrigin(0)
+//                                    roiObject.y = overlay.getOrigin(1)
+//                                    roiObject.w = overlay.getRadius(0)
+//                                    roiObject.h = overlay.getRadius(1)
+//                                    roiObject.ROItype = "Ellipse" //TODO hardcoded
+//                                    roiObject.ROIName = ""
+//                                    roiObject.flowName = flow.flowName
+//                                    configWithTraceROIs!!.roiConfig.rois.add(roiObject)
+//                                }
+//                                else -> {
+//                                    GUIMain.loggerService.log(Level.WARNING, "ROI type not supported")
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        //Populate new sinks
+//        if (configWithTraceROIs!!.sinkConfig.sinks.isEmpty()) {
+//            configWithTraceROIs!!.sinkConfig.sinks = sinksForTraceROIs
+//        } else {
+//            //This will remove duplicates. This usually occurs when going from live mode to preview mode
+//            for (sink in sinksForTraceROIs) {
+//                if (sink.sinkName !in configWithTraceROIs!!.sinkConfig.sinks.map { x -> x.sinkName }) {
+//                    configWithTraceROIs!!.sinkConfig.sinks.add(sink)
+//                }
+//            }
+//        }
+//
+//        //Populate new ROIs
+////        if (configWithTraceROIs!!.roiConfig.rois.isEmpty()) {
+////            configWithTraceROIs!!.roiConfig.rois = roisForTraceROIs
+////        } else {
+//            //This will remove duplicates. This usually occurs when going from live mode to preview mode
+////            for (roi in roisForTraceROIs) {
+////                if (roi.ROIName !in configWithTraceROIs!!.roiConfig.rois.map { x -> x.ROIName }) {
+////                    configWithTraceROIs!!.roiConfig.rois.add(roi)
+////                }
+////            }
+////        }
+//
+//        //Need to work out why this is necessary
+//        for (src in configWithTraceROIs!!.sourceConfig.sources) {
+//            if (src.camera != null) {
+//                src.camera = null
+//            }
+//        }
+//
+//        //Account for any resizes that have been done
+//        addSizesToNewConfig()
+        val expOld = experimentService.experimentStream.expConfig
+        val exp = ExperimentConfiguration()
+        exp.experimentConfigurationName = expOld.experimentConfigurationName
+        exp.experimentMode = expOld.experimentMode
+        exp.experimentDurationMs = expOld.experimentDurationMs
+        exp.HDF5Save = expOld.HDF5Save
+
+        if (isLive) {
+            exp.ROIAdHoc = "False"
+            exp.experimentMode = "Live"
+        }
+        else{
+            exp.ROIAdHoc = "True"
+            exp.experimentMode = "Preview"
+        }
+
+        for (src in expOld.sourceConfig.sources) {
+            val sourceObject = Source()
+            sourceObject.sourceName = src.sourceName
+            sourceObject.deviceLabel = src.deviceLabel
+            sourceObject.sourceCfg = src.sourceCfg
+            sourceObject.outputType = src.outputType
+            sourceObject.isImageSnapped = src.isImageSnapped
+            sourceObject.isTriggered = src.isTriggered
+            sourceObject.isTimeLapse = src.isTimeLapse
+            sourceObject.intervalMs = src.intervalMs
+            sourceObject.exposureMs = src.exposureMs
+            sourceObject.framesInCircularBuffer = src.framesInCircularBuffer
+            sourceObject.outputType = src.outputType
+            sourceObject.isKeyboardSnapEnabled = src.isKeyboardSnapEnabled
+            sourceObject.SnapVirtualCode = src.SnapVirtualCode
+            exp.sourceConfig.sources.add(sourceObject)
+        }
+        for (flow in expOld.flowConfig.flows) {
+            val flowObject = Flow()
+            flowObject.flowName = flow.flowName
+            flowObject.inputType = flow.inputType
+            flowObject.outputType = flow.outputType
+            for (flowName in flow.inputNames) {
+                flowObject.inputNames.add(flowName)
+            }
+            exp.flowConfig.flows.add(flowObject)
+        }
+        for (sink in expOld.sinkConfig.sinks) {
+            val sinkObject = Sink()
+            sinkObject.sinkName = sink.sinkName
+            sinkObject.sinkType = sink.sinkType
+            sinkObject.outputType = sink.outputType
+            sinkObject.displayOrStore = sink.displayOrStore
+            sinkObject.imageWidth = sink.imageWidth
+            sinkObject.imageHeight = sink.imageHeight
+            sinkObject.bitDepth = sink.bitDepth
+            sinkObject.previewInterval = sink.previewInterval
+            sinkObject.roiFlowName = sink.roiFlowName
+            sinkObject.autoscale = sink.autoscale
+            for (sinkName in sink.inputNames) {
+                sinkObject.inputNames.add(sinkName)
+            }
+            exp.sinkConfig.sinks.add(sinkObject)
+
+        }
+
+        // traceColourByFlowAndOverlay<String, Pair<Overlay, Int>>
+        for (flow in expOld.flowConfig.flows) {
+            val roiFlow = GUIMain.strimmUIService.traceColourByFlowAndOverlay[flow.flowName]
+            if (roiFlow != null) {
+                for (roi in roiFlow) {
+                    when(roi.first){
+                        is RectangleOverlay -> {
+                            GUIMain.loggerService.log(Level.INFO, "Adding rectangle ROI")
+                            val overlay = (roi.first) as RectangleOverlay
+                            val roiObject = ROI()
+                            roiObject.x = overlay.getOrigin(0)
+                            roiObject.y = overlay.getOrigin(1)
+                            roiObject.w = overlay.getExtent(0)
+                            roiObject.h = overlay.getExtent(1)
+                            roiObject.ROItype = "Rectangle" //TODO hardcoded
+                            roiObject.ROIName = ""
+                            roiObject.flowName = flow.flowName
+                            exp.roiConfig.rois.add(roiObject)
+                        }
+                        is EllipseOverlay -> {
+                            GUIMain.loggerService.log(Level.INFO, "Adding ellipse ROI")
+                            val overlay = (roi.first) as EllipseOverlay
+                            val roiObject = ROI()
+                            roiObject.x = overlay.getOrigin(0)
+                            roiObject.y = overlay.getOrigin(1)
+                            roiObject.w = overlay.getRadius(0)
+                            roiObject.h = overlay.getRadius(1)
+                            roiObject.ROItype = "Ellipse" //TODO hardcoded
+                            roiObject.ROIName = ""
+                            roiObject.flowName = flow.flowName
+                            exp.roiConfig.rois.add(roiObject)
+                        }
+                        else -> {
+                            GUIMain.loggerService.log(Level.WARNING, "ROI type not supported")
+                        }
+                    }
+                }
+            }
+        }
+
         val liveString = "_Live"
         val previewString = "_Preview"
         val pathAndName: String
 
-        if (isLive) {
-            configWithTraceROIs!!.experimentMode = "Live"
-            configWithTraceROIs!!.ROIAdHoc = "False"
+        pathAndName = if (isLive) {
             configWithTraceROIs!!.experimentConfigurationName.replace(previewString, "")
             val fileName = loadedConfigFile.name.replace(previewString, "")
-            pathAndName = loadedConfigFile.canonicalPath.replace(loadedConfigFile.name, fileName.replace(".json", "") + liveString + ".json")
+            loadedConfigFile.canonicalPath.replace(loadedConfigFile.name, fileName.replace(".json", "") + liveString + ".json")
         } else {
-            configWithTraceROIs!!.experimentMode = "Preview"
-            configWithTraceROIs!!.ROIAdHoc = "True"
-
             //We know that if this method is called and is going to preview mode, it has come from live mode
             configWithTraceROIs!!.experimentConfigurationName.replace(liveString, "")
             val fileName = loadedConfigFile.name.replace(liveString, "")
-            pathAndName = loadedConfigFile.canonicalPath.replace(loadedConfigFile.name, fileName.replace(".json", "") + previewString + ".json")
+            loadedConfigFile.canonicalPath.replace(loadedConfigFile.name, fileName.replace(".json", "") + previewString + ".json")
         }
 
         val newFile = File(pathAndName)
 
-        //Populate new flows
-        if (configWithTraceROIs!!.flowConfig.flows.isEmpty()) {
-            configWithTraceROIs!!.flowConfig.flows = flowsForTraceROIs
-        } else {
-            //This will remove duplicates. This usually occurs when going from live mode to preview mode
-            for (flow in flowsForTraceROIs) {
-                if (flow.flowName !in configWithTraceROIs!!.flowConfig.flows.map { x -> x.flowName }) {
-                    configWithTraceROIs!!.flowConfig.flows.add(flow)
-                }
-            }
-        }
-
-        //Populate new sinks
-        if (configWithTraceROIs!!.sinkConfig.sinks.isEmpty()) {
-            configWithTraceROIs!!.sinkConfig.sinks = sinksForTraceROIs
-        } else {
-            //This will remove duplicates. This usually occurs when going from live mode to preview mode
-            for (sink in sinksForTraceROIs) {
-                if (sink.sinkName !in configWithTraceROIs!!.sinkConfig.sinks.map { x -> x.sinkName }) {
-                    configWithTraceROIs!!.sinkConfig.sinks.add(sink)
-                }
-            }
-        }
-
-        //Populate new ROIs
-        if (configWithTraceROIs!!.roiConfig.rois.isEmpty()) {
-            configWithTraceROIs!!.roiConfig.rois = roisForTraceROIs
-        } else {
-            //This will remove duplicates. This usually occurs when going from live mode to preview mode
-            for (roi in roisForTraceROIs) {
-                if (roi.ROIName !in configWithTraceROIs!!.roiConfig.rois.map { x -> x.ROIName }) {
-                    configWithTraceROIs!!.roiConfig.rois.add(roi)
-                }
-            }
-        }
-        for (src in configWithTraceROIs!!.sourceConfig.sources) {
-            if (src.camera != null) {
-                src.camera = null
-            }
-        }
-
-        //Account for any resizes that have been done
-        addSizesToNewConfig()
-
-        if (configWithTraceROIs != null) {
-            try {
-                val writer = FileWriter(newFile)
-                GUIMain.loggerService.log(Level.INFO, "Writing experiment config with trace ROI info")
-                gson.toJson(configWithTraceROIs!!, writer)
-                writer.flush()
-                writer.close()
-            } catch (ex: Exception) {
-                GUIMain.loggerService.log(Level.SEVERE, "Error in writing new experiment config to file. Error message: ${ex.message}")
-                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
-            }
+        //Finaly write the file
+        try {
+            val writer = FileWriter(newFile)
+            GUIMain.loggerService.log(Level.INFO, "Writing experiment config with trace ROI info")
+            gson.toJson(exp, writer)
+            writer.flush()
+            writer.close()
+        } catch (ex: Exception) {
+            GUIMain.loggerService.log(Level.SEVERE, "Error in writing new experiment config to file. Error message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
 
         return newFile

@@ -25,8 +25,6 @@ import uk.co.strimm.experiment.ROIManager
 import uk.co.strimm.gui.GUIMain
 import uk.co.strimm.services.AcquisitionMethodService
 import uk.co.strimm.streams.ExperimentStream
-import java.awt.Dimension
-import java.awt.FlowLayout
 import java.time.Duration
 import java.util.*
 import java.util.logging.Level
@@ -52,60 +50,51 @@ class TraceFromROIContextDisplay : ContextCommand() {
     }
 
     override fun run() {
-        setUpDialog()
+        createTraceFromROI()
     }
 
     /**
-     * This method will create and show a new dialog to specify the relevant settings for the new trace feed
+     * This method will specify the relevant settings for the new trace feed from an ROI
      */
-    fun setUpDialog() {
-        val dialogLayout = FlowLayout()
-        val panel = JPanel()
-        panel.layout = dialogLayout
-        panel.preferredSize = Dimension(150, 50)
+    fun createTraceFromROI() {
+        val displaySinkName = GUIMain.actorService.getPertainingDisplaySinkNameFromDockableTitle(GUIMain.strimmUIService.currentFocusedDockableTitle)
+        val curVal: Int
+        val sink: uk.co.strimm.experiment.Sink?
+        if (displaySinkName != null) {
+            //retrieve the Sink for associated with the docking window in focus
+            sink = GUIMain.experimentService.experimentStream.expConfig.sinkConfig.sinks.first { src -> src.sinkName == displaySinkName }
 
-        val result = JOptionPane.showConfirmDialog(GUIMain.strimmUIService.strimmFrame, panel, "Confirm Trace from ROI", JOptionPane.OK_CANCEL_OPTION)
-        if (result == JOptionPane.OK_OPTION) {
-            val displaySinkName = GUIMain.actorService.getPertainingDisplaySinkNameFromDockableTitle(GUIMain.strimmUIService.currentFocusedDockableTitle)
-            val curVal: Int
-            val sink: uk.co.strimm.experiment.Sink?
-            var sinkName = ""
-            if (displaySinkName != null) {
-                //retrieve the Sink for associated with the docking window in focus
-                sink = GUIMain.experimentService.experimentStream.expConfig.sinkConfig.sinks.filter { src -> src.sinkName == displaySinkName }.first()
+            //each sink knows its roiFlowName and then can find the current next colourValue
+            if (sink.roiFlowName != "") {
+                curVal = GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[sink.roiFlowName] as Int
 
-                //each sink knows its roiFlowName and then can find the current next colourValue
-                if (sink.roiFlowName != "") {
-                    curVal = GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[sink.roiFlowName] as Int
-
-                    //the overlayService maintains an array of overlays
-                    var ixLatestOverlay = GUIMain.overlayService.overlays.size - 1
-                    if (ixLatestOverlay < 0) {
-                        ixLatestOverlay = 0
-                    }
-
-                    val sel: Overlay? = GUIMain.overlayService.overlays[ixLatestOverlay]
-                    GUIMain.loggerService.log(Level.INFO, "Total  number of applied ROIs is " + GUIMain.strimmUIService.traceFromROICounter)
-                    GUIMain.loggerService.log(Level.INFO,"Total number reported by the overlayService is " + GUIMain.overlayService.overlays.size)
-
-                    // can see a problem here with multiple traces this has not been changes
-                    if (curVal < GUIMain.roiColours.size) {
-                        val col: Color = GUIMain.roiColours[curVal]
-                        sel!!.fillColor = ColorRGB((255.0 * col.red).toInt(), (255.0 * col.green).toInt(), (255.0 * col.blue).toInt())
-                        // sel!!.lineColor = ColorRGB(255,0,0)   //these clash at the moment
-                    } else {
-                        sel!!.fillColor = ColorRGB(100, 100, 100)
-                        // sel!!.lineColor = ColorRGB(100, 100, 100)
-                    }
-
-                    GUIMain.actorService.routedRoiOverlays[sel] = sink.roiFlowName
-                    val overlayDetailsList = GUIMain.strimmUIService.traceColourByFlowAndOverlay[sink.roiFlowName] as ArrayList<Pair<Overlay, Int>>
-                    overlayDetailsList.add(Pair(sel, curVal))
-                    GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[sink.roiFlowName] = curVal + 1
+                //the overlayService maintains an array of overlays
+                var ixLatestOverlay = GUIMain.overlayService.overlays.size - 1
+                if (ixLatestOverlay < 0) {
+                    ixLatestOverlay = 0
                 }
-                else {
-                    GUIMain.loggerService.log(Level.WARNING,"No trace plot associated with this Display")
+
+                val sel: Overlay? = GUIMain.overlayService.overlays[ixLatestOverlay]
+                GUIMain.loggerService.log(Level.INFO, "Total  number of applied ROIs is " + GUIMain.strimmUIService.traceFromROICounter)
+                GUIMain.loggerService.log(Level.INFO,"Total number reported by the overlayService is " + GUIMain.overlayService.overlays.size)
+
+                // can see a problem here with multiple traces this has not been changes
+                if (curVal < GUIMain.roiColours.size) {
+                    val col: Color = GUIMain.roiColours[curVal]
+                    sel!!.fillColor = ColorRGB((255.0 * col.red).toInt(), (255.0 * col.green).toInt(), (255.0 * col.blue).toInt())
+                    // sel!!.lineColor = ColorRGB(255,0,0)   //these clash at the moment
+                } else {
+                    sel!!.fillColor = ColorRGB(100, 100, 100)
+                    // sel!!.lineColor = ColorRGB(100, 100, 100)
                 }
+
+                GUIMain.actorService.routedRoiOverlays[sel] = sink.roiFlowName
+                val overlayDetailsList = GUIMain.strimmUIService.traceColourByFlowAndOverlay[sink.roiFlowName] as ArrayList<Pair<Overlay, Int>>
+                overlayDetailsList.add(Pair(sel, curVal))
+                GUIMain.strimmUIService.traceFromROICounterPerDisplayROIFlow[sink.roiFlowName] = curVal + 1
+            }
+            else {
+                GUIMain.loggerService.log(Level.WARNING,"No trace plot associated with this Display")
             }
         }
     }

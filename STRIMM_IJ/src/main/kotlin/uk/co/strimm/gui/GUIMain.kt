@@ -72,7 +72,7 @@ class GUIMain : Command {
         val autoScaleImageButton = JCheckBox()
         val expStartStopButton = JToggleButton()
 
-        val saveJSON = JButton()
+//        val saveJSON = JButton()
         var mainWindowIcon: ImageIcon? = null
 
         val roiColours = arrayListOf<Color>(
@@ -293,13 +293,13 @@ class GUIMain : Command {
         mainWindowIcon = setIcon(firstButton.width, firstButton.height, Paths.Icons.STRIMM_LOGO_ICON, "Strimm Logo", loggerService, false)
         if (mainWindowIcon != null) strimmUIService.strimmFrame.iconImage = mainWindowIcon!!.image
 
-        imageJButtonBar.add(saveJSON)
-        saveJSON.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
-        saveJSON.toolTipText = ComponentTexts.AcquisitionButtons.FULL_VIEW_TOOLTIP
-        saveJSON.isEnabled = true
-        saveJSON.icon = setIcon(firstButton.width, firstButton.height, Paths.Icons.SAVE_JSON_ICON, "Save JSON", loggerService)
+//        imageJButtonBar.add(saveJSON)
+//        saveJSON.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
+//        saveJSON.toolTipText = ComponentTexts.AcquisitionButtons.FULL_VIEW_TOOLTIP
+//        saveJSON.isEnabled = true
+//        saveJSON.icon = setIcon(firstButton.width, firstButton.height, Paths.Icons.SAVE_JSON_ICON, "Save JSON", loggerService)
 
-        addSaveJSONButtonListener()
+//        addSaveJSONButtonListener()
 
         //TODO need to decide what buttons need to be reinstated vs what can be permanently removed
         imageJButtonBar.add(loadExperimentConfigButton)
@@ -327,113 +327,113 @@ class GUIMain : Command {
 
     }
 
-    private fun addSaveJSONButtonListener() {
-        saveJSON.addActionListener {
-            //            val reloadChoice = JOptionPane.showConfirmDialog(strimmUIService.strimmFrame,
-//                    "Save JSON", "Save JSON to Temp.json",
-//                    JOptionPane.OK_CANCEL_OPTION)
-            val pathAndName = "./ExperimentConfigurations/Temp.json"//TODO hardcoded
-            val newFile = File(pathAndName)
-            val writer = FileWriter(newFile)
-            val exp = ExperimentConfiguration()
-            val expOld = experimentService.experimentStream.expConfig
-
-            exp.experimentConfigurationName = expOld.experimentConfigurationName
-            exp.experimentMode = expOld.experimentMode
-            exp.experimentDurationMs = expOld.experimentDurationMs
-            exp.HDF5Save = expOld.HDF5Save
-            exp.ROIAdHoc = expOld.ROIAdHoc
-            for (src in expOld.sourceConfig.sources) {
-                val sourceObject = uk.co.strimm.experiment.Source()
-                sourceObject.sourceName = src.sourceName
-                sourceObject.deviceLabel = src.deviceLabel
-                sourceObject.sourceCfg = src.sourceCfg
-                sourceObject.outputType = src.outputType
-                sourceObject.isImageSnapped = src.isImageSnapped
-                sourceObject.isTriggered = src.isTriggered
-                sourceObject.isTimeLapse = src.isTimeLapse
-                sourceObject.intervalMs = src.intervalMs
-                sourceObject.exposureMs = src.exposureMs
-                sourceObject.framesInCircularBuffer = src.framesInCircularBuffer
-                sourceObject.outputType = src.outputType
-                sourceObject.isKeyboardSnapEnabled = src.isKeyboardSnapEnabled
-                sourceObject.SnapVirtualCode = src.SnapVirtualCode
-                exp.sourceConfig.sources.add(sourceObject)
-            }
-            for (flow in expOld.flowConfig.flows) {
-                val flowObject = uk.co.strimm.experiment.Flow()
-                flowObject.flowName = flow.flowName
-                flowObject.inputType = flow.inputType
-                flowObject.outputType = flow.outputType
-                for (flowName in flow.inputNames) {
-                    flowObject.inputNames.add(flowName)
-                }
-                exp.flowConfig.flows.add(flowObject)
-            }
-            for (sink in expOld.sinkConfig.sinks) {
-                val sinkObject = uk.co.strimm.experiment.Sink()
-                sinkObject.sinkName = sink.sinkName
-                sinkObject.sinkType = sink.sinkType
-                sinkObject.outputType = sink.outputType
-                sinkObject.displayOrStore = sink.displayOrStore
-                sinkObject.imageWidth = sink.imageWidth
-                sinkObject.imageHeight = sink.imageHeight
-                sinkObject.bitDepth = sink.bitDepth
-                sinkObject.previewInterval = sink.previewInterval
-                sinkObject.roiFlowName = sink.roiFlowName
-                sinkObject.autoscale = sink.autoscale
-                for (sinkName in sink.inputNames) {
-                    sinkObject.inputNames.add(sinkName)
-                }
-                exp.sinkConfig.sinks.add(sinkObject)
-
-            }
-
-            // traceColourByFlowAndOverlay<String, Pair<Overlay, Int>>
-            for (flow in expOld.flowConfig.flows) {
-                val roiFlow = strimmUIService.traceColourByFlowAndOverlay[flow.flowName]
-                if (roiFlow != null) {
-                    for (roi in roiFlow) {
-                        when(roi.first){
-                            is RectangleOverlay -> {
-                                loggerService.log(Level.INFO, "Adding rectangle ROI")
-                                val overlay = (roi.first) as RectangleOverlay
-                                val roiObject = ROI()
-                                roiObject.x = overlay.getOrigin(0)
-                                roiObject.y = overlay.getOrigin(1)
-                                roiObject.w = overlay.getExtent(0)
-                                roiObject.h = overlay.getExtent(1)
-                                roiObject.ROItype = "Rectangle" //TODO hardcoded
-                                roiObject.ROIName = ""
-                                roiObject.flowName = flow.flowName
-                                exp.roiConfig.rois.add(roiObject)
-                            }
-                            is EllipseOverlay -> {
-                                loggerService.log(Level.INFO, "Adding ellipse ROI")
-                                val overlay = (roi.first) as EllipseOverlay
-                                val roiObject = ROI()
-                                roiObject.x = overlay.getOrigin(0)
-                                roiObject.y = overlay.getOrigin(1)
-                                roiObject.w = overlay.getRadius(0)
-                                roiObject.h = overlay.getRadius(1)
-                                roiObject.ROItype = "Ellipse" //TODO hardcoded
-                                roiObject.ROIName = ""
-                                roiObject.flowName = flow.flowName
-                                exp.roiConfig.rois.add(roiObject)
-                            }
-                            else -> {
-                                loggerService.log(Level.WARNING, "ROI type not supported")
-                            }
-                        }
-                    }
-                }
-            }
-
-            experimentService.gson.toJson(exp, writer)
-            writer.flush()
-            writer.close()
-        }
-    }
+//    private fun addSaveJSONButtonListener() {
+//        saveJSON.addActionListener {
+//            //            val reloadChoice = JOptionPane.showConfirmDialog(strimmUIService.strimmFrame,
+////                    "Save JSON", "Save JSON to Temp.json",
+////                    JOptionPane.OK_CANCEL_OPTION)
+//            val pathAndName = "./ExperimentConfigurations/Temp.json"//TODO hardcoded
+//            val newFile = File(pathAndName)
+//            val writer = FileWriter(newFile)
+//            val exp = ExperimentConfiguration()
+//            val expOld = experimentService.experimentStream.expConfig
+//
+//            exp.experimentConfigurationName = expOld.experimentConfigurationName
+//            exp.experimentMode = expOld.experimentMode
+//            exp.experimentDurationMs = expOld.experimentDurationMs
+//            exp.HDF5Save = expOld.HDF5Save
+//            exp.ROIAdHoc = expOld.ROIAdHoc
+//            for (src in expOld.sourceConfig.sources) {
+//                val sourceObject = uk.co.strimm.experiment.Source()
+//                sourceObject.sourceName = src.sourceName
+//                sourceObject.deviceLabel = src.deviceLabel
+//                sourceObject.sourceCfg = src.sourceCfg
+//                sourceObject.outputType = src.outputType
+//                sourceObject.isImageSnapped = src.isImageSnapped
+//                sourceObject.isTriggered = src.isTriggered
+//                sourceObject.isTimeLapse = src.isTimeLapse
+//                sourceObject.intervalMs = src.intervalMs
+//                sourceObject.exposureMs = src.exposureMs
+//                sourceObject.framesInCircularBuffer = src.framesInCircularBuffer
+//                sourceObject.outputType = src.outputType
+//                sourceObject.isKeyboardSnapEnabled = src.isKeyboardSnapEnabled
+//                sourceObject.SnapVirtualCode = src.SnapVirtualCode
+//                exp.sourceConfig.sources.add(sourceObject)
+//            }
+//            for (flow in expOld.flowConfig.flows) {
+//                val flowObject = uk.co.strimm.experiment.Flow()
+//                flowObject.flowName = flow.flowName
+//                flowObject.inputType = flow.inputType
+//                flowObject.outputType = flow.outputType
+//                for (flowName in flow.inputNames) {
+//                    flowObject.inputNames.add(flowName)
+//                }
+//                exp.flowConfig.flows.add(flowObject)
+//            }
+//            for (sink in expOld.sinkConfig.sinks) {
+//                val sinkObject = uk.co.strimm.experiment.Sink()
+//                sinkObject.sinkName = sink.sinkName
+//                sinkObject.sinkType = sink.sinkType
+//                sinkObject.outputType = sink.outputType
+//                sinkObject.displayOrStore = sink.displayOrStore
+//                sinkObject.imageWidth = sink.imageWidth
+//                sinkObject.imageHeight = sink.imageHeight
+//                sinkObject.bitDepth = sink.bitDepth
+//                sinkObject.previewInterval = sink.previewInterval
+//                sinkObject.roiFlowName = sink.roiFlowName
+//                sinkObject.autoscale = sink.autoscale
+//                for (sinkName in sink.inputNames) {
+//                    sinkObject.inputNames.add(sinkName)
+//                }
+//                exp.sinkConfig.sinks.add(sinkObject)
+//
+//            }
+//
+//            // traceColourByFlowAndOverlay<String, Pair<Overlay, Int>>
+//            for (flow in expOld.flowConfig.flows) {
+//                val roiFlow = strimmUIService.traceColourByFlowAndOverlay[flow.flowName]
+//                if (roiFlow != null) {
+//                    for (roi in roiFlow) {
+//                        when(roi.first){
+//                            is RectangleOverlay -> {
+//                                loggerService.log(Level.INFO, "Adding rectangle ROI")
+//                                val overlay = (roi.first) as RectangleOverlay
+//                                val roiObject = ROI()
+//                                roiObject.x = overlay.getOrigin(0)
+//                                roiObject.y = overlay.getOrigin(1)
+//                                roiObject.w = overlay.getExtent(0)
+//                                roiObject.h = overlay.getExtent(1)
+//                                roiObject.ROItype = "Rectangle" //TODO hardcoded
+//                                roiObject.ROIName = ""
+//                                roiObject.flowName = flow.flowName
+//                                exp.roiConfig.rois.add(roiObject)
+//                            }
+//                            is EllipseOverlay -> {
+//                                loggerService.log(Level.INFO, "Adding ellipse ROI")
+//                                val overlay = (roi.first) as EllipseOverlay
+//                                val roiObject = ROI()
+//                                roiObject.x = overlay.getOrigin(0)
+//                                roiObject.y = overlay.getOrigin(1)
+//                                roiObject.w = overlay.getRadius(0)
+//                                roiObject.h = overlay.getRadius(1)
+//                                roiObject.ROItype = "Ellipse" //TODO hardcoded
+//                                roiObject.ROIName = ""
+//                                roiObject.flowName = flow.flowName
+//                                exp.roiConfig.rois.add(roiObject)
+//                            }
+//                            else -> {
+//                                loggerService.log(Level.WARNING, "ROI type not supported")
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            experimentService.gson.toJson(exp, writer)
+//            writer.flush()
+//            writer.close()
+//        }
+//    }
 
     /**
      * Specify logic for loading a new experiment configuration
@@ -508,7 +508,7 @@ class GUIMain : Command {
             } else {
                 var result = JOptionPane.YES_OPTION
                 var noROIsSpecified = false
-                if (experimentService.numNewTraceROIFeeds == 0) {
+                if (strimmUIService.traceFromROICounterPerDisplayROIFlow.all{ x -> x.value == 0}) {
                     result = JOptionPane.showConfirmDialog(strimmUIService.strimmFrame, "No new traces from ROIs specified. Do you want to proceed?", "Trace ROIs",
                             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
                     noROIsSpecified = true
