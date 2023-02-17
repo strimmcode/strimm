@@ -170,7 +170,7 @@ $Files =
 	"$env:USERPROFILE/.m2/repository/com/opencsv/opencsv/4.0/opencsv-4.0.jar",
 	"$env:USERPROFILE/.m2/repository/com/fazecast/jSerialComm/2.9.2/jSerialComm-2.9.2.jar",
 	"$env:USERPROFILE/.m2/repository/org/slf4j/slf4j-nop/1.7.5/slf4j-nop-1.7.5.jar",
-	"$env:USERPROFILE/.m2/repository/org/slf4j/slf4j-nop/1.7.5/slf4j-api-1.7.5.jar",
+	"$env:USERPROFILE/.m2/repository/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar",
 	"../hdfjava/jarhdf5-3.3.2.jar"
 
 function createDir
