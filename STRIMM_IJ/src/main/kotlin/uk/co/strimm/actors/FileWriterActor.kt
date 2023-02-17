@@ -44,6 +44,16 @@ class FileWriterActor : AbstractActor() {
 
     var isWriting = false
 
+    init {
+        try{
+            System.loadLibrary("jhdf5")
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Could not load jhdf5.dll library. File writing will fail")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
+    }
+
     override fun createReceive(): Receive {
         return receiveBuilder()
                 .match<Message>(Message::class.java) { message ->

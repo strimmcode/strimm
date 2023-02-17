@@ -73,11 +73,11 @@
         "timeLastCaptured": 0.0,
         "previewInterval": 0.2,
         "outputType": "Image",
-        "samplingFrequencyHz": 30.0,
-        "x": 512.0,
-        "y": 512.0,
-        "w": 512.0,
-        "h": 512.0,
+        "samplingFrequencyHz": 0.0,
+        "x": 0.0,
+        "y": 0.0,
+        "w": 0.0,
+        "h": 0.0,
         "channel": "",
         "sourceMMConfig": ""
       }
@@ -236,14 +236,27 @@
         "roiSz": "",
         "roiFlowName": "",
         "autoscale": true,
-        "isROI": true,
+        "isROI": false,
         "lut": "",
-        "terminatingCond": "time",
+        "terminatingCond": "",
         "terminatingKey": ""
       }
     ]
   },
   "roiConfig": {
-    "rois": []
+    "rois": [
+      {
+        "x": 324.0,
+        "y": 192.0,
+        "w": 42.0,
+        "h": 37.0,
+        "ROItype": "Rectangle",
+        "cameraDeviceLabel": "",
+        "ROIName": "",
+        "flowName": "DemoCameraROIFlow1",
+        "displaySink": "",
+        "ROInum": 0
+      }
+    ]
   }
 }

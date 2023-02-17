@@ -1,9 +1,12 @@
 package uk.co.strimm
 
+import hdf.hdf5lib.H5
+import hdf.hdf5lib.HDF5Constants
 import net.imagej.ImageJ
 import uk.co.strimm.gui.GUIMain
 import java.io.FileOutputStream
 import java.io.PrintStream
+import java.util.logging.Level
 
 /**
  * Main class. Everything starts here

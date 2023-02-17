@@ -2189,3 +2189,50 @@ Registered acquisition method SquareWaveSource
 Registered acquisition method RandomTraceSource
 Deleted a log file
 [INFO] [10/17/2022 12:39:53.887] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-253d7a59-0273-47ee-9620-886e27476496#-460311007] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+DCam DemoCamera DCam
+OpenCV OpenCVgrabber OpenCVgrabber
+failed to load RetigaR1.cfg
+Line 16: Property,Core,Initialize,1
+Error in device "Retiga R1": No Camera Found. Is it connected and switched on? (10006)
+
+
+failed to load testcam.cfg
+Line 7: Device,testcam,XIMEACamera,52601550
+Failed to load device "52601550" from adapter module "XIMEACamera" [ Failed to load device adapter "XIMEACamera" [ Failed to load module "./DeviceAdapters\mmgr_dal_XIMEACamera.dll" [ The module, or a module it depends upon, could not be found (Windows error: The specified module could not be found.) ] ] ]
+
+
+failed to load Ximea.cfg
+Line 8: Device,Ximea,XIMEACamera,17983042
+Failed to load device "17983042" from adapter module "XIMEACamera" [ Failed to load device adapter "XIMEACamera" [ Failed to load module "./DeviceAdapters\mmgr_dal_XIMEACamera.dll" [ The module, or a module it depends upon, could not be found (Windows error: The specified module could not be found.) ] ] ]
+
+
+Registered acquisition method averageROI
+Registered acquisition method ConfiguredCamera
+Registered acquisition method generateImage
+Registered acquisition method getTraceData
+Registered acquisition method Trace Data Method NIDAQ
+Registered acquisition method Trace Data Method Keyboard
+Registered acquisition method KeyboardA
+Registered acquisition method ConstantTraceSource
+Registered acquisition method ConstantVectorSource
+Registered acquisition method SineWaveSource
+Registered acquisition method SquareWaveSource
+Registered acquisition method RandomTraceSource
+Deleted a log file
+[INFO] [02/15/2023 15:39:18.636] [STRIMMAkkaSystem-akka.actor.default-dispatcher-2] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-6d5be110-c7b4-4b52-ad5b-6db86fb1a8d1#-472331506] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [1] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+Setting exposure to: 100.0
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+STARTING CONTINUOUS SEQUENCE ACQUISITION
+512  512   DemoCameraDisplay1   8
+[INFO] Found 10 JHotDraw adapters.
+[ERROR] [02/15/2023 15:39:34.944] [STRIMMAkkaSystem-akka.actor.default-dispatcher-11] [akka://STRIMMAkkaSystem/user/DemoCameraROIDisplayTraceActor1-ID-70cede27-833c-432e-b8b2-4384f0044a12] Kill (akka.actor.ActorKilledException: Kill)
+[ERROR] [02/15/2023 15:39:34.946] [STRIMMAkkaSystem-akka.actor.default-dispatcher-11] [akka://STRIMMAkkaSystem/user/DemoCameraDisplay1-ID-c30ffeed-c58e-49c3-8e1e-59faa9242145] Kill (akka.actor.ActorKilledException: Kill)
+Setting exposure to: 100.0
+TERRY : SetTriggered
+Calling StartAcquisition()
+If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+STARTING CONTINUOUS SEQUENCE ACQUISITION
+[INFO] [02/15/2023 15:39:36.530] [STRIMMAkkaSystem-akka.actor.default-dispatcher-11] [akka://STRIMMAkkaSystem/deadLetters] Message [uk.co.strimm.Acknowledgement] from Actor[akka://STRIMMAkkaSystem/user/FileWriterActor-ID-6d5be110-c7b4-4b52-ad5b-6db86fb1a8d1#-472331506] to Actor[akka://STRIMMAkkaSystem/deadLetters] was not delivered. [2] dead letters encountered. If this is not an expected behavior, then [Actor[akka://STRIMMAkkaSystem/deadLetters]] may have terminated unexpectedly, This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+512  512   DemoCameraDisplay1   8

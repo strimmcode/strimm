@@ -169,10 +169,9 @@ $Files =
     "$env:USERPROFILE/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.2.61/kotlin-stdlib-jdk7-1.2.61.jar",
 	"$env:USERPROFILE/.m2/repository/com/opencsv/opencsv/4.0/opencsv-4.0.jar",
 	"$env:USERPROFILE/.m2/repository/com/fazecast/jSerialComm/2.9.2/jSerialComm-2.9.2.jar",
-	"../hdfjava/jarhdf5-3.3.2.jar",
-	"../hdfjava/slf4j-api-1.7.5.jar",
-	"../hdfjava/slf4j-nop-1.7.5.jar",
-	"../hdfjava/slf4j-simple-1.7.5.jar"
+	"$env:USERPROFILE/.m2/repository/org/slf4j/slf4j-nop/1.7.5/slf4j-nop-1.7.5.jar",
+	"$env:USERPROFILE/.m2/repository/org/slf4j/slf4j-nop/1.7.5/slf4j-api-1.7.5.jar",
+	"../hdfjava/jarhdf5-3.3.2.jar"
 
 function createDir
 {
@@ -273,6 +272,7 @@ copyFolderContents -From "../WorkingDirectory/luts" -To "$OutputDir/luts"
 Write-Host "Copying loose files" -ForegroundColor Cyan
 copyFile -From "../WorkingDirectory/MMCoreJ_wrap.dll" -To "$OutputDir"
 copyFile -From "../WorkingDirectory/Test.dll" -To "$OutputDir"
+copyFile -From "../WorkingDirectory/jhdf5.dll" -To "$OutputDir"
 copyFile -From "splash.png" -To "$OutputDir"
 
 Write-Host "Creating Launcher" -ForegroundColor Cyan
