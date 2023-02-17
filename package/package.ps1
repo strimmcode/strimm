@@ -273,6 +273,9 @@ Write-Host "Copying loose files" -ForegroundColor Cyan
 copyFile -From "../WorkingDirectory/MMCoreJ_wrap.dll" -To "$OutputDir"
 copyFile -From "../WorkingDirectory/Test.dll" -To "$OutputDir"
 copyFile -From "../WorkingDirectory/jhdf5.dll" -To "$OutputDir"
+copyFile -From "../WorkingDirectory/msvcp140d.dll" -To "$OutputDir"
+copyFile -From "../WorkingDirectory/ucrtbased.dll" -To "$OutputDir"
+copyFile -From "../WorkingDirectory/vcruntime140d.dll" -To "$OutputDir"
 copyFile -From "splash.png" -To "$OutputDir"
 
 Write-Host "Creating Launcher" -ForegroundColor Cyan
