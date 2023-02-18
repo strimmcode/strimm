@@ -171,7 +171,14 @@ $Files =
 	"$env:USERPROFILE/.m2/repository/com/fazecast/jSerialComm/2.9.2/jSerialComm-2.9.2.jar",
 	"$env:USERPROFILE/.m2/repository/org/slf4j/slf4j-nop/1.7.5/slf4j-nop-1.7.5.jar",
 	"$env:USERPROFILE/.m2/repository/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar",
-	"../hdfjava/jarhdf5-3.3.2.jar"
+	"../hdfjava/jarhdf5-3.3.2.jar",
+	"$env:USERPROFILE/.m2/repository/org/openjfx/javafx-base/19/javafx-base-19.jar",
+	"$env:USERPROFILE/.m2/repository/org/openjfx/javafx-controls/19/javafx-controls-19.jar",
+	"$env:USERPROFILE/.m2/repository/org/openjfx/javafx-fxml/19/javafx-fxml-19.jar",
+	"$env:USERPROFILE/.m2/repository/org/openjfx/javafx-swing/19/javafx-swing-19.jar",
+	"$env:USERPROFILE/.m2/repository/org/openjfx/javafx-web/19/javafx-web-19.jar",
+	"$env:USERPROFILE/.m2/repository/org/openjfx/javafx-media/19/javafx-media-19.jar",
+	"$env:USERPROFILE/.m2/repository/org/openjfx/javafx-graphics/19/javafx-graphics-19.jar"
 
 function createDir
 {

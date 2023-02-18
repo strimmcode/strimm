@@ -246,10 +246,10 @@
   "roiConfig": {
     "rois": [
       {
-        "x": 324.0,
-        "y": 192.0,
-        "w": 42.0,
-        "h": 37.0,
+        "x": 255.0,
+        "y": 194.0,
+        "w": 25.0,
+        "h": 26.0,
         "ROItype": "Rectangle",
         "cameraDeviceLabel": "",
         "ROIName": "",
