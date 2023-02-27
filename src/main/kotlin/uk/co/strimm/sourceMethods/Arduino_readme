@@ -1,0 +1,21 @@
+The main source of bugs with Arduinos is using the wrong COM and baudRate, also the Arduinos have very small RAM
+and can only store 10 samples.s
+
+ArduinoSink receives a STRIMMArduinoControlBuffer which indicates whether the Sink is to be in continuous or episodic
+mode. This is determined by the first field ArduinoMode.  Whether the DO is to be obtained from data or file is
+determined by the field bFromFile. The remainder contains the location of the DO data or the actual DO data in the form
+of arrays.
+
+It is the previous flows or sources which construct the STRIMMArduinoControlBuffer which make the decision as to
+how the data will be emitted by the Arduino.
+
+To demonstrate this ArduinoSourceFileTest can be configured to emit a buffer with intervalMS (alternatively change the
+JSON entry).
+
+BUG some sort of shutdown error going from arduinoSource to arduinoSink files
+
+ArduinoSource creates a STRIMMSignalBuffer1 and then sends the data through the akka-graph.
+The data is packed into heterogeneous rows in the following order:
+digitialTime (arduino does not measure this however it can be calculated to 1us)
+
+

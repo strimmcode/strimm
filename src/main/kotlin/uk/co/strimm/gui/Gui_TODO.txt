@@ -1,0 +1,4 @@
+GUI TODO
+********
+1) sort out the icons and javaFX resources so that are not deleted each time the project is cleaned.
+2) remove all of the buttons in the toolbar which are not used, same for the menu items.

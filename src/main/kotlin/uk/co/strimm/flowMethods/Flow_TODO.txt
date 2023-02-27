@@ -1,0 +1,32 @@
+FLOW TASKS
+**********
+
+1) Implement the RAW flows.  These take strings and parameters in a derived
+class from STRIMMBuffer.  These will map (similar to a REST interface) to the
+function calls on the MMCore.
+2) Clarify the frame acquistion times in MMSeqCameraFlow for bursts of images
+3) Implement a Flow/logic which will turn a burst of images  from a MMseqCameraFlow
+so that they can be processed as normal STRIMMBuffer.  This could be done in a clumsy
+way by sending it to a special sink - which then passes it to a special source which
+only pumps out burst images - which could then be processed, but this is REALLY CRAP.
+Possible solutions might be in using akka.
+4) For each of the key MM components not currently developed (Galvo, Serial, SLM, XYStage, ZStage),
+implement the the flow - so that the STRIMMBuffer can contain relevant info eg the z depth
+to move the stage to, or the pattern to put onto the SLM. Also implement it as a File - or say
+xy positions which the stage will move through - along with some flag to say whether this
+is single shot or multiple/infinite.
+5) TCP Flow.  This will receive a string and parameters and send the request off to
+a server, the return from the server will be of the form string and parameters.  This means
+that some non standard tech such as the KX2 robot could be controlled via this flow.
+6) MMCameraFlow - currently takes an image when it receives a STRIMMBuffer, change this
+so that the incoming buffer can contain optional information to say change the exposure time.
+7) (IMPORTANT) Implement Flows in Jars according to the FlowMethod interface. This way a vendor can produce a
+flow, drop it into a Flows folder and it would be available to use.  DONE 230224
+8) (GOOD TO DO) ModalDlgFlowBaseMethod, which allows dlig configurable flows at runtime. The natural
+way to do this is with JavaFX, but since possible move away from this the quickest for me is via
+windows dlg boxes or swing.
+9) (IMPORTANT) DLLFlow, so vendors can develop to IFlow and drop them into JSONS
+10) (NICE TO DO) ComponentObjectModelFlow - a COM aware component can be written in many languages and then accessed by many
+STRIMMs etc
+11) (IMPORTANT) PythonFlow,  runs a Python script most likely by having a parallel Python3 process going on. Important issues
+here might be how to communicate, likely sockets or pipes - so marshalling is an issue.

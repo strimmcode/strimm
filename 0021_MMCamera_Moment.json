@@ -1,0 +1,58 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "Moment",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "0020_MomentSource.cfg",
+				"isTimeLapse" : True,
+				"intervalMs" : 300.0
+		
+
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "ROIFlow",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "0021_ROIFlow.cfg",
+				"inputNames" : [
+					"Moment"
+				]
+			}
+		]
+	},	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "SaveSink_save",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"Moment"
+				]
+			},
+			
+			{
+				"sinkName" : "DisplaySink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "0020_MomentSink.cfg",
+				"inputNames" : [
+					"Moment"
+				]
+			},
+			{
+				"sinkName" : "ROITraceSink",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "0004_TraceSink.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			}
+		]
+	}
+
+}

@@ -1,0 +1,31 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "Moment",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "0020_MomentSource.cfg",
+				"isTimeLapse" : True,
+				"intervalMs" : 300.0
+		
+
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "DisplaySink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "0020_MomentSink.cfg",
+				"inputNames" : [
+					"Moment"
+				]
+			}
+		]
+	}
+
+}

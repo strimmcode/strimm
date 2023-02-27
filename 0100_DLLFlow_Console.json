@@ -1,0 +1,42 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "DLLSource",
+				"isTimeLapse" : True,
+				"intervalMs" : 500
+		
+
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "flow",
+				"flowType" : "DLLFlow",
+				"async" : True,
+				"inputNames" : [
+					"1"
+				]
+
+		
+
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "Sink",
+				"sinkType" : "DLLSink",
+				"inputNames" : [
+					"flow"
+				]
+			}
+		]
+	}
+
+}

@@ -1,0 +1,43 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "ActorSourceTest",
+				"sourceCfg" : "0005_OpenCV.cfg",
+				"isTimeLapse" : True,
+				"intervalMs" : 100.0
+		
+
+			}
+		]
+	},
+
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "F1",
+				"flowType" : "ActorFlowTest",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	},
+		
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "PixelTestSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "0005_OpenCVSink.cfg",
+				"inputNames" : [
+					"F1"
+				]
+			}
+		]
+	}
+
+}

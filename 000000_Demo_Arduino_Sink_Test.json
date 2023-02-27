@@ -1,0 +1,31 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "ARDUINOSourceFileTestMethod",
+				"sourceCfg" : "000000_DemoArduinoSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0
+		
+
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "Sink",
+				"sinkType" : "ARDUINOSinkMethod",
+				"sinkCfg" : "000000_DemoArduinoSink.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	}
+
+}

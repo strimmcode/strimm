@@ -1,0 +1,25 @@
+SINK TODO
+*********
+1)(IMPORTANT) DLLSink, so that a vendor can just drop in a DLL into a folder, the cfg
+would name the dll, and it would be called via an ISink C++ interface through JNI.
+2)(NICE to do) ComponentObjectModelSink, registered component via COM so that it can
+be called generically across the OS (say registered by regsrv32 etc)
+3) RESTSink, uses a REST interface to send the results to an external website
+4) TCPMethod - port this to TCPSink
+5) TCPSink - act as a client and sends string and data to a TCP server (which could
+be localmachine)
+6) UDPSink - act as client and sends string and data as UDP packets to a UDP server
+7) (IMPORTANT) decide on the format for marshalling the STRIMMBuffer received by the
+sink onto a USP or TCP server.
+8) SERIALSinkMethod, send string and data taken from a STRIMMBuffer to device on Serial COM port.
+9) (IMPORTANT) PythonSink runs a Python function or class which takes the STRIMMBuffer
+converts it into Python types and executes a Python script.
+10) MatlabSink, runs a Matlab class or function which takes a marshalled version of the
+STRIMMBuffer.
+11) ModalDlgSinkBaseMethod, launches a Modal dialog so that the Sink can be parameterised
+at run-time.  Other classes will inherit from this class.
+12) SinkImageJPixelTest, probably not longer needed so can remove.
+13) (IMPORTANT) SinkHistogramMethod, SinkTraceMethod need to be redone with better
+graphics, could go to windows and do through QT.
+14) (NICE to do) a real-time TensorFlow link to do deep-learning on the fly
+15) (IMPORTANT) load from JARs which conform to SinkMethod interface.  DONE 240223

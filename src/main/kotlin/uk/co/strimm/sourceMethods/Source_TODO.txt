@@ -1,0 +1,26 @@
+SOURCE TODO
+***********
+
+1) Arduino and NIDAQ unification of the code, as far as is possible use the same kind of subclass of STRIMMBuffer
+2) RESTSource, RESTSourceRaw with a website demo. The RESTSource polls the website, and the website will
+create the STRIMMBuffer and marshall it back to the RESTSource. Other users can then alter the parameters behind how the
+website will return data. So the website could have databases, cloud services, etc
+3) TCPSoure,UDPSource, TCPSourceRaw, UDPSourceRaw: as an extension and fleshed out version of TCPMethod
+4) PythonSource runs a script.py which is specified in the cfg, need to decide how the data comes out of the
+script and is turned into a STRIMMBuffer.
+5) MouseSource, KeyboardSource cfg defines the rate at which the mouse and the keyboard are polled and turn the
+data into a STRIMMBuffer and is sent through the akka-graph.
+6) InputStringSource derived from ModalDlgSourceBaseMethod where you enter a string - which is then packaged
+and passed through the akka-graph along with its timestamp in a STRIMMBuffer.
+7) HF5SourceMethod - creates STRIMMBuffer from an h5 file.
+8) (IMPORTANT) DLLSource - cfg defines a dll file which is loaded into address space and then the source class within it
+is runaccording to interface ISource c++ interface via JNI.
+9) ActorSourceTest - clean this up - so that gets samples from an external actor
+10) (IMPORTANT) Develop a single CMMCore sources - where a core a selected in cfg and has a global presence which could be
+used by other components - rather than everything having the same core.
+11) MatlabSource - runs a Matlab script to generate a STRIMMBuffer - could be a Matlab class
+12) (IMPORTANT) ModalDlgSourceBaseMethod - a base method to be subclassed, which will launch a modal dlg box as it is init, which
+will then allow the Source to be configured at runtime.
+13) More consistent naming of the classes (remove Method name)
+14) (IMPORTANT) Load and run jars with classes derived from interface SourceMethod so vendors can quickly develop sources  DONE 240223
+15) (NICE to do) ComponentObjectModelSource - runs a ISource c++ interface from COM once component registered to the OS

@@ -1,0 +1,162 @@
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Could not load Save ROIs button icon
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Stack trace: javax.imageio.ImageIO.read(ImageIO.java:1394)
+uk.co.strimm.UtilitiesKt.setIcon(utilities.kt:29)
+uk.co.strimm.UtilitiesKt.setIcon$default(utilities.kt:25)
+uk.co.strimm.gui.GUIMain.addAcquisitionButtons(GUIMain.kt:123)
+uk.co.strimm.gui.GUIMain.initAndShowGUI(GUIMain.kt:97)
+uk.co.strimm.gui.GUIMain.run(GUIMain.kt:64)
+org.scijava.command.CommandModule.run(CommandModule.java:199)
+org.scijava.module.ModuleRunner.run(ModuleRunner.java:168)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:127)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:66)
+org.scijava.thread.DefaultThreadService$3.call(DefaultThreadService.java:238)
+java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:266)
+java.util.concurrent.FutureTask.run(FutureTask.java)
+java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+java.lang.Thread.run(Thread.java:748)
+
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Could not load Load Experiment button icon
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Stack trace: javax.imageio.ImageIO.read(ImageIO.java:1394)
+uk.co.strimm.UtilitiesKt.setIcon(utilities.kt:29)
+uk.co.strimm.UtilitiesKt.setIcon$default(utilities.kt:25)
+uk.co.strimm.gui.GUIMain.addAcquisitionButtons(GUIMain.kt:129)
+uk.co.strimm.gui.GUIMain.initAndShowGUI(GUIMain.kt:97)
+uk.co.strimm.gui.GUIMain.run(GUIMain.kt:64)
+org.scijava.command.CommandModule.run(CommandModule.java:199)
+org.scijava.module.ModuleRunner.run(ModuleRunner.java:168)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:127)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:66)
+org.scijava.thread.DefaultThreadService$3.call(DefaultThreadService.java:238)
+java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:266)
+java.util.concurrent.FutureTask.run(FutureTask.java)
+java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+java.lang.Thread.run(Thread.java:748)
+
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Could not load StartPreview button icon
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Stack trace: javax.imageio.ImageIO.read(ImageIO.java:1394)
+uk.co.strimm.UtilitiesKt.setIcon(utilities.kt:29)
+uk.co.strimm.UtilitiesKt.setIcon$default(utilities.kt:25)
+uk.co.strimm.gui.GUIMain.addAcquisitionButtons(GUIMain.kt:134)
+uk.co.strimm.gui.GUIMain.initAndShowGUI(GUIMain.kt:97)
+uk.co.strimm.gui.GUIMain.run(GUIMain.kt:64)
+org.scijava.command.CommandModule.run(CommandModule.java:199)
+org.scijava.module.ModuleRunner.run(ModuleRunner.java:168)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:127)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:66)
+org.scijava.thread.DefaultThreadService$3.call(DefaultThreadService.java:238)
+java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:266)
+java.util.concurrent.FutureTask.run(FutureTask.java)
+java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+java.lang.Thread.run(Thread.java:748)
+
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Could not load StartPreview button icon
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Stack trace: javax.imageio.ImageIO.read(ImageIO.java:1394)
+uk.co.strimm.UtilitiesKt.setIcon(utilities.kt:29)
+uk.co.strimm.UtilitiesKt.setIcon$default(utilities.kt:25)
+uk.co.strimm.gui.GUIMain.addAcquisitionButtons(GUIMain.kt:139)
+uk.co.strimm.gui.GUIMain.initAndShowGUI(GUIMain.kt:97)
+uk.co.strimm.gui.GUIMain.run(GUIMain.kt:64)
+org.scijava.command.CommandModule.run(CommandModule.java:199)
+org.scijava.module.ModuleRunner.run(ModuleRunner.java:168)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:127)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:66)
+org.scijava.thread.DefaultThreadService$3.call(DefaultThreadService.java:238)
+java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:266)
+java.util.concurrent.FutureTask.run(FutureTask.java)
+java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+java.lang.Thread.run(Thread.java:748)
+
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Could not load Pause button icon
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Stack trace: javax.imageio.ImageIO.read(ImageIO.java:1394)
+uk.co.strimm.UtilitiesKt.setIcon(utilities.kt:29)
+uk.co.strimm.UtilitiesKt.setIcon$default(utilities.kt:25)
+uk.co.strimm.gui.GUIMain.addAcquisitionButtons(GUIMain.kt:144)
+uk.co.strimm.gui.GUIMain.initAndShowGUI(GUIMain.kt:97)
+uk.co.strimm.gui.GUIMain.run(GUIMain.kt:64)
+org.scijava.command.CommandModule.run(CommandModule.java:199)
+org.scijava.module.ModuleRunner.run(ModuleRunner.java:168)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:127)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:66)
+org.scijava.thread.DefaultThreadService$3.call(DefaultThreadService.java:238)
+java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:266)
+java.util.concurrent.FutureTask.run(FutureTask.java)
+java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+java.lang.Thread.run(Thread.java:748)
+
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Could not load Stop button icon
+Feb 24, 2023 4:38:29 PM uk.co.strimm.services.LoggerService log
+WARNING: Stack trace: javax.imageio.ImageIO.read(ImageIO.java:1394)
+uk.co.strimm.UtilitiesKt.setIcon(utilities.kt:29)
+uk.co.strimm.UtilitiesKt.setIcon$default(utilities.kt:25)
+uk.co.strimm.gui.GUIMain.addAcquisitionButtons(GUIMain.kt:150)
+uk.co.strimm.gui.GUIMain.initAndShowGUI(GUIMain.kt:97)
+uk.co.strimm.gui.GUIMain.run(GUIMain.kt:64)
+org.scijava.command.CommandModule.run(CommandModule.java:199)
+org.scijava.module.ModuleRunner.run(ModuleRunner.java:168)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:127)
+org.scijava.module.ModuleRunner.call(ModuleRunner.java:66)
+org.scijava.thread.DefaultThreadService$3.call(DefaultThreadService.java:238)
+java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:266)
+java.util.concurrent.FutureTask.run(FutureTask.java)
+java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+java.lang.Thread.run(Thread.java:748)
+
+Feb 24, 2023 4:38:38 PM uk.co.strimm.services.LoggerService log
+INFO: Registering actor: StrimmActor
+Feb 24, 2023 4:38:38 PM uk.co.strimm.services.LoggerService log
+INFO: Registering actor: FileManagerActor-ID-0d415e17-5967-484e-b66e-846d2177b69b
+Feb 24, 2023 4:38:38 PM uk.co.strimm.services.LoggerService log
+INFO: STRIMM actor now watching FileManagerActor-ID-0d415e17-5967-484e-b66e-846d2177b69b
+Feb 24, 2023 4:38:56 PM uk.co.strimm.services.LoggerService log
+INFO: Experiment stream info:
+Number of sources: 1
+Number of flows: 1
+Number of sinks 1
+Sources details:
+Source name: 1, number of source outlets: 1
+Flow name: flow, number of flow inlets: 1, number of flow outlets: 1, Sink name: Sink, number of sink inlets: 1
+
+Feb 24, 2023 4:38:56 PM uk.co.strimm.services.LoggerService log
+INFO: Finished building graph
+Feb 24, 2023 4:38:56 PM uk.co.strimm.services.LoggerService log
+INFO: Number of connections specified is equal to number of connections made (this is good). Number of specified connections is 2, number of connections made is 2
+Feb 24, 2023 4:39:22 PM uk.co.strimm.services.LoggerService log
+INFO: FileManagerActor actor FileManagerActor-ID-0d415e17-5967-484e-b66e-846d2177b69b terminating
+Feb 24, 2023 4:39:22 PM uk.co.strimm.services.LoggerService log
+INFO: STRIMM actor does not recognise message
+Feb 24, 2023 4:39:22 PM uk.co.strimm.services.LoggerService log
+INFO: Registering actor: StrimmActor
+Feb 24, 2023 4:39:22 PM uk.co.strimm.services.LoggerService log
+INFO: Registering actor: FileManagerActor-ID-7a344f23-4983-471d-882d-8373df4f9856
+Feb 24, 2023 4:39:22 PM uk.co.strimm.services.LoggerService log
+INFO: STRIMM actor now watching FileManagerActor-ID-7a344f23-4983-471d-882d-8373df4f9856
+Feb 24, 2023 4:39:28 PM uk.co.strimm.services.LoggerService log
+INFO: Experiment stream info:
+Number of sources: 1
+Number of flows: 1
+Number of sinks 1
+Sources details:
+Source name: 1, number of source outlets: 1
+Flow name: flow, number of flow inlets: 1, number of flow outlets: 1, Sink name: Sink, number of sink inlets: 1
+
+Feb 24, 2023 4:39:28 PM uk.co.strimm.services.LoggerService log
+INFO: Finished building graph
+Feb 24, 2023 4:39:28 PM uk.co.strimm.services.LoggerService log
+INFO: Number of connections specified is equal to number of connections made (this is good). Number of specified connections is 2, number of connections made is 2

@@ -1,0 +1,29 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "SignalSourceMethod",
+				"sourceCfg" : "SignalSource.cfg",
+				"isTimeLapse" : True,
+				"intervalMs" : 500
+		
+
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "PixelTestSink",
+				"sinkType" : "SinkConsoleMethod",
+				"sinkCfg" : "ConsoleSink.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	}
+
+}

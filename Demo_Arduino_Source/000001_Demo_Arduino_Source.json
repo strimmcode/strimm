@@ -1,0 +1,31 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "ArduinoSource",
+				"sourceCfg" : "000001_DemoArduinoSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0
+		
+
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "ConsoleSink",
+				"sinkType" : "SinkConsoleMethod",
+				"sinkCfg" : "ConsoleSink.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	}
+
+}

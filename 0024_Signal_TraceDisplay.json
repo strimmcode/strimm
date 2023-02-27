@@ -1,0 +1,37 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "SignalSourceMethod",
+				"sourceCfg" : "0004_SignalSource.cfg",
+				"isTimeLapse" : True,
+				"intervalMs" : 100
+		
+
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "SaveSink_save",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"1"
+				]
+			},
+			
+			{
+				"sinkName" : "PixelTestSink1",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "0004_TraceSink.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	}
+
+}

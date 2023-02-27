@@ -1,0 +1,4 @@
+EXPERIMENT TODO
+***************
+1) Contains lots of redundant classes and needs to be cleaned up
+for example DAQDevice is no longer used.

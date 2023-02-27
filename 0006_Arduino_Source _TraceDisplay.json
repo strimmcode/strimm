@@ -1,0 +1,31 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "ArduinoSource",
+				"sourceCfg" : "0006_ArduinoSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0
+		
+
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "PixelTestSink1",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "0004_TraceSink.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	}
+
+}

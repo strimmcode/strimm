@@ -1,0 +1,10 @@
+VENDOR PRODUCED SOURCES,FLOWS,SINKS
+***********************************
+In the folder LIBSs is a library test_vendor.jar.  It contains DLLSink, DLLFlow, DLLSource.
+These were made in FullGraph19_Vendor project.
+
+In order to use a jar in Intellij, file/project structure/settings and then attach the jar file as a
+Java library - and will sort out the class path and the IDE will run the app.
+
+In the case of the package it is simpler, just drop the jar file into the jars folder
+and the Source, Flow and Sink can be referenced in the JSON.

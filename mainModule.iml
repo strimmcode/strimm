@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="AutoImportedSourceRoots">
+    <option name="directories">
+      <list>
+        <option value="C:\Users\twrig\Desktop\Code\FullGraph19/src/main/java" />
+        <option value="C:\Users\twrig\Desktop\Code\FullGraph19/src/main/kotlin" />
+        <option value="C:\Users\twrig\Desktop\Code\FullGraph19/src/test/java" />
+        <option value="C:\Users\twrig\Desktop\Code\FullGraph19/src/test/kotlin" />
+        <option value="src/main/kotlin" />
+        <option value="target/generated-sources/kapt" />
+        <option value="target/generated-sources/kaptKotlin" />
+      </list>
+    </option>
+  </component>
+</module>

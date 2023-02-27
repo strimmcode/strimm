@@ -1,0 +1,10 @@
+GENERAL TODO
+************
+1) Currenly a MicroManager eneabled Source,Flow,Sink has its own MMCore.
+IMPORTANT QUESTION - do they clash. Maybe behind the scenes they are somehow
+sharing resources in terms of dlls, locking memory, sychronisation primitives etc.
+Validate or find out the limits with some experiments/scope etc.
+2) Have Source/Flow/Sink that use a single shared MMCore. The core could be names in
+the config - and then checked against a global dictionary of cores, and it could be
+instantiated if not present. It could be that a named core is busy so there could be delays,
+which should be OK with the current implementation of akka - however needs to be confirmed.
