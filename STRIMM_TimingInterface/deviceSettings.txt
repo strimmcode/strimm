@@ -1,6 +1,0 @@
-General > Configuration Type           : Dynamic Library (.dll)
-
-VC++ Directories > Include Directories : ..\ (+ any device specific includes)
-VC++ Directories > Library directories : (+ any device specific includes)
-
-Linker > Use Library Dependency Inputs : Yes

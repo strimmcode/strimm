@@ -1,5 +1,0 @@
-settings-icon-png-10-transparent: <a href='https://webstockreview.net'>https://webstockreview.net</a>
-
-build_tools: http://www.myiconfinder.com/icon/build-screwdriver-settings-tools-tool-wrench/7968 : CC (Attribution-Share Alike 3.0 Unported)
-
-dslr-camera: Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
