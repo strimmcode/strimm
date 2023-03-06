@@ -1,0 +1,14 @@
+﻿  CompoundProtocol.cpp
+  dllmain.cpp
+  ProtocolBase.cpp
+  SimpleDataProtocol.cpp
+  SimpleProtocol.cpp
+  SimpleProtocolContinuous.cpp
+  SimpleProtocolSoftwareTiming.cpp
+  Test.cpp
+     Creating library C:\Users\twrig\source\repos\Test__16_11_22__multipleNIDAQ__allNIDAQs\x64\Release\Test.lib and object C:\Users\twrig\source\repos\Test__16_11_22__multipleNIDAQ__allNIDAQs\x64\Release\Test.exp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 839 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Test.vcxproj -> C:\Users\twrig\source\repos\Test__16_11_22__multipleNIDAQ__allNIDAQs\x64\Release\Test.dll

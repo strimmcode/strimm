@@ -1,0 +1,5 @@
+Now compiles to Release mode 
+x64/Release/test.dll
+
+Has the NIDAQ: episodic/continuous code, also useful Win API code,
+probably break into smaller dlls.
