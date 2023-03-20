@@ -1,0 +1,63 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "retiga",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "retigaSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0
+		
+
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "ROIFlow",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "retigaROIFlow.cfg",
+				"inputNames" : [
+					"retiga"
+				]
+			}
+	    ]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "ROITraceSink",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "retigaROISink.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			},
+			{
+				"sinkName" : "ROI_Save",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			},
+			{
+				"sinkName" : "SaveSink",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"retiga"
+				]
+			},
+			{
+				"sinkName" : "DisplaySink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "retigaSink.cfg",
+				"inputNames" : [
+					"retiga"
+				]
+			}
+		]
+	}
+}

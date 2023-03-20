@@ -95,7 +95,7 @@ class NIDAQSourceMethod () : SourceMethod {
     }
 
     override fun run(): STRIMMBuffer? {
-
+        println("IN NIDAQSOURCEMETHOD RUN")
         //get the parameters of the loaded protocol (which will be the next SimpleProtocol)
         var numSamples = GUIMain.protocolService.NIDAQ_Source_GetNumSamples(deviceID)
         sampleFreq = GUIMain.protocolService.NIDAQ_Source_GetSampleFreq(deviceID)

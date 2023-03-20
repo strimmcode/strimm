@@ -21,6 +21,7 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
     override var actor: ActorRef? = null
     var times_cnt = 0
     override fun init(flow: Flow) {
+        println("IN INIT")
         //todo this is in the wrong place it should be in flow
         this.flow = flow
         if (flow.flowCfg != "") {
@@ -41,6 +42,7 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
         }
     }
     override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
+        println("IN RUN FLOW METHOD")
         //the flow function should know the
 
         var dataIn = data[0] as STRIMMNIDAQBuffer
@@ -52,10 +54,26 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
             times_cnt++
         }
 
-        var numAOChannels = dataIn.AOChannels!!.size
-        var numAIChannels = dataIn.AIChannels!!.size
-        var numDOChannels = dataIn.DOChannels!!.size
-        var numDIChannels = dataIn.DIChannels!!.size
+        var numAOChannels = 0
+        if(dataIn.AOChannels != null){
+            numAOChannels = dataIn.AOChannels!!.size
+        }
+        var numAIChannels = 0
+        if(dataIn.AIChannels != null){
+            numAIChannels = dataIn.AIChannels!!.size
+        }
+        var numDOChannels = 0
+        if(dataIn.DOChannels != null){
+            numDOChannels = dataIn.DOChannels!!.size
+        }
+        var numDIChannels = 0
+        if(dataIn.DIChannels != null){
+            numDIChannels = dataIn.DIChannels!!.size
+        }
+//        var numAOChannels = dataIn.AOChannels!!.size
+//        var numAIChannels = dataIn.AIChannels!!.size
+//        var numDOChannels = dataIn.DOChannels!!.size
+//        var numDIChannels = dataIn.DIChannels!!.size
 
 
         //create an array of channel names

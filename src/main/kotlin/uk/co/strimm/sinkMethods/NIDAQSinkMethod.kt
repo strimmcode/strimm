@@ -95,6 +95,7 @@ class NIDAQSinkMethod() : SinkMethod {
     }
     override fun run(data : List<STRIMMBuffer>){
         println("***********************************")
+        println("IN NIDAQSINKMETHOD RUN")
         //receipt of a STRIMMBuffer of any kind triggers the protocol
         //get the parameters of the loaded protocol (which will be the next SimpleProtocol)
         var numSamples = GUIMain.protocolService.NIDAQ_Source_GetNumSamples(deviceID)

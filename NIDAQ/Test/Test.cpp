@@ -342,31 +342,37 @@ JNIEXPORT jint JNICALL Java_uk_co_strimm_services_JDAQ_NIDAQSourceGetDOPort
 
 JNIEXPORT jint JNICALL Java_uk_co_strimm_services_JDAQ_NIDAQSourceRun
 (JNIEnv* env, jobject, jint deviceID,  jdoubleArray pTimes, jdoubleArray pAOData, jdoubleArray pAIData, jintArray pDOData, jintArray pDIData) {
-  //  MessageBox(NULL, L"RunNext1", L"", MB_OK);
+   //MessageBox(NULL, L"RunNext1", L"", MB_OK);
 
+   jdouble *pDataDouble = NULL, *pDataDouble0 = NULL, *pDataDouble1 = NULL;
+   jint* pDataInt = NULL, * pDataInt1 = NULL;
 
+   if (pTimes) {
+       jboolean bIsCopy0 = 0;
+       jsize lenDouble0 = env->GetArrayLength(pTimes);
+       pDataDouble0 = env->GetDoubleArrayElements(pTimes, &bIsCopy0);
+   }
 
-
-    jboolean bIsCopy0 = 0;
-    jsize lenDouble0 = env->GetArrayLength(pTimes);
-    jdouble* pDataDouble0 = env->GetDoubleArrayElements(pTimes, &bIsCopy0);
-
-
-    jboolean bIsCopy1 = 0;
-    jsize lenDouble = env->GetArrayLength(pAIData);
-    jdouble* pDataDouble = env->GetDoubleArrayElements(pAIData, &bIsCopy1);
-
-    jboolean bIsCopy2 = 0;
-    jsize lenInt = env->GetArrayLength(pDIData);
-    jint* pDataInt = env->GetIntArrayElements(pDIData, &bIsCopy2);
-
-    jboolean bIsCopy3 = 0;
-    jsize lenDouble1 = env->GetArrayLength(pAOData);
-    jdouble* pDataDouble1 = env->GetDoubleArrayElements(pAOData, &bIsCopy3);
-
-    jboolean bIsCopy4 = 0;
-    jsize lenInt1 = env->GetArrayLength(pDOData);
-    jint* pDataInt1 = env->GetIntArrayElements(pDOData, &bIsCopy4);
+    if (pAIData) {
+        jboolean bIsCopy1 = 0;
+        jsize lenDouble = env->GetArrayLength(pAIData);
+        pDataDouble = env->GetDoubleArrayElements(pAIData, &bIsCopy1);
+    }
+    if (pDIData) {
+        jboolean bIsCopy2 = 0;
+        jsize lenInt = env->GetArrayLength(pDIData);
+        pDataInt = env->GetIntArrayElements(pDIData, &bIsCopy2);
+    }
+    if (pAOData) {
+        jboolean bIsCopy3 = 0;
+        jsize lenDouble1 = env->GetArrayLength(pAOData);
+        pDataDouble1 = env->GetDoubleArrayElements(pAOData, &bIsCopy3);
+    }
+    if (pDOData) {
+        jboolean bIsCopy4 = 0;
+        jsize lenInt1 = env->GetArrayLength(pDOData);
+        pDataInt1 = env->GetIntArrayElements(pDOData, &bIsCopy4);
+    }
 
     bool bSuccess = false;
    // software timing should be part of CP no code change
@@ -376,12 +382,28 @@ JNIEXPORT jint JNICALL Java_uk_co_strimm_services_JDAQ_NIDAQSourceRun
 
     //
 
+    if (pTimes) {
+        env->ReleaseDoubleArrayElements(pTimes, pDataDouble0, 0);
+    }
 
-    env->ReleaseDoubleArrayElements(pTimes, pDataDouble0, 0);
-    env->ReleaseIntArrayElements(pDIData, pDataInt, 0); //copy the contents back into the array
-    env->ReleaseDoubleArrayElements(pAIData, pDataDouble, 0); //copy the contents back into the array
-    env->ReleaseIntArrayElements(pDOData, pDataInt1, 0); //copy the contents back into the array
-    env->ReleaseDoubleArrayElements(pAOData, pDataDouble1, 0); //copy the contents back into the array
+ 
+    if (pAIData) {
+        env->ReleaseDoubleArrayElements(pAIData, pDataDouble, 0); //copy the contents back into the array
+    }
+
+
+    if (pDIData) {
+        env->ReleaseIntArrayElements(pDIData, pDataInt, 0); //copy the contents back into the array
+    }
+    if (pAOData) {
+        env->ReleaseDoubleArrayElements(pAOData, pDataDouble1, 0); //copy the contents back into the array
+    }
+
+    if (pDOData) {
+
+        env->ReleaseIntArrayElements(pDOData, pDataInt1, 0); //copy the contents back into the array
+    }
+
     return ret;
 }
 
@@ -474,7 +496,7 @@ extern "C" TEST_API bool SimpleProtocolContinuousTest() {
     //Continuous NIDAQ source requires AO, AI, DO, DI
 
 
-    string sz_AOAIDODI = "C:\\Users\\twrig\\source\\repos\\CreateCSV\\CreateCSV\\1_AOAIDODI_3.csv"; //test1 ok 15/8/21
+    string sz_AOAIDODI = "C:\\Users\\twrig\\Desktop\\Code\\FullGraph25\\STRIMM.app\\TBIO_LDI_Trig.csv"; //test1 ok 15/8/21
 
     SimpleProtocolContinuous PPP;
 
@@ -577,7 +599,7 @@ extern "C" TEST_API bool SimpleProtocolTest() {
 
     string sz_AOAIDODI = "C:\\Users\\twrig\\source\\repos\\CreateCSV\\CreateCSV\\1_AOAIDODI.csv"; //test1 ok 15/8/21
 
-    string sz_Test = "C:\\Users\\twrig\\source\\repos\\CreateCSV\\CreateCSV\\test.csv"; //test1 ok 15/8/21
+    string sz_Test = "C:\\Users\\twrig\\Desktop\\Code\\FullGraph25\\STRIMM.app\\TBIO_LDI_Trig.csv"; //test1 ok 15/8/21
 
     SimpleProtocolContinuous PPP;
     
@@ -608,6 +630,7 @@ extern "C" TEST_API bool SimpleProtocolTest() {
 
     for (int f = 0; f < 10000; f++) {
         PP1.RunProtocolDAQ(pTime, pDataAO, pDataAI, pDataDO, pDataDI, false, true, 0, -1);
+        cout << "done" << endl;
     }
 
     PP1.ReleaseDAQ();
@@ -803,9 +826,11 @@ extern "C" TEST_API bool CompoundProtocolTest() {
     string szCsv1 = szFolder + "compoundTest1.csv";
     string szCsv2 = szFolder + "compoundTest2.csv";
 
+    string szTest1 = "C:\\Users\\twrig\\Desktop\\Code\\FullGraph25\\STRIMM.app\\TBIO_LDI_Trig.csv";
+
+    int testNum = 11;
 
 
-    int testNum = 0;
     if (testNum == 0) {
         //timingMethod = 0, no startTrigger
 
@@ -1527,7 +1552,78 @@ extern "C" TEST_API bool CompoundProtocolTest() {
 
            PM3.ShutdownProtocol();
     }
+    else     if (testNum == 11) {
+    //timingMethod = 0, no startTrigger
 
+    CompoundProtocol PM3;
+    PM3.InitProtocol(szTest1, false, true, 4, -10.0, 10.0);
+    PM3.SetStartTrigger(false, 0, true, -1);
+    PM3.SetTimingMethod(0);
+
+    int numAOChannels = PM3.GetNumChannels(0);
+    int numDOChannels = PM3.GetNumChannels(2);
+    int numAIChannels = PM3.GetNumChannels(1);
+    int numDIChannels = PM3.GetNumChannels(3);
+
+    int numSamples = PM3.GetNextNumSamples();
+    double* pDataAI = new double[numSamples * numAIChannels];
+    uInt32* pDataDI = new uInt32[numSamples * numDIChannels];
+
+    double* pDataAO = new double[numSamples * numAOChannels];
+    uInt32* pDataDO = new uInt32[numSamples * numDOChannels];
+
+    double* pTime = new double[numSamples];
+    //
+
+         //it is up to you to make sure all of the buffers are the right size
+    bool bError = false;
+    int ret = 1;
+    while (ret > 0) {
+        cout << "run next" << endl;
+        ret = PM3.RunNext(pTime, pDataAO, pDataAI, pDataDO, pDataDI, &bError);
+
+        if (numAOChannels > 0) {
+            for (int ff = 0; ff < numSamples; ff++) {
+                cout << "AO ";
+                for (int fff = 0; fff < numAOChannels; fff++) {
+                    cout << pDataAO[ff * numAOChannels + fff] << " ";
+                }
+                cout << endl;
+            }
+        }
+        if (numDOChannels > 0) {
+            for (int ff = 0; ff < numSamples; ff++) {
+                cout << "DO ";
+                for (int fff = 0; fff < numDOChannels; fff++) {
+                    cout << pDataDO[ff * numDOChannels + fff] << " ";
+                }
+                cout << endl;
+            }
+        }
+        if (numAIChannels > 0) {
+            for (int ff = 0; ff < numSamples; ff++) {
+                cout << "AI ";
+                for (int fff = 0; fff < numAIChannels; fff++) {
+                    cout << pDataAI[ff * numAIChannels + fff] << " ";
+                }
+                cout << endl;
+            }
+        }
+        if (numDIChannels > 0) {
+            for (int ff = 0; ff < numSamples; ff++) {
+                cout << "DI ";
+                for (int fff = 0; fff < numDIChannels; fff++) {
+                    cout << pDataDI[ff * numDIChannels + fff] << " ";
+                }
+                cout << endl;
+            }
+        }
+
+    }
+
+    PM3.ShutdownProtocol();
+
+    }
     return false;
 }
 extern "C" TEST_API bool SimpleDataProtocolTest() {
@@ -1551,11 +1647,12 @@ extern "C" TEST_API bool SimpleDataProtocolTest() {
 }
 extern "C" TEST_API int Test(void)
 {
-    cout << "Simple protocol test " << endl;
-    SimpleProtocolContinuousTest();
+    //cout << "Simple protocol test " << endl;
+   // SimpleProtocolContinuousTest();
+    //SimpleProtocolTest();
     
-    //cout << "Compound protocol test " << endl;
-    //CompoundProtocolTest();
+    cout << "Compound protocol test " << endl;
+    CompoundProtocolTest();
     //cout << "test complete" << endl;
     return 1000;
 }

@@ -1,0 +1,32 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "ContinuousSource",
+				"sourceType" : "NIDAQContinousSourceMethod",
+				"sourceCfg" : "continuousSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "TraceSink",				
+				"sinkType" : "SinkBaseMethod",
+				"sinkCfg" : "continuousTraceSink.cfg",
+				"inputNames" : [
+					"ContinuousSource"
+				]
+			},
+			{
+				"sinkName" : "TraceSaveSink",				
+				"sinkType" : "SinkSaveMethod",
+				"inputNames" : [
+					"ContinuousSource"
+				]
+			}
+		]
+	}
+}

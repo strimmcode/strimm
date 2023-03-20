@@ -52,16 +52,16 @@ class SinkConsoleMethod() : SinkMethod {
         }
         else {
             println("*****console********************")
-//            for (f in 0..data.size - 1) {
-//                val trace = data[f] as STRIMMSignalBuffer1
-//                val data = trace.data as Array<Double>
-//                val numChannels = trace.numChannels
-//                println("numChannels " + numChannels)
-//                val numSamples = data.size / numChannels
-//                println("numSamples " + numSamples)
-//
-//
-//            }
+            for (f in 0..data.size - 1) {
+                val trace = data[f] as STRIMMSignalBuffer1
+                val data = trace.data as Array<Double>
+                val numChannels = trace.numChannels
+                println("numChannels " + numChannels)
+                val numSamples = data.size / numChannels
+                println("numSamples " + numSamples)
+
+
+            }
         }
     }
     override fun getActorRef() : ActorRef? {
