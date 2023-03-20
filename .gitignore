@@ -4,3 +4,10 @@ out/*
 STRIMM.app/*
 *.h5
 NIDAQ/.vs/*
+*.log
+log/*
+*.zip
+CreateCSV/*
+CreateCSV
+NIDAQ/Test/x64/*
+log/*.lck
