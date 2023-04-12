@@ -166,7 +166,22 @@ $Files =
     "$env:USERPROFILE/.m2/repository/org/jetbrains/kotlin/kotlin-runtime/1.2.61/kotlin-runtime-1.2.61.jar",
     "$env:USERPROFILE/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar",
     "$env:USERPROFILE/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.2.61/kotlin-stdlib-jdk8-1.2.61.jar",
-    "$env:USERPROFILE/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.2.61/kotlin-stdlib-jdk7-1.2.61.jar"
+    "$env:USERPROFILE/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.2.61/kotlin-stdlib-jdk7-1.2.61.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-base/19/javafx-base-19.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-base/19/javafx-base-19-win.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-controls/19/javafx-controls-19.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-controls/19/javafx-controls-19-win.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-fxml/19/javafx-fxml-19.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-fxml/19/javafx-fxml-19-win.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-swing/19/javafx-swing-19.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-swing/19/javafx-swing-19-win.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-web/19/javafx-web-19.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-web/19/javafx-web-19-win.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-media/19/javafx-media-19.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-media/19/javafx-media-19-win.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-graphics/19/javafx-graphics-19.jar",
+    "$env:USERPROFILE/.m2/repository/org/openjfx/javafx-graphics/19/javafx-graphics-19-win.jar",
+    "$env:USERPROFILE/.m2/repository/com/opencsv/opencsv/4.0/opencsv-4.0.jar"
 
 function createDir
 {
@@ -246,18 +261,29 @@ createDir $OutputDir
 
 createDir "$OutputDir/jars"
 $Files | foreach { copyFile -From $_ -To "$OutputDir/jars/" }
-copyMavenJar -Location "../STRIMM_IJ/target" -Name "STRIMM_IJ"
-copyMavenJar -Location "../STRIMM_JNI/target" -Name "STRIMM_JNI"
+copyMavenJar -Location "./target" -Name "mainModule"
+# copyMavenJar -Location "../STRIMM_JNI/target" -Name "STRIMM_JNI"
 
 createDir "$OutputDir/DAQs"
-copyFolderContents -From "../WorkingDirectory/DAQs" -To "$OutputDir/DAQs"
+#copyFolderContents -From "../WorkingDirectory/DAQs" -To "$OutputDir/DAQs"
 
 createDir "$OutputDir/DeviceAdapters"
-copyFolderContents -From "../WorkingDirectory/DeviceAdapters" -To "$OutputDir/DeviceAdapters"
+copyFolderContents -From "./DeviceAdapters" -To "$OutputDir/DeviceAdapters"
 
 Write-Host "Copying loose files" -ForegroundColor Cyan
-copyFile -From "../WorkingDirectory/MMCoreJ_wrap.dll" -To "$OutputDir"
+#copyFile -From "../WorkingDirectory/MMCoreJ_wrap.dll" -To "$OutputDir"
 copyFile -From "splash.png" -To "$OutputDir"
+copyFile -From "./jarhdf5-3.3.2.jar" -To "$OutputDir/jars"
+copyFile -From "./slf4j-api-1.7.5.jar" -To "$OutputDir/jars"
+copyFile -From "./slf4j-nop-1.7.5.jar" -To "$OutputDir/jars"
+copyFile -From "./slf4j-simple-1.7.5.jar" -To "$OutputDir/jars"
+copyFile -From "./*.dll" -To "$OutputDir"
+copyFile -From "./*.cfg" -To "$OutputDir"
+copyFile -From "./*.jar" -To "$OutputDir"
+copyFile -From "./*.json" -To "$OutputDir"
+copyFile -From "./*.csv" -To "$OutputDir"
+copyFile -From "./*.lib" -To "$OutputDir"
+copyFile -From "./STRIMM_settings.txt" -To "$OutputDir"
 
 
 
