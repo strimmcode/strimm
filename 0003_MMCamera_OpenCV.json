@@ -5,15 +5,13 @@
 				"sourceName" : "1",
 				"sourceType" : "MMCameraSource",
 				"sourceCfg" : "0003_OpenCVSource.cfg",
-				"isTimeLapse" : True,
-				"intervalMs" : 300.0
+				"isTimeLapse" : False,
+				"intervalMs" : 0.1
 		
 
 			}
 		]
 	},
-	
-	
 	"sinkConfig":{ 
 		"sinks" : [
 			

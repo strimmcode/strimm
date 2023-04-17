@@ -83,7 +83,6 @@ class ExperimentService  : AbstractService(), ImageJService {
     //runStream()   set the AQM::bCamerasAcquire so all sources start, then runStream in experimentStream()
     fun runStream() {
        // GUIMain.acquisitionMethodService.bCamerasAcquire = true
-        println("///////////////////////RUNSTREAM")
         experimentStream.runStream()
     }
     //stopStream()   set AQM::bCamerasAquire to false to stop sources. Switch the killswitch, set experimentStream::isRunning to false

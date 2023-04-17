@@ -264,9 +264,10 @@ JNIEXPORT jint JNICALL Java_uk_co_strimm_services_JDAQ_NIDAQSourceInit
     char* szProt = (char*)env->GetStringUTFChars(szCsv, &bIsCopy);
 
     CompoundProtocol CP;
+    cout << "Initialising protocol..." << endl;
     int ret = CP.InitProtocol(szProt, bCompound, bRepeat, deviceID, minV, maxV);
     map_protocols[deviceID] = CP;
-
+    
 
     
     env->ReleaseStringUTFChars(szCsv, szProt);

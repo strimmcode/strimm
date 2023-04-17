@@ -1,0 +1,62 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "OpenCVCamera",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "MMCameraSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "ROIFlow",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "MMCameraROIFlow.cfg",
+				"inputNames" : [
+					"OpenCVCamera"
+				]
+			}
+	    ]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "ROITraceSink",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "MMCameraROISink.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			},
+			{
+				"sinkName" : "ROISaveSink",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			},
+			{
+				"sinkName" : "OpenCVSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"OpenCVCamera"
+				]
+			},
+			{
+				"sinkName" : "OpenCVSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "MMCameraSink.cfg",
+				"inputNames" : [
+					"OpenCVCamera"
+				]
+			}
+		]
+	}
+
+}

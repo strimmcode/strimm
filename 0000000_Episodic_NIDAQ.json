@@ -5,15 +5,13 @@
 				"sourceName" : "EpisodicSource",
 				"sourceType" : "NIDAQSourceMethod",
 				"sourceCfg" : "episodicSource.cfg",
-				"isTimeLapse" : False,
-				"intervalMs" : 100.0
+				"isTimeLapse" : False
 			},
 			{
 				"sourceName" : "retiga",
 				"sourceType" : "MMCameraSource",
 				"sourceCfg" : "retigaSource.cfg",
-				"isTimeLapse" : False,
-				"intervalMs" : 100.0
+				"isTimeLapse" : False
 			}
 		]
 	},

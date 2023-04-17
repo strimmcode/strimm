@@ -71,9 +71,11 @@ SimpleProtocol::~SimpleProtocol() {
 	if (!dataDO_back) delete[] dataDO_back;
 }
 bool	SimpleProtocol::Init(char* szCsv) {
-
+	cout << "Initialising simple protocol" << endl;
 	ProtocolBase pb;
+	cout << "Reading protocol CSV" << endl;
 	pb.ReadProtocol(szCsv);
+
 	numAOChannels = pb.GetNumAOChannels();
 	numAIChannels = pb.GetNumAIChannels();
 	numDOChannels = pb.GetNumDOChannels();
@@ -87,8 +89,10 @@ bool	SimpleProtocol::Init(char* szCsv) {
 	DOChannels = pb.GetDOChannels();
 	DIChannels = pb.GetDIChannels();
 
+	cout << "Getting output data" << endl;
 	vector<int> v_DO = pb.GetDOData();
 	vector<double> v_AO = pb.GetAOData();
+	
 	//
 	//to avoid AO and DO add a AI line
 	if (numAOChannels > 0) {
@@ -97,7 +101,6 @@ bool	SimpleProtocol::Init(char* szCsv) {
 			dataAO[f] = v_AO[f];
 		}
 	}
-
 
 	if (numDOChannels > 0) {
 		dataDO = new uInt32[numSamples * numDOChannels];
@@ -155,7 +158,7 @@ bool	SimpleProtocol::InitDAQ() {
 	
 	
 	*/
-
+	cout << "Simple protocol initialising DAQ" << endl;
 	char buffer[2000] = { 0 };
 	int errorCode = 0;
 
@@ -209,7 +212,7 @@ bool	SimpleProtocol::InitDAQ() {
 		}
 	}
 
-
+	cout << "Simple protocol loading channels" << endl;
 	////load channels
 	for (int f = 0; f < numAIChannels; f++) {
 		std::stringstream ss;
@@ -621,6 +624,7 @@ bool	SimpleProtocol::RunProtocolDAQ(double* pTimeSec, double* pDataAO, double* p
 
 			this->pFIx = pFIx;
 			std::stringstream ssTrig;
+			cout << "Checking PFIx" << endl;
 			ssTrig << "/Dev" << deviceID << "/PFI" << pFIx;
 
 

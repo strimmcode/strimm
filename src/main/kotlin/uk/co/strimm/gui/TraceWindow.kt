@@ -63,10 +63,8 @@ class TraceWindowPlugin : AbstractDockableWindow() {
                 dockableWindowMultiple = this
 
             } catch(ex : Exception){
-                GUIMain.loggerService.log(
-                    Level.SEVERE,
-                    "TERRY :exception " + ex.message
-                )
+                GUIMain.loggerService.log(Level.SEVERE, "Error loading TraceWindow. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             }
         }
     }

@@ -1,0 +1,2 @@
+startMemory 256m
+maxMemory 256m

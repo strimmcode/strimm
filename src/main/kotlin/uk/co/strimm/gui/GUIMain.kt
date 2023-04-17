@@ -38,6 +38,8 @@ import uk.co.strimm.experiment.ROI
 import uk.co.strimm.services.*
 import uk.co.strimm.setIcon
 import java.awt.BorderLayout
+//import java.awt.Color
+//import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.io.*
@@ -76,11 +78,11 @@ class GUIMain : Command {
         //
         //
         // start the server thread
-        initRemoteControl()
-        controlThread = CommandServerThread("remote control", commandServerSocket!!)
-        if (controlThread != null){
-            controlThread!!.start()
-        }
+//        initRemoteControl()
+//        controlThread = CommandServerThread("remote control", commandServerSocket!!)
+//        if (controlThread != null){
+//            controlThread!!.start()
+//        }
         //
         //
         //
@@ -391,8 +393,8 @@ class GUIMain : Command {
                 //
                 //
                 // end remote control
-                shutdownRemoteControl()
-                controlThread!!.EndThread()
+//                shutdownRemoteControl()
+//                controlThread!!.EndThread()
                 //
                 //
                 //
@@ -412,9 +414,11 @@ class GUIMain : Command {
         private fun initRemoteControl(){
             commandServerSocket = ServerSocket(commandTCPPort)
         }
+
         private fun shutdownRemoteControl(){
-            commandServerSocket!!.close()
+//            commandServerSocket!!.close()
         }
+
         fun remoteLoadExperiment(selectedConfigFile : String){
             println("Remotely load an experiment")
             //store the selectedFile : File so that it can be reloaded when the experiment is finished
@@ -595,7 +599,6 @@ class GUIMain : Command {
             Color.color(0.6350,0.0780,0.1840),
             Color.color(0.5,0.5,0.5)
         )
-
     }
 
     class CommandServerThread(name: String?, var commandServerSocket: ServerSocket) : Thread(name) {

@@ -1,10 +1,2 @@
 ﻿  CompoundProtocol.cpp
-  dllmain.cpp
-  ProtocolBase.cpp
-  SimpleDataProtocol.cpp
-  SimpleProtocol.cpp
-  SimpleProtocolContinuous.cpp
-  SimpleProtocolSoftwareTiming.cpp
-  Test.cpp
-  Generating Code...
   Test.vcxproj -> C:\strimm\strimm\strimm\NIDAQ\x64\Debug\Test.dll

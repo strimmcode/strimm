@@ -270,6 +270,9 @@ createDir "$OutputDir/DAQs"
 createDir "$OutputDir/DeviceAdapters"
 copyFolderContents -From "./DeviceAdapters" -To "$OutputDir/DeviceAdapters"
 
+createDir "$OutputDir/luts"
+copyFolderContents -From "./luts" -To "$OutputDir/luts"
+
 Write-Host "Copying loose files" -ForegroundColor Cyan
 #copyFile -From "../WorkingDirectory/MMCoreJ_wrap.dll" -To "$OutputDir"
 copyFile -From "splash.png" -To "$OutputDir"

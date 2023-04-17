@@ -8,6 +8,8 @@ import org.scijava.plugin.Plugin
 import org.scijava.service.AbstractService
 import org.scijava.service.Service
 import uk.co.strimm.ArduinoCommunicator
+import uk.co.strimm.gui.GUIMain
+import java.util.logging.Level
 
 @Plugin(type = Service::class)
 class ProtocolService : AbstractService(), ImageJService  {
@@ -27,8 +29,9 @@ class ProtocolService : AbstractService(), ImageJService  {
 //        return 0;
 //    }
     fun Test() : Int {
-        var ret = jdaq.Test()
-        return ret
+//        var ret = jdaq.Test()
+//        return ret
+        return 1
     }
     fun TestStart() : Int {  //starts a thread of callbacks
         var ret = jdaq.TestStart()
@@ -42,24 +45,6 @@ class ProtocolService : AbstractService(), ImageJService  {
         var ret = jdaq.TestStop()
         return ret
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // NIDAQ Continuous Source
 
@@ -108,16 +93,7 @@ class ProtocolService : AbstractService(), ImageJService  {
         return jdaq.NIDAQContinuousSourceGetDIPort(deviceID)
     }
 
-
-
-
-
-
-
-
-
     // NIDAQ Source
-
     fun NIDAQ_Source_Init(szCsv : String, bCompound : Boolean, bRepeat : Boolean, deviceID : Int, deviceName : String, minV : Double, maxV : Double) : Int{
         return jdaq.NIDAQSourceInit(szCsv, bCompound, bRepeat, deviceID, deviceName, minV, maxV)
     }
@@ -128,22 +104,34 @@ class ProtocolService : AbstractService(), ImageJService  {
         return jdaq.NIDAQSourceSetTimingMethod(deviceID, timingMethod)
     }
     fun NIDAQ_Source_GetNumAOChannels(deviceID : Int) : Int{
-        return jdaq.NIDAQSourceGetNumAOChannels(deviceID)
+        var numAOChannels = jdaq.NIDAQSourceGetNumAOChannels(deviceID)
+        GUIMain.loggerService.log(Level.INFO, "Number of AO channels: $numAOChannels")
+        return numAOChannels
     }
     fun NIDAQ_Source_GetNumAIChannels(deviceID : Int) : Int{
-        return jdaq.NIDAQSourceGetNumAIChannels(deviceID)
+        var numAIChannels = jdaq.NIDAQSourceGetNumAIChannels(deviceID)
+        GUIMain.loggerService.log(Level.INFO, "Number of AI channels: $numAIChannels")
+        return numAIChannels
     }
     fun NIDAQ_Source_GetNumDOChannels(deviceID : Int) : Int{
-        return jdaq.NIDAQSourceGetNumDOChannels(deviceID)
+        var numDOChannels = jdaq.NIDAQSourceGetNumDOChannels(deviceID)
+        GUIMain.loggerService.log(Level.INFO, "Number of DO channels: $numDOChannels")
+        return numDOChannels
     }
     fun NIDAQ_Source_GetNumDIChannels(deviceID : Int) : Int{
-        return jdaq.NIDAQSourceGetNumDIChannels(deviceID)
+        var numDIChannels = jdaq.NIDAQSourceGetNumDOChannels(deviceID)
+        GUIMain.loggerService.log(Level.INFO, "Number of DI channels: $numDIChannels")
+        return numDIChannels
     }
     fun NIDAQ_Source_GetNumSamples(deviceID : Int) : Int{
-        return jdaq.NIDAQSourceGetNumSamples(deviceID)
+        var numSamples = jdaq.NIDAQSourceGetNumSamples(deviceID)
+        GUIMain.loggerService.log(Level.INFO, "Number of samples: $numSamples")
+        return numSamples
     }
     fun NIDAQ_Source_GetSampleFreq(deviceID : Int) : Double{
-        return jdaq.NIDAQSourceGetSampleFreq(deviceID)
+        var sampleFrequency = jdaq.NIDAQSourceGetSampleFreq(deviceID)
+        GUIMain.loggerService.log(Level.INFO, "Sampling frequency: $sampleFrequency")
+        return sampleFrequency
     }
 
     fun NIDAQ_Source_GetChannelFromIndex(deviceID : Int, type : Int, index : Int) : Int{
@@ -160,10 +148,8 @@ class ProtocolService : AbstractService(), ImageJService  {
         return jdaq.NIDAQSourceRun(deviceID, pTimes, AOdata, AIdata, DOdata, DIdata)
     }
     fun NIDAQ_Source_Shutdown(deviceID : Int) : Int {
-        return jdaq.NIDAQSourceShutdown(deviceID);
+        return jdaq.NIDAQSourceShutdown(deviceID)
     }
-
-
 
 
     //NIDAQ DataSink
@@ -175,11 +161,10 @@ class ProtocolService : AbstractService(), ImageJService  {
         return jdaq.NIDAQDataSinkRun(deviceID, pAOData, pDOData, numSamples, sampleFreq, numAOChannels, AOChannels, numDOChannels, DOChannels, DOport)
     }
 
-    fun NIDAQ_DataSink_Shutdown(deviceID : Int): Int{
+    fun NIDAQ_DataSink_Shutdown(deviceID : Int): Int {
         return jdaq.NIDAQDataSinkShutdown(deviceID)
 
     }
-
 
 
 // Arduino

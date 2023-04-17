@@ -7,7 +7,10 @@ import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMNIDAQBuffer
 import uk.co.strimm.experiment.Source
 import uk.co.strimm.gui.GUIMain
+import uk.co.strimm.services.UIstate
 import java.io.FileReader
+import java.util.logging.Level
+import javax.swing.JOptionPane
 
 
 class NIDAQSourceMethod () : SourceMethod {
@@ -66,10 +69,35 @@ class NIDAQSourceMethod () : SourceMethod {
 
         dataID = 0
 
-        var ret = GUIMain.protocolService.NIDAQ_Source_Init(szCsv, bCompound, bRepeat, deviceID, deviceName, minV, maxV)
-        ret = GUIMain.protocolService.NIDAQ_Source_SetStartTrigger(deviceID, bStartTrigger, pFIx, bRisingEdge, timeoutSec)
-        ret = GUIMain.protocolService.NIDAQ_Source_SetTimingMethod(deviceID, timingMethod)
+        val isCSVPresent = GUIMain.utilsService.checkCSVFilePresent(szCsv)
 
+        if(isCSVPresent) {
+            val csvPath = GUIMain.utilsService.changeSlashesInFilePath(szCsv)
+            GUIMain.loggerService.log(Level.INFO, "NIDAQ source method calling NIDAQ_Source_Init")
+            var ret =
+                GUIMain.protocolService.NIDAQ_Source_Init(csvPath, bCompound, bRepeat, deviceID, deviceName, minV, maxV)
+            GUIMain.loggerService.log(Level.INFO, "NIDAQ_Source_Init returned $ret")
+            GUIMain.loggerService.log(Level.INFO, "NIDAQ source method calling NIDAQ_Source_SetStartTrigger")
+            ret = GUIMain.protocolService.NIDAQ_Source_SetStartTrigger(
+                deviceID,
+                bStartTrigger,
+                pFIx,
+                bRisingEdge,
+                timeoutSec
+            )
+            GUIMain.loggerService.log(Level.INFO, "NIDAQ_Source_SetStartTrigger returned $ret")
+            GUIMain.loggerService.log(Level.INFO, "NIDAQ source method calling NIDAQ_Source_SetTimingMethod")
+            ret = GUIMain.protocolService.NIDAQ_Source_SetTimingMethod(deviceID, timingMethod)
+            GUIMain.loggerService.log(Level.INFO, "NIDAQ_Source_SetTimingMethod returned $ret")
+        }
+        else{
+            val messageString = "Protocol CSV file not found at specified path. " +
+                    "Could not initialise NIDAQ board. " +
+                    "Check CSV file is present and path contains forward slashes / "
+            JOptionPane.showMessageDialog(GUIMain.strimmUIService.strimmFrame, messageString)
+            GUIMain.strimmUIService.state = UIstate.IDLE
+            GUIMain.loggerService.log(Level.SEVERE, messageString)
+        }
     }
 
     override fun preStart() {
@@ -97,6 +125,7 @@ class NIDAQSourceMethod () : SourceMethod {
     override fun run(): STRIMMBuffer? {
         println("IN NIDAQSOURCEMETHOD RUN")
         //get the parameters of the loaded protocol (which will be the next SimpleProtocol)
+        println("DeviceID: $deviceID")
         var numSamples = GUIMain.protocolService.NIDAQ_Source_GetNumSamples(deviceID)
         sampleFreq = GUIMain.protocolService.NIDAQ_Source_GetSampleFreq(deviceID)
         if (numSamples >0){
@@ -118,7 +147,6 @@ class NIDAQSourceMethod () : SourceMethod {
                         AIChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 1, ix)
                     }
                     dataAI = DoubleArray(numSamples * numAIChannels)
-
                 }
                 if (numDOChannels > 0){
                     DOChannels = IntArray(numDOChannels)

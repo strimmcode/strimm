@@ -29,7 +29,7 @@ class TraceActor(val plugin: TraceWindowPlugin) : AbstractActor(){
                 GUIMain.loggerService.log(Level.INFO,"Trace actor receiving message")
             }
             .match<StartStreaming>(StartStreaming::class.java){
-                println("TraceActor:startStreaming")
+                GUIMain.loggerService.log(Level.INFO, "TraceActor starting streaming")
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .match<CompleteStreaming>(CompleteStreaming::class.java){

@@ -6,7 +6,9 @@ import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMNIDAQBuffer
 import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.experiment.Flow
+import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
+import java.util.logging.Level
 
 //STRIMMBuffer format conversion from NIDAQBuffer which is the output of the NIDAQ
 //to SignalBufferFlow - which is used by the TraceWindow
@@ -21,7 +23,7 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
     override var actor: ActorRef? = null
     var times_cnt = 0
     override fun init(flow: Flow) {
-        println("IN INIT")
+        GUIMain.loggerService.log(Level.INFO, "Initialising NIDAQBuffer to SignalBuffer flow")
         //todo this is in the wrong place it should be in flow
         this.flow = flow
         if (flow.flowCfg != "") {
@@ -42,7 +44,7 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
         }
     }
     override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
-        println("IN RUN FLOW METHOD")
+        println("In NIDAQBuffer to SignalBuffer flow run method")
         //the flow function should know the
 
         var dataIn = data[0] as STRIMMNIDAQBuffer
@@ -54,6 +56,7 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
             times_cnt++
         }
 
+        println("Dealing with channels")
         var numAOChannels = 0
         if(dataIn.AOChannels != null){
             numAOChannels = dataIn.AOChannels!!.size
@@ -90,6 +93,8 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
         for (f in 0..numDIChannels-1){
             channelNames.add("DI" + dataIn.DIChannels!![f].toString())
         }
+
+        println("Converting channels to doube arrays")
         //convert the data into a single array of doubles
         var data = DoubleArray( channelNames.size * numSamples)
         var cnt = 0
@@ -119,8 +124,6 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
                 cnt++
             }
         }
-
-
 
         return STRIMMSignalBuffer(data, times, numSamples, channelNames, dataIn.dataID, dataIn.status)
 

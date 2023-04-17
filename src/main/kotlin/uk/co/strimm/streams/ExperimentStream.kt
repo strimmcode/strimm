@@ -107,6 +107,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             throw ex
         }
     }
+
     fun runStream(){
             isRunning = true
             GUIMain.softwareTimerService.setFirstTimeMeasurement()
@@ -119,10 +120,10 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             sinkMethods.values.forEach{
                 it.preStart()
             }
+            GUIMain.loggerService.log(Level.INFO, "Running stream")
             stream?.run(GUIMain.actorService.materializer)
-
-
     }
+
     private fun checkNumberOfConnections(){
         if(numConnectionsMade == numConnectionsSpecified){
             GUIMain.loggerService.log(Level.INFO, "Number of connections specified is equal to number of connections made (this is good)." +
@@ -282,7 +283,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                     val expSource = ExperimentSource(source.sourceName)
                     val cl = Class.forName("uk.co.strimm.sourceMethods." + source.sourceType)
                     val sourceMethod = cl.newInstance() as SourceMethod
+                    println("Source method init")
                     sourceMethod.init(source)
+                    println("Source method post init")
                     //sourceList.add(sourceMethod)
                     sourceMethods[source.sourceName] = sourceMethod
 
@@ -312,8 +315,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
 
                                     //.filter{ GUIMain.experimentService.experimentStream.isRunning == true}
                                     .mapAsync(
-                                        1,
-                                        akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
+                                        1, akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
                                     )
                                     .filter { it.status == 1 }
                                     .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
@@ -442,6 +444,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                     sinkMethods[sink.sinkName] = sinkMethod
 
                     if (sinkMethod.useActor()) {
+                        GUIMain.loggerService.log(Level.INFO, "Creating sink actor to go with sink")
                         val akkaSink: Sink<List<STRIMMBuffer>, NotUsed> =
                             Sink.actorRefWithAck(
                                 sinkMethod.getActorRef()!!, sinkMethod.start(),
@@ -459,7 +462,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                     }
             }
         } catch (ex: Exception) {
-            println("sink exception")
+            GUIMain.loggerService.log(Level.SEVERE, "Error in creating sink. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
     private fun getOutlets(currentNode : ExperimentNode, expConfig: ExperimentConfiguration) : ArrayList<ExperimentNode>{

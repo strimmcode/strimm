@@ -130,6 +130,7 @@ int		CompoundProtocol::InitProtocol(string csvProt, bool bCompound, bool bRepeat
 		//stringstream ss;
 		//ss << vID.size() << " " << vRepeats.size();
 		//MessageBoxA(NULL, ss.str().c_str(), "results", MB_OK);
+		return 1;
 	}
 	else {
 		
@@ -141,6 +142,7 @@ int		CompoundProtocol::InitProtocol(string csvProt, bool bCompound, bool bRepeat
 	/*	if (bRepeat) {
 			prot->SetRepeat(true);
 		}*/
+		cout << "Creating simple protocol" << endl;
 		vProtocols.push_back(prot);
 		vID.push_back(0);
 		vRepeats.push_back(1);
@@ -148,9 +150,9 @@ int		CompoundProtocol::InitProtocol(string csvProt, bool bCompound, bool bRepeat
 		curRepeat = 0; // there is only 1 repeat
 
 		bSingleShotCompleted = false;
-		
+		return 1;
 	}
-	return 1; // has no meaning in this case  TO DO give 0 if parsing error
+	return 0; // has no meaning in this case  TO DO give 0 if parsing error
 }
 
 /*
@@ -294,7 +296,7 @@ ShutdownProtocol	Calls ReleaseDAQ() on all of the protocols and then clear() eac
 
 */
 int		CompoundProtocol::ShutdownProtocol() {
-	cout << "CP :: ShutdownProtocol" << endl;
+	cout << "Shutting down compound protocol" << endl;
 	while (bInRunMethod) {
 		Sleep(100);
 	}

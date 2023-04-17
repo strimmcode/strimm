@@ -1,0 +1,2 @@
+startMemory 8192m
+maxMemory 8192m

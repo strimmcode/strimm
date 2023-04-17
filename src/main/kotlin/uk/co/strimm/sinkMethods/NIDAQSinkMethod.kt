@@ -11,6 +11,7 @@ import uk.co.strimm.actors.messages.start.StartStreaming
 import uk.co.strimm.experiment.Sink
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
+import java.util.logging.Level
 
 
 //NIDAQSinkMethod will execute a protocol (csv) on receipt of any kind of STRIMMBuffer
@@ -82,19 +83,19 @@ class NIDAQSinkMethod() : SinkMethod {
         dataID = 0
 
 
+        GUIMain.loggerService.log(Level.INFO, "Calling protocol service NIDAQ_Source_Init")
         var ret = GUIMain.protocolService.NIDAQ_Source_Init(szCsv, bCompound, bRepeat, deviceID, deviceName, minV, maxV)
+        GUIMain.loggerService.log(Level.INFO, "Calling protocol service NIDAQ_Source_SetStartTrigger")
         ret = GUIMain.protocolService.NIDAQ_Source_SetStartTrigger(deviceID,bStartTrigger, pFIx, bRisingEdge, timeoutSec)
+        GUIMain.loggerService.log(Level.INFO, "Calling protocol service NIDAQ_Source_SetTimingMethod")
         ret = GUIMain.protocolService.NIDAQ_Source_SetTimingMethod(deviceID, timingMethod)
-
-
-
     }
+
     override fun preStart() {
         //open all resources that the source might need
         //eg start the circular buffer, load a tiff stack etc
     }
     override fun run(data : List<STRIMMBuffer>){
-        println("***********************************")
         println("IN NIDAQSINKMETHOD RUN")
         //receipt of a STRIMMBuffer of any kind triggers the protocol
         //get the parameters of the loaded protocol (which will be the next SimpleProtocol)
@@ -127,7 +128,6 @@ class NIDAQSinkMethod() : SinkMethod {
     }
     override fun postStop() {
         //shut down and clean up all resources
-
         GUIMain.protocolService.NIDAQ_Source_Shutdown(deviceID)
     }
     override fun getActorRef() : ActorRef? {

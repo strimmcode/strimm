@@ -1,0 +1,59 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "EpisodicSource",
+				"sourceType" : "NIDAQSourceMethod",
+				"sourceCfg" : "episodicSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 10.0
+			},
+			{
+				"sourceName" : "retiga",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "retigaSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 20.0
+			}
+		]
+	},
+	"flowConfig":{
+		"flows" : [
+			{
+				"flowName" : "EpisodicFlow",
+				"flowType" : "NIDAQBuffer_to_SignalBufferFlow",
+				"inputNames" : [
+					"EpisodicSource"
+				]
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "TraceSaveSink",				
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"EpisodicFlow"
+				]
+			},
+			{
+				"sinkName" : "retigaSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"retiga"
+				]
+			},
+			{
+				"sinkName" : "retigaSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "retigaSink.cfg",
+				"inputNames" : [
+					"retiga"
+				]
+			}
+		]
+	}
+}

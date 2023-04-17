@@ -157,7 +157,8 @@ open class MMCameraSource() : SourceMethod {
                         )
 
                     }
-                } else if (numChannels == 4) {
+                }
+                else if (numChannels == 4) {
                     if (coreBytesPerPixel != 4) {
                         println("Core format clashes with cfg")
                     } else {
@@ -192,10 +193,12 @@ open class MMCameraSource() : SourceMethod {
                             1
                         )
                     }
-                } else {
+                }
+                else {
                     println("Number of channels not supported")
                 }
-            } else if (pixelType == "Short") {
+            }
+            else if (pixelType == "Short") {
                 if (numChannels == 1) {
                     if (coreBytesPerPixel != 2) {
                         println("Core format clashes with cfg")
@@ -234,7 +237,8 @@ open class MMCameraSource() : SourceMethod {
                 } else {
                     println("Number of channels not supported")
                 }
-            } else if (pixelType == "Float") {
+            }
+            else if (pixelType == "Float") {
                 if (numChannels == 1) {
                     if (coreBytesPerPixel != 4) {
                         println("Core format clashes with cfg")
@@ -255,7 +259,8 @@ open class MMCameraSource() : SourceMethod {
                 } else {
                     println("Number of channels not supported")
                 }
-            } else {
+            }
+            else {
                 println("Pixel type not supported")
             }
             // GUIMain.protocolService.GDIPrintText(core.imageWidth.toInt(),core.imageHeight.toInt(), pix, "dataID : " + dataID.toString(),50.0, 50.0, 80)

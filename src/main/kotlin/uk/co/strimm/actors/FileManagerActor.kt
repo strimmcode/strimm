@@ -43,20 +43,30 @@ class FileManagerActor() : AbstractActor(){
             .match<AskInitHDF5File>(AskInitHDF5File::class.java){
                 //TODO open and close the h5 file
 
-                println("***#### open h5 file ******")
-                var filename = "strimm_exp"
-                val timeStampFull =
-                    ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(":", "-")
-                val timeStamp =
-                    timeStampFull.substring(0, timeStampFull.length - 4) //Trim the end to not include milliseconds
-                filename += timeStamp
-                filename += ".h5"
+                GUIMain.loggerService.log(Level.INFO, "Creating H5 file")
+                try {
+                    var filename = "strimm_exp"
+                    val timeStampFull =
+                        ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(":", "-")
+                    val timeStamp =
+                        timeStampFull.substring(0, timeStampFull.length - 4) //Trim the end to not include milliseconds
+                    filename += timeStamp
+                    filename += ".h5"
 
-                //create file (which is a long/handle) with defaults
-                file = H5.H5Fcreate(filename, HDF5Constants.H5F_ACC_TRUNC, HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT)
-                handles["file"] = file
-
-                print("created h5 " + file.toString())
+                    //create file (which is a long/handle) with defaults
+                    file = H5.H5Fcreate(
+                        filename,
+                        HDF5Constants.H5F_ACC_TRUNC,
+                        HDF5Constants.H5P_DEFAULT,
+                        HDF5Constants.H5P_DEFAULT
+                    )
+                    handles["file"] = file
+                    GUIMain.loggerService.log(Level.INFO, "Created H5 file $file")
+                }
+                catch(ex : Exception){
+                    GUIMain.loggerService.log(Level.SEVERE, "Could not create H5 file")
+                    GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                }
 
             }
             .match<AskShutdownHDF5File>(AskShutdownHDF5File::class.java){
