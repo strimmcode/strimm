@@ -1,0 +1,30 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "MySource",
+				"sourceType" : "SourceBaseMethod",
+				"isTimeLapse" : True,
+				"intervalMs" : 3000.0
+		
+
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "NIDAQSink",
+				"sinkType" : "NIDAQSinkMethod",
+				"sinkCfg" : "0015_EpisodicSink.cfg",
+				"inputNames" : [
+					"MySource"
+				]
+			}
+		]
+	}
+
+}

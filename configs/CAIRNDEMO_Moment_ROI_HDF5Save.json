@@ -1,0 +1,39 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "CAIRNDEMO_MomentSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 200.0
+		
+
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "Moment_Save",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"1"
+				]
+			},
+			
+			{
+				"sinkName" : "MomentSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "CAIRNDEMO_MomentSink.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	}
+
+}

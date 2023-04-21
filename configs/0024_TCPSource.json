@@ -1,0 +1,29 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "TCPSource",
+				"sourceType" : "TCPMethod",
+				"sourceCfg" : "0024_TCPSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100
+		
+
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "SimpleSink",
+				"sinkType" : "SinkBaseMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"TCPSource"
+				]
+			}
+		]
+	}
+
+}

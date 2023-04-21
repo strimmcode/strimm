@@ -1,0 +1,81 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "0003_OpenCVSource_new.cfg",
+				"isTimeLapse" : True,
+				"intervalMs" : 300.0
+		
+
+			}
+		]
+	},
+
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "ROIFlow",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "0040_ROIFlow.cfg",
+				"inputNames" : [
+					"1"
+				]
+			},
+			{
+				"flowName" : "ROIThreshhold",
+				"flowType" : "ThreshholdROIFlowMethod",
+				"flowCfg" : "0040_ROIThreshhold.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			}
+			{
+				"flowName" : "SeqCam",
+				"flowType" : "MMSeqCameraFlow",
+				"flowCfg" : "0040_MMSeqCameraFlow.cfg",
+				"inputNames" : [
+					"ROIThreshold"
+				]
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "OpenCVSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "0003_OpenCVSink_new.cfg",
+				"inputNames" : [
+					"1"
+				]
+			},
+			{
+				"sinkName" : "MomentSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "CAIRNDEMO_MomentSink",
+				"inputNames" : [
+					"SeqCam"
+				]
+			},
+			
+			{
+				"sinkName" : "ConsoleSink",
+				"sinkType" : "SinkConsoleMethod",
+				"inputNames" : [
+					"SeqCam"
+				]
+			},
+			{
+				"sinkName" : "ROITraceSink",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "0004_TraceSink.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			}
+		]
+	}
+
+}

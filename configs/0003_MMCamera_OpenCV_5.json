@@ -1,0 +1,76 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "0003_OpenCVSource.cfg",
+				"isTimeLapse" : True,
+				"intervalMs" : 300.0
+		
+
+			}
+		]
+	},
+
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "ROIFlow",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "0003_ROIFlow.cfg",
+				"inputNames" : [
+					"1"
+				]
+			},
+			{
+				"flowName" : "ROIFlow1",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "0003_ROIFlow1.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "OpenCVSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "0003_OpenCVSink.cfg",
+				"inputNames" : [
+					"1"
+				]
+			},
+			{
+				"sinkName" : "OpenCVSink1",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "0003_OpenCVSink1.cfg",
+				"inputNames" : [
+					"1"
+				]
+			},
+			{
+				"sinkName" : "ROITraceSink",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "0004_TraceSink.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			},
+			{
+				"sinkName" : "ROITraceSink1",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "0004_TraceSink.cfg",
+				"inputNames" : [
+					"ROIFlow1"
+				]
+			}
+		]
+	}
+
+}

@@ -1,0 +1,44 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "MySource",
+				"sourceType" : "SourceBaseMethod",
+				"isTimeLapse" : True,
+				"intervalMs" : 100.0,
+				"async" : False
+		
+
+			}
+		]
+	},
+	
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "MyFlow",
+				"flowType" : "FlowBaseMethod",
+				"async" : False,
+				"inputNames" : [
+					"MySource"
+				]
+
+		
+
+			}
+		]
+	},	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "MySink",
+				"sinkType" : "SinkBaseMethod",
+				"inputNames" : [
+					"MyFlow"
+				]
+			}
+		]
+	}
+
+}

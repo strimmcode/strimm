@@ -1,0 +1,44 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "SignalSourceMethod",
+				"sourceCfg" : "SignalSource.cfg",
+				"isTimeLapse" : True,
+				"intervalMs" : 500
+		
+
+			}
+		]
+	},
+
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "MMCameraFlow",
+				"flowType" : "MMCameraFlow",
+				"flowCfg" : "0003_OpenCVSource_new.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "OpenCVSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "0003_OpenCVSink_new.cfg",
+				"inputNames" : [
+					"MMCameraFlow"
+				]
+			}
+		]
+	}
+
+}

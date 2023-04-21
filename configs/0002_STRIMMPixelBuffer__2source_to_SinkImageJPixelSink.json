@@ -1,0 +1,43 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "PixelTypeMethod",
+				"sourceCfg" : "0002_PixelTestSource_Short_3ch.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0,
+				"async" : True
+		
+
+			},
+			{
+				"sourceName" : "2",
+				"sourceType" : "PixelTypeMethod",
+				"sourceCfg" : "0002_PixelTestSource_Short_3ch.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0,
+				"async" : True
+		
+
+			}
+		]
+	},
+	
+	
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "PixelTestSink",
+				"sinkType" : "SinkImageJPixelTest",
+				"sinkCfg" : "0002_PixelTestSink_Short_3ch.cfg",
+				"inputNames" : [
+					"1",
+					"2"
+				]
+			}
+		]
+	}
+
+}

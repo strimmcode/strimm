@@ -1,0 +1,24 @@
+numSamples 10
+sampFreq 10
+numAIChannels 0
+AIChannels
+numDIChannels 2
+DIPort 0
+DIChannels line2,line3
+numAOChannels 0 
+AOChannels 
+numDOChannels 2
+DOPort 0
+DOChannels line0,line1
+DODATA
+0,0
+1,0
+0,1
+1,1
+0,0
+1,0
+0,1
+1,1
+0,0
+1,0
+END

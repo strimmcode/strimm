@@ -1,0 +1,29 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "1",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "0003_OpenCVSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 0.1
+		
+
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			
+			{
+				"sinkName" : "OpenCVSink",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "0003_OpenCVSink.cfg",
+				"inputNames" : [
+					"1"
+				]
+			}
+		]
+	}
+
+}
