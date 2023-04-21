@@ -268,8 +268,6 @@ JNIEXPORT jint JNICALL Java_uk_co_strimm_services_JDAQ_NIDAQSourceInit
     int ret = CP.InitProtocol(szProt, bCompound, bRepeat, deviceID, minV, maxV);
     map_protocols[deviceID] = CP;
     
-
-    
     env->ReleaseStringUTFChars(szCsv, szProt);
     return ret;
 }
@@ -348,6 +346,8 @@ JNIEXPORT jint JNICALL Java_uk_co_strimm_services_JDAQ_NIDAQSourceRun
    jdouble *pDataDouble = NULL, *pDataDouble0 = NULL, *pDataDouble1 = NULL;
    jint* pDataInt = NULL, * pDataInt1 = NULL;
 
+   cout << "In NIDAQSourceRun" << endl;
+
    if (pTimes) {
        jboolean bIsCopy0 = 0;
        jsize lenDouble0 = env->GetArrayLength(pTimes);
@@ -378,30 +378,24 @@ JNIEXPORT jint JNICALL Java_uk_co_strimm_services_JDAQ_NIDAQSourceRun
     bool bSuccess = false;
    // software timing should be part of CP no code change
     int ret = map_protocols[deviceID].RunNext(pDataDouble0, pDataDouble1, pDataDouble, (uInt32*)pDataInt1, (uInt32*)pDataInt, &bSuccess);
-  
-
-
-    //
 
     if (pTimes) {
         env->ReleaseDoubleArrayElements(pTimes, pDataDouble0, 0);
     }
-
  
     if (pAIData) {
         env->ReleaseDoubleArrayElements(pAIData, pDataDouble, 0); //copy the contents back into the array
     }
 
-
     if (pDIData) {
         env->ReleaseIntArrayElements(pDIData, pDataInt, 0); //copy the contents back into the array
     }
+
     if (pAOData) {
         env->ReleaseDoubleArrayElements(pAOData, pDataDouble1, 0); //copy the contents back into the array
     }
 
     if (pDOData) {
-
         env->ReleaseIntArrayElements(pDOData, pDataInt1, 0); //copy the contents back into the array
     }
 

@@ -304,7 +304,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                         1,
                                         akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
                                     )
-                                    .filter { it.status == 1 }
+//                                    .filter { it.status == 1 }
                                     .async() //ensures that akka-stream source gets its own thread so cameras can work in parallel
                                     .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
                             }
@@ -317,7 +317,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                     .mapAsync(
                                         1, akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
                                     )
-                                    .filter { it.status == 1 }
+//                                    .filter { it.status == 1 }
                                     .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
                             }
                         }
@@ -338,7 +338,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                         1,
                                         akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
                                     )
-                                    .filter { it.status == 1 }
+//                                    .filter { it.status == 1 }
                                     .async()
                                     .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
                             }
@@ -350,7 +350,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                         1,
                                         akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
                                     )
-                                    .filter { it.status == 1 }
+//                                    .filter { it.status == 1 }
                                     .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
                             }
 
@@ -400,7 +400,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                 }) as CompletionStage<STRIMMBuffer>
                             }
                         )
-                        .filter { it.status == 1 }
+//                        .filter { it.status == 1 }
                         .async()
                         .named(flow.flowName)
                     expFlow.flow = builder.add(akkaFlow) as FlowShape<List<STRIMMBuffer>, STRIMMBuffer>
@@ -422,7 +422,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                 }) as CompletionStage<STRIMMBuffer>
                             }
                         )
-                        .filter { it.status == 1 }
+//                        .filter { it.status == 1 }
                         .named(flow.flowName)
                     expFlow.flow = builder.add(akkaFlow) as FlowShape<List<STRIMMBuffer>, STRIMMBuffer>
                     experimentFlows.add(expFlow)

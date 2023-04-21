@@ -82,7 +82,6 @@ class NIDAQSinkMethod() : SinkMethod {
 
         dataID = 0
 
-
         GUIMain.loggerService.log(Level.INFO, "Calling protocol service NIDAQ_Source_Init")
         var ret = GUIMain.protocolService.NIDAQ_Source_Init(szCsv, bCompound, bRepeat, deviceID, deviceName, minV, maxV)
         GUIMain.loggerService.log(Level.INFO, "Calling protocol service NIDAQ_Source_SetStartTrigger")
@@ -119,11 +118,10 @@ class NIDAQSinkMethod() : SinkMethod {
 
             }
             //The AI and the DI will be ignored
-            var ret = GUIMain.protocolService.NIDAQ_Source_Run(deviceID, pTimes, dataAO, dataAI, dataDO, dataDI);
-
+            var ret = GUIMain.protocolService.NIDAQ_Source_Run(deviceID, pTimes, dataAO, dataAI, dataDO, dataDI)
         }
         else {
-            Thread.sleep(100);
+            Thread.sleep(100)
         }
     }
     override fun postStop() {

@@ -129,9 +129,8 @@ bool	ProtocolBase::ReadProtocol(string szProt) {
 			int val = 0;
 			szz2 >> val;
 			szz2.clear();
-			v_DO.push_back((int)(val * pow(2, channelVal)));
-
-
+			//v_DO.push_back((int)(val * pow(2, channelVal)));
+			v_DO.push_back((int)(val));
 		}
 		else if (v_line0[f].substr(0, 2) == "DI") {
 			stringstream szz2;
@@ -142,9 +141,7 @@ bool	ProtocolBase::ReadProtocol(string szProt) {
 			DIChannels.push_back(channelVal);
 			v_DI_locs.push_back(f);
 		}
-
 	}
-
 
 	while (getline(pIfs, szLine)) {
 		stringstream szz;
@@ -166,7 +163,8 @@ bool	ProtocolBase::ReadProtocol(string szProt) {
 			szz2 << v_line00[v_DO_locs[f]];
 			int val = 0;
 			szz2 >> val;
-			v_DO.push_back((int)(val * pow(2, DOChannels[f])));
+			//v_DO.push_back((int)(val * pow(2, DOChannels[f])));
+			v_DO.push_back((int)(val));
 		}
 	}
 

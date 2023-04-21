@@ -1,5 +1,5 @@
-numSamples,sampFreq,DIPort,DOPort,AO0,AI0,DO2,DI1
-100,100,0,0,0,0,0,0
+numSamples,sampFreq,DIPort,DOPort,AO0,AI0,DO0,DI1
+100,50,0,0,0,0,0,0
 ,,,,5,0,5,0
 ,,,,0,0,0,0
 ,,,,5,0,5,0

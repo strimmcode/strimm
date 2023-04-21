@@ -13,6 +13,7 @@ import uk.co.strimm.actors.messages.start.StartStreaming
 import uk.co.strimm.experiment.Sink
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
+import java.util.logging.Level
 
 //each sink will get its images saved in its own file
 //however you can also save several sources to the save SinkSaveMethod but
@@ -55,6 +56,11 @@ class SinkSaveMethod() : SinkMethod {
 //            println("save STRIMMSignalBuffer1")
 //        }
         GUIMain.actorService.fileManagerActor.tell(STRIMMSaveBuffer(data , sink!!.sinkName),null)
+
+        if(data.any{ x -> x.status <= 0}) {
+            GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of 0. Stopping acquisition")
+            GUIMain.stopExperimentButton.doClick()
+        }
     }
     override fun getActorRef() : ActorRef? {
         return null

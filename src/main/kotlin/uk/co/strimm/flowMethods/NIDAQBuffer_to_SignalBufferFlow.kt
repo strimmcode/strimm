@@ -44,9 +44,7 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
         }
     }
     override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
-        println("In NIDAQBuffer to SignalBuffer flow run method")
         //the flow function should know the
-
         var dataIn = data[0] as STRIMMNIDAQBuffer
         var numSamples = dataIn.numSamples
         var times = dataIn.pTimes
@@ -56,7 +54,6 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
             times_cnt++
         }
 
-        println("Dealing with channels")
         var numAOChannels = 0
         if(dataIn.AOChannels != null){
             numAOChannels = dataIn.AOChannels!!.size
@@ -94,7 +91,6 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
             channelNames.add("DI" + dataIn.DIChannels!![f].toString())
         }
 
-        println("Converting channels to doube arrays")
         //convert the data into a single array of doubles
         var data = DoubleArray( channelNames.size * numSamples)
         var cnt = 0
@@ -126,13 +122,9 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
         }
 
         return STRIMMSignalBuffer(data, times, numSamples, channelNames, dataIn.dataID, dataIn.status)
-
-    }
-    override fun preStart(){
-
-    }
-    override fun postStop(){
-
     }
 
+    override fun preStart(){}
+
+    override fun postStop(){}
 }

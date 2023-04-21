@@ -36,9 +36,6 @@ class ExperimentService  : AbstractService(), ImageJService {
     var loadtimeRoiList = hashMapOf<String, List<RoiInfo>>()
     var runtimeRoiList = hashMapOf<String, List<RoiInfo>>()
 
-
-
-
     //convertGsonToConfig()    destroy the existing stream, capture the configFile, then load the expConfig from the JSON
     fun convertGsonToConfig(configFile: File): Boolean {
         destroyStream()
@@ -116,9 +113,7 @@ class ExperimentService  : AbstractService(), ImageJService {
     //destroy fileWriter and main actor, close all docking windows, and then close the actorSystem.
     //Closing the actorSystem will also shutdown any akka-stream components. The flag isStreamLoaded is then set to false.
     fun destroyStream() {
-
         if (isStreamLoaded) {
-
             GUIMain.experimentService.experimentStream.cameraActors.forEach { x ->
                 x.key.tell(TerminateActor(), ActorRef.noSender())
             }
@@ -144,7 +139,5 @@ class ExperimentService  : AbstractService(), ImageJService {
             }
             isStreamLoaded = false
         }
-
     }
-
 }

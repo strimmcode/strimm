@@ -6,7 +6,7 @@
 				"sourceType" : "MMCameraSource",
 				"sourceCfg" : "0003_OpenCVSource.cfg",
 				"isTimeLapse" : True,
-				"intervalMs" : 0.1
+				"intervalMs" : 100.0
 		
 
 			}

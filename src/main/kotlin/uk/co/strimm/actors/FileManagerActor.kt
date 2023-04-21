@@ -1,7 +1,6 @@
 package uk.co.strimm.actors
 
 import akka.actor.AbstractActor
-import akka.actor.ActorRef
 import akka.actor.Kill
 import akka.actor.Props
 import uk.co.strimm.*
@@ -18,31 +17,28 @@ import hdf.hdf5lib.HDF5Constants
 import uk.co.strimm.actors.messages.ask.*
 
 
-class FileManagerActor() : AbstractActor(){
-    var file : Int = 0 //handle to the hdf5 file
-    var buffers = hashMapOf<String, List<List<STRIMMBuffer> > >()  //each datasource that has send SaveBuffers to the FileManager will have its name added to this dictionary and will save a list of its buffers
+class FileManagerActor : AbstractActor() {
+    var file: Int = 0 //handle to the hdf5 file
+    var buffers = hashMapOf<String, List<List<STRIMMBuffer>>>()  //each datasource that has send SaveBuffers to the FileManager will have its name added to this dictionary and will save a list of its buffers
     var flush_cnt = 5000 //number of SaveBuffers received before a flush, done per datasource
     var imageDataNumberMap = hashMapOf<String, Long>() //imageDataNumberMap is used to ensure that each datasource has the correct frame number for each buffer saved ie 0,1,2 etc
     var traceDataNumberMap = hashMapOf<String, LongArray>() //traceDataNumberMap keeps a record of the length of each STRIMMBuffer's trace data in each frame which is a List<STRIMMBuffer>
-
-    var b_capturing_to_buffers = false
-
-
+    var isCapturingBuffers = false
     var handles = hashMapOf<String, Int>()
+
     companion object {
         fun props(): Props {
-            println("in props")
             return Props.create<FileManagerActor>(FileManagerActor::class.java) { FileManagerActor() }
         }
     }
+
     override fun createReceive(): Receive {
         return receiveBuilder()
             .match<Message>(Message::class.java) { message ->
-                println("FileManagerActor <MESSAGE>")
+                GUIMain.loggerService.log(Level.INFO, "FileManagerActor received basic message")
             }
-            .match<AskInitHDF5File>(AskInitHDF5File::class.java){
+            .match<AskInitHDF5File>(AskInitHDF5File::class.java) {
                 //TODO open and close the h5 file
-
                 GUIMain.loggerService.log(Level.INFO, "Creating H5 file")
                 try {
                     var filename = "strimm_exp"
@@ -60,36 +56,36 @@ class FileManagerActor() : AbstractActor(){
                         HDF5Constants.H5P_DEFAULT,
                         HDF5Constants.H5P_DEFAULT
                     )
+
                     handles["file"] = file
                     GUIMain.loggerService.log(Level.INFO, "Created H5 file $file")
-                }
-                catch(ex : Exception){
+                } catch (ex: Exception) {
                     GUIMain.loggerService.log(Level.SEVERE, "Could not create H5 file")
                     GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
                 }
-
             }
-            .match<AskShutdownHDF5File>(AskShutdownHDF5File::class.java){
-
+            .match<AskShutdownHDF5File>(AskShutdownHDF5File::class.java) {
+                //TODO is this used anywhere?
             }
-            .match<TerminateActor>(TerminateActor::class.java){
+            .match<TerminateActor>(TerminateActor::class.java) {
                 GUIMain.loggerService.log(Level.INFO, "FileManagerActor actor ${self.path().name()} terminating")
                 self.tell(Kill.getInstance(), self)
             }
-            .match<TellSaveDatasets>(TellSaveDatasets::class.java){
-                println("**#######stop message received")
-                //only save when in acquisition mode
-                //message received when acquisition is Stopped
+            .match<TellSaveDatasets>(TellSaveDatasets::class.java) {
+                GUIMain.loggerService.log(Level.INFO, "Stop message received. Saving data...")
+                //Only save when in acquisition mode
+                //Message received when acquisition is Stopped
                 if (GUIMain.strimmUIService.state == UIstate.ACQUISITION) {
-
                     //flush remaining data
-                    //wait until this flag is set which indicates that no more buffers need to be captured (some might still be flowing through the akka graph but will be ignored and not saved)
-                    while (b_capturing_to_buffers == true){
+                    //wait until this flag is set which indicates that no more buffers need to be captured
+                    // (some might still be flowing through the akka graph but will be ignored and not saved)
+                    while (isCapturingBuffers) {
                         Thread.sleep(100)
                     }
+
                     //this means that the akkka graph might still be pumping out samples (but they can be ignored)
                     //buffers contains the flush data associated with each data source by name so is a map of String : List<List<STRIMMBuffer>>
-                    for (keySz in buffers.keys){
+                    for (keySz in buffers.keys) {
                         //for each data source save the flush data, so this means save the matrix data as a new array and add the vector data onto the previous
                         // TODO change the name of the vector data because it could be a 2D matrix which is appened
                         var data = buffers[keySz]
@@ -100,7 +96,6 @@ class FileManagerActor() : AbstractActor(){
                             //the 'outer' list is the frame
                             for (frame in 0..data.size - 1) { //for each frame
                                 for (f in 0..data[frame].size - 1) {//go through each image source in List<STRIMMBuffer>
-
                                     if (data[frame][f].imageData != null) {
                                         var dims = data[frame][f].getImageDataDims()
                                         var type_frm = data[frame][f].getImageDataType()
@@ -197,19 +192,17 @@ class FileManagerActor() : AbstractActor(){
                                         //////////////////////////
                                     }
                                     if (data[frame][f].traceData != null) {
-
                                         var dims = data[frame][f].getTraceDataDims()
                                         val curLength = traceDataNumberMap[keySz]!![f]
-                                        val newLength: Long = (curLength + dims[0]).toLong()
+                                        val newLength: Long = (curLength + dims[0])
                                         val dataset_append =
                                             handles["dataset_" + keySz + "_traceData_" + f.toString()]!!
 
                                         H5.H5Dset_extent(dataset_append, longArrayOf(newLength, dims[1]))
 
-                                        val newOffset: Long = curLength.toLong()
-                                        val extLength: Long = dims[0].toLong()
+                                        val newOffset: Long = curLength
+                                        val extLength: Long = dims[0]
                                         var filespace = H5.H5Dget_space(dataset_append)
-
 
                                         H5.H5Sselect_hyperslab(
                                             filespace,
@@ -219,11 +212,13 @@ class FileManagerActor() : AbstractActor(){
                                             longArrayOf(extLength, dims[1]),
                                             null
                                         )
+
                                         var memspace = H5.H5Screate_simple(
                                             2,
                                             longArrayOf(extLength, dims[1]),
                                             null
                                         ) //TODO is the rank = 2
+
                                         H5.H5Dwrite(
                                             dataset_append,
                                             HDF5Constants.H5T_NATIVE_DOUBLE,
@@ -232,57 +227,50 @@ class FileManagerActor() : AbstractActor(){
                                             HDF5Constants.H5P_DEFAULT,
                                             data[frame][f].traceData
                                         )
+
                                         H5.H5Sclose(memspace)
                                         H5.H5Sclose(filespace)
                                         traceDataNumberMap[keySz]!![f] += dims[0]
                                     }
-
                                 }
                             }
                         }
                     }
 
-
                     //close handles
                     //TODO closes the handles but does it close the file each time
                     //TODO it might be better to be continuously opening and closing the HDF5 file handle
-                    for (ky in handles.keys){
-                        if (ky == "file"){
+                    for (ky in handles.keys) {
+                        if (ky == "file") {
                             H5.H5Fclose(handles[ky]!!)
                             file = 0
-                        }
-                        else if(ky.substring(0,5) == "group"){
+                        } else if (ky.substring(0, 5) == "group") {
                             H5.H5Gclose(handles[ky]!!)
-                        }
-                        else if (ky.substring(0,7) == "dataset"){
+                        } else if (ky.substring(0, 7) == "dataset") {
                             H5.H5Dclose(handles[ky]!!)
-                        }
-                        else{
+                        } else {
 
                         }
-
                     }
-                    //println("**#####Close H5 file")
+
                     //explicitely clean up
                     handles = hashMapOf<String, Int>()
 //                    vec_size_map[keySz] = vec_size_map[keySz]!! + flush_cnt
 //                    buffers[keySz] = ArrayList<List<STRIMMBuffer>>()
-
                 }
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
-                //most of activity takes place here, creates the group structure and flushes buffers
-            .match<STRIMMSaveBuffer>(STRIMMSaveBuffer::class.java){
-
+            //most of activity takes place here, creates the group structure and flushes buffers
+            .match<STRIMMSaveBuffer>(STRIMMSaveBuffer::class.java) {
                 //Note the order that data is displayed in HDF5View is not the same as ImageJ
                 //so you will see a managled image in HDF5View
 
                 //only save the STRIMMSaveBuffer if in ACQUISITION mode (and not ACQUISITION_PAUSED or PREVIEW)
                 if (GUIMain.strimmUIService.state == UIstate.ACQUISITION) {
                     //set a flag to show that processing a received save-buffer (which is a buffer which has the name of the dataset)
-                    b_capturing_to_buffers = true
+                    isCapturingBuffers = true
 
-                    if (it.data[0].className == "STRIMMSequenceCameraDataBuffer"){
+                    if (it.data[0].className == "STRIMMSequenceCameraDataBuffer") {
                         //save a burst of images from a software trigger camera
                         var data = buffers[it.name]
                         if (data != null) {
@@ -427,7 +415,11 @@ class FileManagerActor() : AbstractActor(){
                                             longArrayOf(extLength, dims[1]),
                                             null
                                         )
-                                        var memspace = H5.H5Screate_simple(2, longArrayOf(extLength, dims[1]), null) //TODO is the rank = 2
+                                        var memspace = H5.H5Screate_simple(
+                                            2,
+                                            longArrayOf(extLength, dims[1]),
+                                            null
+                                        ) //TODO is the rank = 2
                                         H5.H5Dwrite(
                                             dataset_append,
                                             HDF5Constants.H5T_NATIVE_DOUBLE,
@@ -443,8 +435,7 @@ class FileManagerActor() : AbstractActor(){
                                     buffers[it.name] = ArrayList<List<STRIMMBuffer>>()
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             //NEW DATA SOURCE this is where all of the new groups etc are defined.
                             //
                             //
@@ -464,7 +455,8 @@ class FileManagerActor() : AbstractActor(){
                                     HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                 )
                                 handles["group_" + it.name + "_node"] = group_node
-                                traceDataNumberMap[it.name] = LongArray(data[0].size) //data[0].size is the number of sub images
+                                traceDataNumberMap[it.name] =
+                                    LongArray(data[0].size) //data[0].size is the number of sub images
 
                                 for (f in 0..it.data.size - 1) {//go through the sub images
                                     traceDataNumberMap[it.name]!![f] = 0
@@ -473,14 +465,15 @@ class FileManagerActor() : AbstractActor(){
                                         group_node, f.toString(), HDF5Constants.H5P_DEFAULT,
                                         HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                     ) ////////////default
-                                    handles["group_node_ix_"+ it.name + "_" + f.toString()] = group_node_ix
+                                    handles["group_node_ix_" + it.name + "_" + f.toString()] = group_node_ix
 
                                     //println("******create Group: image_data")/////////////////////////////////////////////////////////////
                                     val group_node_ix_imageData = H5.H5Gcreate(
                                         group_node_ix, "imageData", HDF5Constants.H5P_DEFAULT,
                                         HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                     )
-                                    handles["group_node_ix_" + it.name + "_" + f.toString() + "_imageData"] = group_node_ix_imageData
+                                    handles["group_node_ix_" + it.name + "_" + f.toString() + "_imageData"] =
+                                        group_node_ix_imageData
 
                                     //println("******add attributes for image data")
                                     val datamapm = data[0][f].getImageDataMap()
@@ -506,7 +499,8 @@ class FileManagerActor() : AbstractActor(){
                                         HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                     )
 
-                                    handles["group_node_ix_"  + it.name + "_" +  f.toString() + "_traceData"] = group_node_ix_traceData
+                                    handles["group_node_ix_" + it.name + "_" + f.toString() + "_traceData"] =
+                                        group_node_ix_traceData
 
                                     //print("******create vector attributes*****")
                                     val datamapv = data[0][f].getTraceDataMap()
@@ -531,15 +525,23 @@ class FileManagerActor() : AbstractActor(){
 
                                     val traceDataDims = data[0][f].getTraceDataDims()
                                     val maxdims = longArrayOf(HDF5Constants.H5S_UNLIMITED.toLong(), traceDataDims[1])
-                                    val dims = longArrayOf(0,traceDataDims[1])
-                                    val chunk_dims = longArrayOf( flush_cnt.toLong(), traceDataDims[1])
+                                    val dims = longArrayOf(0, traceDataDims[1])
+                                    val chunk_dims = longArrayOf(flush_cnt.toLong(), traceDataDims[1])
                                     val dataspace = H5.H5Screate_simple(2, dims, maxdims) // the 2 is the rank
                                     //create handle to a creation property list
-                                    val prop   = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE)
+                                    val prop = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE)
                                     //set chunk size on the creation property list - chunks are needed for an extensible array
                                     var status = H5.H5Pset_chunk(prop, 2, chunk_dims) //2 is the rank
                                     //create dataset, native int and pass the dataspace and creation property. So it knows it has chunking and that can be extended
-                                    val dataset_vector = H5.H5Dcreate(group_node_ix_traceData, "data", HDF5Constants.H5T_NATIVE_DOUBLE, dataspace, HDF5Constants.H5P_DEFAULT, prop, HDF5Constants.H5P_DEFAULT)
+                                    val dataset_vector = H5.H5Dcreate(
+                                        group_node_ix_traceData,
+                                        "data",
+                                        HDF5Constants.H5T_NATIVE_DOUBLE,
+                                        dataspace,
+                                        HDF5Constants.H5P_DEFAULT,
+                                        prop,
+                                        HDF5Constants.H5P_DEFAULT
+                                    )
                                     handles["dataset_" + it.name + "_traceData_" + f.toString()] = dataset_vector
 
                                     H5.H5Sclose(dataspace)
@@ -552,8 +554,7 @@ class FileManagerActor() : AbstractActor(){
 
                         }
 
-                    }
-                    else {
+                    } else {
                         //see if the dataset it.name already is stored, every new datasoyrce is added and processed
                         var data = buffers[it.name]
                         if (data != null) {
@@ -694,7 +695,11 @@ class FileManagerActor() : AbstractActor(){
                                             longArrayOf(extLength, dims[1]),
                                             null
                                         )
-                                        var memspace = H5.H5Screate_simple(2, longArrayOf(extLength, dims[1]), null) //TODO is the rank = 2
+                                        var memspace = H5.H5Screate_simple(
+                                            2,
+                                            longArrayOf(extLength, dims[1]),
+                                            null
+                                        ) //TODO is the rank = 2
                                         H5.H5Dwrite(
                                             dataset_append,
                                             HDF5Constants.H5T_NATIVE_DOUBLE,
@@ -710,8 +715,7 @@ class FileManagerActor() : AbstractActor(){
                                     buffers[it.name] = ArrayList<List<STRIMMBuffer>>()
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             //NEW DATA SOURCE this is where all of the new groups etc are defined.
                             //
                             //
@@ -728,7 +732,8 @@ class FileManagerActor() : AbstractActor(){
                                     HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                 )
                                 handles["group_" + it.name + "_node"] = group_node
-                                traceDataNumberMap[it.name] = LongArray(data[0].size) //data[0].size is the number of sub images
+                                traceDataNumberMap[it.name] =
+                                    LongArray(data[0].size) //data[0].size is the number of sub images
 
                                 for (f in 0..it.data.size - 1) {//go through the sub images
                                     traceDataNumberMap[it.name]!![f] = 0
@@ -737,14 +742,15 @@ class FileManagerActor() : AbstractActor(){
                                         group_node, f.toString(), HDF5Constants.H5P_DEFAULT,
                                         HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                     ) ////////////default
-                                    handles["group_node_ix_"+ it.name + "_" + f.toString()] = group_node_ix
+                                    handles["group_node_ix_" + it.name + "_" + f.toString()] = group_node_ix
 
                                     //println("******create Group: image_data")/////////////////////////////////////////////////////////////
                                     val group_node_ix_imageData = H5.H5Gcreate(
                                         group_node_ix, "imageData", HDF5Constants.H5P_DEFAULT,
                                         HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                     )
-                                    handles["group_node_ix_" + it.name + "_" + f.toString() + "_imageData"] = group_node_ix_imageData
+                                    handles["group_node_ix_" + it.name + "_" + f.toString() + "_imageData"] =
+                                        group_node_ix_imageData
 
                                     //println("******add attributes for image data")
                                     val datamapm = data[0][f].getImageDataMap()
@@ -770,7 +776,8 @@ class FileManagerActor() : AbstractActor(){
                                         HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                     )
 
-                                    handles["group_node_ix_"  + it.name + "_" +  f.toString() + "_traceData"] = group_node_ix_traceData
+                                    handles["group_node_ix_" + it.name + "_" + f.toString() + "_traceData"] =
+                                        group_node_ix_traceData
 
                                     //print("******create vector attributes*****")
                                     val datamapv = data[0][f].getTraceDataMap()
@@ -795,39 +802,37 @@ class FileManagerActor() : AbstractActor(){
 
                                     val traceDataDims = data[0][f].getTraceDataDims()
                                     val maxdims = longArrayOf(HDF5Constants.H5S_UNLIMITED.toLong(), traceDataDims[1])
-                                    val dims = longArrayOf(0,traceDataDims[1])
-                                    val chunk_dims = longArrayOf( flush_cnt.toLong(), traceDataDims[1])
+                                    val dims = longArrayOf(0, traceDataDims[1])
+                                    val chunk_dims = longArrayOf(flush_cnt.toLong(), traceDataDims[1])
                                     val dataspace = H5.H5Screate_simple(2, dims, maxdims) // the 2 is the rank
                                     //create handle to a creation property list
-                                    val prop   = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE)
+                                    val prop = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE)
                                     //set chunk size on the creation property list - chunks are needed for an extensible array
                                     var status = H5.H5Pset_chunk(prop, 2, chunk_dims) //2 is the rank
                                     //create dataset, native int and pass the dataspace and creation property. So it knows it has chunking and that can be extended
-                                    val dataset_vector = H5.H5Dcreate(group_node_ix_traceData, "data", HDF5Constants.H5T_NATIVE_DOUBLE, dataspace, HDF5Constants.H5P_DEFAULT, prop, HDF5Constants.H5P_DEFAULT)
+                                    val dataset_vector = H5.H5Dcreate(
+                                        group_node_ix_traceData,
+                                        "data",
+                                        HDF5Constants.H5T_NATIVE_DOUBLE,
+                                        dataspace,
+                                        HDF5Constants.H5P_DEFAULT,
+                                        prop,
+                                        HDF5Constants.H5P_DEFAULT
+                                    )
                                     handles["dataset_" + it.name + "_traceData_" + f.toString()] = dataset_vector
 
                                     H5.H5Sclose(dataspace)
                                     H5.H5Pclose(prop)
-
-
                                 }
-
                             }
-
                         }
                     }
-                    b_capturing_to_buffers = false
+                    isCapturingBuffers = false
                 }
-
             }
-            .matchAny{ imm ->
+            .matchAny { imm ->
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .build()
     }
-
 }
-
-
-//                //flush to the dset  it.name
-//

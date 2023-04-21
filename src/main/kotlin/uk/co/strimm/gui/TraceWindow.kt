@@ -34,19 +34,20 @@ var debugTW = false
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Trace Feed")
 class TraceWindowPlugin : AbstractDockableWindow() {
     override var title = GUIMain.utilsService.createDockableWindowTitleText("", false)
-    lateinit var traceWindowController : TraceWindow
+    lateinit var traceWindowController: TraceWindow
 
     override fun setCustomData(data: Any?) {
         traceWindowController.properties = data as HashMap<String, String>
     }
-    override var dockableWindowMultiple : DefaultMultipleCDockable = run {
+
+    override var dockableWindowMultiple: DefaultMultipleCDockable = run {
         this.createDock(title).apply {
             val fxPanel = JFXPanel()
             add(fxPanel)
 
 
             try {
-                val URL= this.javaClass.getResource("/fxml/TraceChart.fxml")
+                val URL = this.javaClass.getResource("/fxml/TraceChart.fxml")
                 val loader = FXMLLoader(URL)
                 GUIMain.loggerService.log(
                     Level.SEVERE,
@@ -62,7 +63,7 @@ class TraceWindowPlugin : AbstractDockableWindow() {
                 }
                 dockableWindowMultiple = this
 
-            } catch(ex : Exception){
+            } catch (ex: Exception) {
                 GUIMain.loggerService.log(Level.SEVERE, "Error loading TraceWindow. Message: ${ex.message}")
                 GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             }
@@ -73,11 +74,10 @@ class TraceWindowPlugin : AbstractDockableWindow() {
 
 class TraceWindow {
     var sink: Sink? = null
-    lateinit var properties : HashMap<String, String>
+    lateinit var properties: HashMap<String, String>
     var xAxis = NumberAxis()
     var yAxis = NumberAxis()
     var allSeries = hashMapOf<String, XYChart.Series<Number, Number>>()
-
 
     @FXML
     lateinit var tracePane: VBox
@@ -90,10 +90,7 @@ class TraceWindow {
             initialiseChart()
             innerPane.children.add(lineChart)
             tracePane.children.add(innerPane)
-
-
             setTraceRenderFeatures()
-
         } catch (ex: Exception) {
             GUIMain.loggerService.log(Level.SEVERE, "Error in initializing trace window. Error: " + ex.message)
         }
@@ -106,7 +103,7 @@ class TraceWindow {
         lineChart.isHorizontalZeroLineVisible = false
     }
 
-    fun furtherInit(){
+    fun furtherInit() {
         if (properties["xAxisLabel"] != null) xAxis.label = properties["xAxisLabel"]
         if (properties["yAxisLabel"] != null) yAxis.label = properties["yAxisLabel"]
         if (properties["Title"] != null) lineChart.setTitle(properties["Title"])
@@ -131,30 +128,30 @@ class TraceWindow {
         xAxis.isAutoRanging = isXAutoRanging
         yAxis.isAutoRanging = isYAutoRanging
 
-
         xAxis.isMinorTickVisible = true
         xAxis.isTickLabelsVisible = true
 
-
         yAxis.isTickLabelsVisible = true
         yAxis.isMinorTickVisible = true
-
     }
-    fun setSeriesColour(red: Double, green: Double, blue: Double, alpha: Double, series : XYChart.Series<Number,Number>){
-        // println("TraceWindow::setSeriesColour")
 
+    fun setSeriesColour(
+        red: Double,
+        green: Double,
+        blue: Double,
+        alpha: Double,
+        series: XYChart.Series<Number, Number>
+    ) {
+        // println("TraceWindow::setSeriesColour")
         val line = series.node.lookup(".chart-series-line")
         line.style = "-fx-stroke: rgba(${red * 255},${green * 255},${blue * 255},$alpha);"
-
-
-
     }
+
     fun updateChart(data: List<STRIMMBuffer>) {
         Platform.runLater {
             if (data[0] is STRIMMSignalBuffer) {
                 val dat = data[0] as STRIMMSignalBuffer
                 for (f in 0..dat!!.channelNames!!.size - 1) {
-
                     var series = allSeries[dat!!.channelNames!!.get(f)]
                     if (series == null) {
                         //make and add a new series
@@ -163,29 +160,24 @@ class TraceWindow {
                         series.name = dat!!.channelNames!!.get(f)
                         allSeries[dat!!.channelNames!!.get(f)] = series
                         lineChart.data.add(series)
-                        //
-                        //
-                        //
+
                         var colourToUse = GUIMain.roiColours[GUIMain.roiColours.size - 1]
                         var chVal = f % GUIMain.roiColours.size
-                        if (isNumeric(dat!!.channelNames!!.get(f))){
+                        if (isNumeric(dat!!.channelNames!!.get(f))) {
                             chVal = dat!!.channelNames!!.get(f).toInt()
                         }
 
-                        if (chVal < GUIMain.roiColours.size){
+                        if (chVal < GUIMain.roiColours.size) {
                             colourToUse = GUIMain.roiColours[chVal]
                         }
                         colourToUse = GUIMain.roiColours[chVal % GUIMain.roiColours.size]
-                        setSeriesColour(colourToUse.red,colourToUse.green,colourToUse.blue,1.0, series)
-                        //
-                        //
-                        //
-                        //
+                        setSeriesColour(colourToUse.red, colourToUse.green, colourToUse.blue, 1.0, series)
+
                         for (n in lineChart.getChildrenUnmodifiable()) {
                             if (n is Legend) {
                                 for (legendItem in (n as Legend).items) {
                                     //do them all so that the loaded ones are done correctly
-                                    if (isNumeric(legendItem.text )) {
+                                    if (isNumeric(legendItem.text)) {
                                         val ix = legendItem.text.toInt()
                                         val colourToUse = GUIMain.roiColours[ix % GUIMain.roiColours.size]
                                         val color =
@@ -193,15 +185,13 @@ class TraceWindow {
                                         legendItem.symbol.style =
                                             "-fx-background-color: " + color + "; -fx-background-radius: 0;"
                                     }
-                                    }
+                                }
                             }
                         }
                         lineChart.isLegendVisible = true
                         lineChart
-
                     }
-                    //
-                    //
+
                     //add the new data
                     for (ff in 0..dat!!.times!!.size - 1) {
                         val time = dat!!.times!!.get(ff)
@@ -211,7 +201,7 @@ class TraceWindow {
                 }
 
             }
-            else if (data[0] is STRIMMSignalBuffer1){
+            else if (data[0] is STRIMMSignalBuffer1) {
                 val dat = data[0] as STRIMMSignalBuffer1
                 val numChannels = dat!!.channelNames!!.size
                 val numSamples = dat!!.traceData.size / numChannels
@@ -233,10 +223,9 @@ class TraceWindow {
                         for (ff in 0..numSamples - 1) {
                             val time = dat!!.traceData!!.get(ff * numChannels)
                             var value = 0.0
-                            if (dat!!.channelNames!!.get(f) == "DO8"){
+                            if (dat!!.channelNames!!.get(f) == "DO8") {
                                 value = dat!!.traceData!!.get(1 + ff * numChannels)
-                            }
-                            else if (dat!!.channelNames!!.get(f) == "DO9"){
+                            } else if (dat!!.channelNames!!.get(f) == "DO9") {
                                 value = dat!!.traceData!!.get(2 + ff * numChannels)
                             }
                             series!!.data!!.add(XYChart.Data(time, value))

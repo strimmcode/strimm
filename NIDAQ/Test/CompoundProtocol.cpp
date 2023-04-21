@@ -133,7 +133,6 @@ int		CompoundProtocol::InitProtocol(string csvProt, bool bCompound, bool bRepeat
 		return 1;
 	}
 	else {
-		
 		//	load a simple protocol
 		SimpleProtocol* prot = new SimpleProtocol(deviceID, minV, maxV);
 		
@@ -213,7 +212,6 @@ int		CompoundProtocol::RunNext(double* pTimes, double* dataAO, double* dataAI, u
 		//
 		if (bCompound) {
 			cout << "curRepeat " << curRepeat << " curProtocol " << curProtocol << endl;
-
 			//
 			//if (curProtocol == vID.size()) {
 			//	if (bRepeat) {
@@ -226,8 +224,6 @@ int		CompoundProtocol::RunNext(double* pTimes, double* dataAO, double* dataAI, u
 			}
 			else {
 				if (timingMethod <= 1) {  //order of curRepeat and curProtocol etc
-
-
 					if (curRepeat == 0) {
 						if (vRepeats[curProtocol] == 1) { //protocol of only 1 SimpleProtocol
 							vProtocols[vID[curProtocol]]->InitDAQ();
@@ -270,8 +266,6 @@ int		CompoundProtocol::RunNext(double* pTimes, double* dataAO, double* dataAI, u
 					else curProtocol = 0;
 				}
 			}
-
-
 		}
 		else {
 			if (bRepeat || !bSingleShotCompleted) {
@@ -282,9 +276,9 @@ int		CompoundProtocol::RunNext(double* pTimes, double* dataAO, double* dataAI, u
 			}
 			retVal =  -1;
 			retVal = (bRepeat) ? 1 : -1;
-		
 		}
 		bInRunMethod = false;
+		cout << "returning retval: " << retVal << endl;
 		return retVal;
 }
 /*

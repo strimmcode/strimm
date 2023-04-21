@@ -58,24 +58,26 @@ class SinkTraceMethod() : SinkMethod {
 
     }
     override fun run(data : List<STRIMMBuffer>){
-        //println("TraceActor::run()")
-//not used
     }
+
     override fun getActorRef() : ActorRef? {
         return traceActor
     }
+
     override fun start() : StartStreaming{
         return StartStreaming()
     }
+
     override fun complete() : CompleteStreaming {
         return CompleteStreaming()
     }
-    override fun fail(ex: Throwable) {
-        println("FAIL")
-    }
-    override fun postStop() {
 
+    override fun fail(ex: Throwable) {
     }
+
+    override fun postStop() {
+    }
+
     override fun preStart() {
     }
 }

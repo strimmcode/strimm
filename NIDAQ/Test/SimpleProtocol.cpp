@@ -519,6 +519,7 @@ bool	SimpleProtocol::InitDAQ() {
 
 	return true;
 }
+
 bool	SimpleProtocol::RunProtocolDAQ(double* pTimeSec, double* pDataAO, double* pDataAI, uInt32* pDataDO, uInt32* pDataDI, bool bStartTrigger, bool bRisingEdge, uInt32 pFIx, double timeoutSec) {
 	/*
 	* Start all of the tasks which have a clock dependent on another subsystem - so that they will start when the master subsystem starts
@@ -527,12 +528,7 @@ bool	SimpleProtocol::RunProtocolDAQ(double* pTimeSec, double* pDataAO, double* p
 	* This will now block until the samples have been read. (Reading is synchronous and Writing is asynchronous)
 	* For tasks which are only output eg AO, DO then daqmx waits until the task is over.
 	* The tasks are stopped.
-	*
-
-
 	*/
-	
-
 	if (bContinuous) {
 		// and if bFirst
 		//     start continuous sampling
@@ -581,7 +577,7 @@ bool	SimpleProtocol::RunProtocolDAQ(double* pTimeSec, double* pDataAO, double* p
 		return false;
 	}
 	else {
-
+		cout << "Running simple episodic protocol" << endl;
 		char buffer[2000] = { 0 };
 		int errorCode = 0;
 
@@ -606,17 +602,12 @@ bool	SimpleProtocol::RunProtocolDAQ(double* pTimeSec, double* pDataAO, double* p
 			}
 			else {
 				memcpy(pDataDO, dataDO, numSamples * numDOChannels * sizeof(uInt32));
-
-
-
 			}
-
-			//todo
 		}
 
 		stringstream ssError;
 		if ((!bRepeat && bFirst) || (!bRepeat && !bFirst) || (bRepeat && bFirst)) {
-			if (bRepeat && !bFirst) bFirst = false;
+			if ((bRepeat && !bFirst) || (!bRepeat && bFirst)) bFirst = false;
 			//if !bRepeat then do this each time
 			//if bRepeat then do only 1
 			this->bStartTrigger = bStartTrigger;
@@ -1073,8 +1064,6 @@ bool	SimpleProtocol::RunProtocolDAQ(double* pTimeSec, double* pDataAO, double* p
 			}
 		}
 
-
-
 		for (int f = 0; f < numSamples; f++) {
 			pTimeSec[f] = endTime - (numSamples - f) / sampleFreq;
 		}
@@ -1084,7 +1073,6 @@ bool	SimpleProtocol::RunProtocolDAQ(double* pTimeSec, double* pDataAO, double* p
 	}
 }
 bool	SimpleProtocol::ReleaseDAQ() {
-	
 		char buffer[2000] = { 0 };
 		stringstream ssError;
 		int errorCode = 0;
@@ -1093,8 +1081,10 @@ bool	SimpleProtocol::ReleaseDAQ() {
 		bool bUsingDO = numDOChannels > 0;
 		bool bUsingDI = numDIChannels > 0;
 
-		if (bRepeat) {
-			bFirst = true;
+		if (bRepeat || (!bRepeat && !bFirst)) {
+			bFirst = bRepeat;
+
+			cout << "Stopping task handles" << endl;
 			if (bUsingAI) {
 				errorCode = DAQmxStopTask(AItaskHandle);
 				if (errorCode < 0) {
@@ -1128,15 +1118,14 @@ bool	SimpleProtocol::ReleaseDAQ() {
 				}
 			}
 			}
-/*
-* Clear all of the daqmx tasks - which destroys the resources held by the NIDAQ
 
-
-
-*/
-
+		cout << "Finished stopping task handles" << endl;
+		/*
+		* Clear all of the daqmx tasks - which destroys the resources held by the NIDAQ
+		*/
 		ssError << "Dev" << deviceID << " NIDAQ error";
 
+		cout << "Clearing task handles" << endl;
 		if (numAIChannels > 0) {
 			errorCode = DAQmxClearTask(AItaskHandle);
 			if (errorCode < 0) {
@@ -1169,6 +1158,7 @@ bool	SimpleProtocol::ReleaseDAQ() {
 				return false;
 			}
 		}
+		cout << "Finished clearing task handles" << endl;
 		return true;
 }
 

@@ -118,83 +118,102 @@ class NIDAQSourceMethod () : SourceMethod {
             } catch (ex: Exception) {
                 println(ex.message)
             }
-
         }
     }
 
     override fun run(): STRIMMBuffer? {
-        println("IN NIDAQSOURCEMETHOD RUN")
-        //get the parameters of the loaded protocol (which will be the next SimpleProtocol)
-        println("DeviceID: $deviceID")
-        var numSamples = GUIMain.protocolService.NIDAQ_Source_GetNumSamples(deviceID)
-        sampleFreq = GUIMain.protocolService.NIDAQ_Source_GetSampleFreq(deviceID)
-        if (numSamples >0){
-            if (bFirst  ||  numSamples != numSamples_old){ //the size of each SimpleProtocol has changed
-                numAOChannels = GUIMain.protocolService.NIDAQ_Source_GetNumAOChannels(deviceID)
-                numAIChannels = GUIMain.protocolService.NIDAQ_Source_GetNumAIChannels(deviceID)
-                numDOChannels = GUIMain.protocolService.NIDAQ_Source_GetNumDOChannels(deviceID)
-                numDIChannels = GUIMain.protocolService.NIDAQ_Source_GetNumDIChannels(deviceID)
-                if (numAOChannels > 0){
-                    AOChannels = IntArray(numAOChannels)
-                    for (ix in 0..numAOChannels-1){
-                        AOChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 0, ix)
+        /**
+         * The first if-else statement makes sure we don't interact with the NIDAQ board more than is necessary.
+         * A status of 0 is considered a "stop" status. This will be handled downstream in the SinkSaveMethod
+        */
+        if((!bFirst && bRepeat) || bFirst) {
+            //get the parameters of the loaded protocol (which will be the next SimpleProtocol)
+            var numSamples = GUIMain.protocolService.NIDAQ_Source_GetNumSamples(deviceID)
+            sampleFreq = GUIMain.protocolService.NIDAQ_Source_GetSampleFreq(deviceID)
+            if (numSamples > 0) {
+                if (bFirst || numSamples != numSamples_old) { //the size of each SimpleProtocol has changed
+                    numAOChannels = GUIMain.protocolService.NIDAQ_Source_GetNumAOChannels(deviceID)
+                    numAIChannels = GUIMain.protocolService.NIDAQ_Source_GetNumAIChannels(deviceID)
+                    numDOChannels = GUIMain.protocolService.NIDAQ_Source_GetNumDOChannels(deviceID)
+                    numDIChannels = GUIMain.protocolService.NIDAQ_Source_GetNumDIChannels(deviceID)
+                    if (numAOChannels > 0) {
+                        AOChannels = IntArray(numAOChannels)
+                        for (ix in 0..numAOChannels - 1) {
+                            AOChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 0, ix)
+                        }
+                        dataAO = DoubleArray(numSamples * numAOChannels)
                     }
-                    dataAO = DoubleArray(numSamples * numAOChannels)
-                }
-                if (numAIChannels > 0){
-                    AIChannels = IntArray(numAIChannels)
-                    for (ix in 0..numAIChannels-1){
-                        AIChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 1, ix)
+                    if (numAIChannels > 0) {
+                        AIChannels = IntArray(numAIChannels)
+                        for (ix in 0..numAIChannels - 1) {
+                            AIChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 1, ix)
+                        }
+                        dataAI = DoubleArray(numSamples * numAIChannels)
                     }
-                    dataAI = DoubleArray(numSamples * numAIChannels)
-                }
-                if (numDOChannels > 0){
-                    DOChannels = IntArray(numDOChannels)
-                    for (ix in 0..numDOChannels-1){
-                        DOChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 2, ix)
+                    if (numDOChannels > 0) {
+                        DOChannels = IntArray(numDOChannels)
+                        for (ix in 0..numDOChannels - 1) {
+                            DOChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 2, ix)
+                        }
+                        DOPort = GUIMain.protocolService.NIDAQ_Source_GetDOPort(deviceID)
+                        dataDO = IntArray(numSamples * numDOChannels)
                     }
-                    DOPort = GUIMain.protocolService.NIDAQ_Source_GetDOPort(deviceID)
-                    dataDO = IntArray(numSamples * numDOChannels)
-                }
-                if (numDIChannels > 0){
-                    DIChannels = IntArray(numDIChannels)
-                    for (ix in 0..numDIChannels-1){
-                        DIChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 3, ix)
+                    if (numDIChannels > 0) {
+                        DIChannels = IntArray(numDIChannels)
+                        for (ix in 0..numDIChannels - 1) {
+                            DIChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 3, ix)
+                        }
+                        DIPort = GUIMain.protocolService.NIDAQ_Source_GetDIPort(deviceID)
+                        dataDI = IntArray(numSamples * numDIChannels)
                     }
-                    DIPort = GUIMain.protocolService.NIDAQ_Source_GetDIPort(deviceID)
-                    dataDI = IntArray(numSamples * numDIChannels)
+
+                    pTimes = DoubleArray(numSamples)
+                    numSamples_old = numSamples
                 }
 
-                pTimes = DoubleArray(numSamples)
+                var status = 1
+                //Only run the NIDAQ protocol if it's the first time and no repeats, or it is repeated
+                if ((bFirst && !bRepeat) || bRepeat) {
+                    val ret = GUIMain.protocolService.NIDAQ_Source_Run(deviceID, pTimes, dataAO, dataAI, dataDO, dataDI)
+                    if ((ret < 0)) {
+                        GUIMain.loggerService.log(Level.INFO, "NIDAQ return status of -1 received (this may be expected)")
+                        status = 0
+                    }
+                }
+
+                //Make sure to set bFirst as false now that we've run the NIDAQ protocol at least once
                 bFirst = false
-                numSamples_old = numSamples
-            }
+                if (!bRepeat) {
+                    status = 0
+                }
 
-            var ret = GUIMain.protocolService.NIDAQ_Source_Run(deviceID, pTimes, dataAO, dataAI, dataDO, dataDI);
-            var status = 1
-            if (ret < 0) {
-                status  = 0
+                dataID++
+                return STRIMMNIDAQBuffer(
+                    numSamples,
+                    sampleFreq,
+                    pTimes,
+                    dataAO, AOChannels,
+                    dataAI, AIChannels,
+                    dataDO, DOChannels, DOPort,
+                    dataDI, DIChannels, DIPort,
+                    dataID, status
+                )
             }
-            dataID++
-            return STRIMMNIDAQBuffer(
-                numSamples,
-                sampleFreq,
-                pTimes,
-                dataAO, AOChannels,
-                dataAI, AIChannels,
-                dataDO, DOChannels, DOPort,
-                dataDI, DIChannels, DIPort,
-                dataID, status)
+            else{
+                Thread.sleep(100)
+                return STRIMMBuffer(dataID, 0)
+            }
         }
         else {
-            Thread.sleep(100);
+            Thread.sleep(100)
             return STRIMMBuffer(dataID, 0)
         }
-
     }
 
     override fun postStop() {
-
-        GUIMain.protocolService.NIDAQ_Source_Shutdown(deviceID)
+        //If bRepeat is false the stream will be shut down from the SinkSaveMethod when a status of 0 is received
+        if(bRepeat) {
+            GUIMain.protocolService.NIDAQ_Source_Shutdown(deviceID)
+        }
     }
 }
