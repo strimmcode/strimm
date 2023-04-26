@@ -264,7 +264,7 @@ $Files | foreach { copyFile -From $_ -To "$OutputDir/jars/" }
 copyMavenJar -Location "./target" -Name "mainModule"
 # copyMavenJar -Location "../STRIMM_JNI/target" -Name "STRIMM_JNI"
 
-createDir "$OutputDir/DAQs"
+#createDir "$OutputDir/DAQs"
 #copyFolderContents -From "../WorkingDirectory/DAQs" -To "$OutputDir/DAQs"
 
 createDir "$OutputDir/DeviceAdapters"
@@ -272,6 +272,9 @@ copyFolderContents -From "./DeviceAdapters" -To "$OutputDir/DeviceAdapters"
 
 createDir "$OutputDir/luts"
 copyFolderContents -From "./luts" -To "$OutputDir/luts"
+
+createDir "$OutputDir/configs"
+copyFolderContents -From "./configs" -To "$OutputDir/configs"
 
 Write-Host "Copying loose files" -ForegroundColor Cyan
 #copyFile -From "../WorkingDirectory/MMCoreJ_wrap.dll" -To "$OutputDir"

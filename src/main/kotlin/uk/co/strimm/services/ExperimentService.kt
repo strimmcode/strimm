@@ -6,6 +6,9 @@ import akka.actor.ActorSystem
 import akka.pattern.PatternsCS
 import akka.stream.javadsl.RunnableGraph
 import com.google.gson.GsonBuilder
+import hdf.hdf5lib.H5
+import hdf.hdf5lib.HDF5Constants
+import javafx.application.Platform
 import net.imagej.ImageJService
 import org.scijava.plugin.Plugin
 import org.scijava.service.AbstractService
@@ -32,9 +35,11 @@ class ExperimentService  : AbstractService(), ImageJService {
     var EndExperimentAndSaveData = false //flag used to trigger the saving of data in acquisition mode. Datastore have a function CheckIfIShouldStop() which used this flag.
     lateinit var experimentStream: ExperimentStream //performs the akka-level tasks
 
-
     var loadtimeRoiList = hashMapOf<String, List<RoiInfo>>()
     var runtimeRoiList = hashMapOf<String, List<RoiInfo>>()
+
+    val imageHDFDatasets = hashMapOf<String, Any>() //<name as path, data>
+    val traceHDFDatasets = hashMapOf<String, Array<FloatArray>>() //<name as path, data>
 
     //convertGsonToConfig()    destroy the existing stream, capture the configFile, then load the expConfig from the JSON
     fun convertGsonToConfig(configFile: File): Boolean {
@@ -139,5 +144,144 @@ class ExperimentService  : AbstractService(), ImageJService {
             }
             isStreamLoaded = false
         }
+    }
+
+    fun loadH5File(path : String, name: String){
+        GUIMain.loggerService.log(Level.INFO, "Loading H5 file...")
+        //TODO find a way of getting the group and dataset names programmatically instead of hardcoding
+        val sinkGroupString = "TraceSaveSink"
+        val lowerLevelGroupString = "0"
+        val traceFolderGroupString = "traceData"
+        val imageFolderGroupString = "imageData"
+        val datasetString = "data"
+
+        try {
+            val fileID = H5.H5Fopen("$path/$name", HDF5Constants.H5F_ACC_RDWR, HDF5Constants.H5P_DEFAULT)
+            if(fileID <= 0){
+                throw Exception("Could not open HDF file $path/$name")
+            }
+
+            val sinkGroupID = H5.H5Gopen(fileID, sinkGroupString, HDF5Constants.H5P_DEFAULT)
+            if(sinkGroupID <= 0){
+                throw Exception("Could not find HDF group $sinkGroupString")
+            }
+
+            val lowerLevelGroupID = H5.H5Gopen(sinkGroupID, lowerLevelGroupString, HDF5Constants.H5P_DEFAULT)
+            if(lowerLevelGroupID <= 0){
+                throw Exception("Could not find HDF group $lowerLevelGroupString")
+            }
+
+            val imageDataFolderID = H5.H5Gopen(lowerLevelGroupID, imageFolderGroupString, HDF5Constants.H5P_DEFAULT)
+            if(imageDataFolderID <= 0){
+                throw Exception("Could not find HDF group $imageFolderGroupString")
+            }
+
+            val traceDataFolderID = H5.H5Gopen(lowerLevelGroupID, traceFolderGroupString, HDF5Constants.H5P_DEFAULT)
+            if(traceDataFolderID <= 0){
+                throw Exception("Could not find HDF group $traceFolderGroupString")
+            }
+
+            val traceDatasetHashMap = hashMapOf<String, Int>()
+            val datasetID = H5.H5Dopen(traceDataFolderID, datasetString, HDF5Constants.H5P_DEFAULT)
+            if(datasetID <= 0){
+                throw Exception("Could not find HDF dataset $datasetString")
+            }
+            else{
+                traceDatasetHashMap[datasetString] = datasetID
+            }
+
+
+            readTraceDatasets(traceDatasetHashMap)
+            createTracePlugins(traceDataFolderID)
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Failed to load h5 file")
+            GUIMain.loggerService.log(Level.SEVERE, ex.message!!)
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
+    }
+
+    fun readImageDatasets(datasetIDs : HashMap<String, Int>){
+        for(datasetName in datasetIDs.keys){
+            try{
+
+            }
+            catch(ex : Exception){
+                GUIMain.loggerService.log(Level.SEVERE, "Failed to read dataset $datasetName. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+            }
+        }
+    }
+
+    fun readTraceDatasets(datasetIDs : HashMap<String, Int>){
+        for(datasetName in datasetIDs.keys){
+            GUIMain.loggerService.log(Level.INFO, "Reading trace dataset $datasetName")
+            try{
+                val datasetID = datasetIDs[datasetName]!!
+                val datasetSpace = H5.H5Dget_space(datasetID)
+
+                var dataTypeConstant = H5.H5Sget_simple_extent_type(datasetSpace)
+                //Add to the when statement below if the datatype is expected to be something other than float
+                when(dataTypeConstant){
+                    HDF5Constants.H5T_FLOAT -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_FLOAT}
+                }
+
+                val dims = LongArray(2) //Assumption that this will only ever be 2D (reasonable)
+                val maxDims = LongArray(2) //Don't see a need to use this but needed for method call
+                H5.H5Sget_simple_extent_dims(datasetSpace, dims, maxDims) //Populates dims and maxDims
+                val dataRead : Array<FloatArray> = Array(dims[0].toInt()) { FloatArray(dims[1].toInt())} //Column, then row
+                H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
+
+                traceHDFDatasets[datasetName] = dataRead
+            }
+            catch(ex : Exception){
+                GUIMain.loggerService.log(Level.SEVERE, "Failed to read dataset $datasetName. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+            }
+        }
+    }
+
+    fun createTracePlugins(traceDataFolderID : Int){
+        for(traceDataset in traceHDFDatasets){ //Each entry represents all the trace data from one device
+            val sortedData = sortTraces(traceDataFolderID, traceDataset)
+            val plugin = GUIMain.dockableWindowPluginService.createPlugin(TraceScrollWindowPlugin::class.java, sortedData, false, "TraceScrollWindow")
+            plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
+            Platform.runLater {
+                plugin.traceWindowController.populateChart() //Has to be done here because plugin initialisation needs to happen before the graph is populated
+            }
+        }
+    }
+
+    fun sortTraces(traceDataFolderID : Int, traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>) : HashMap<String, FloatArray>{
+        val folderInfo = H5.H5Oget_info(traceDataFolderID)
+        val numAttributes = folderInfo.num_attrs
+
+        val sortedTraces = hashMapOf<String, FloatArray>()
+
+        for(i in 0 until numAttributes){
+            /**
+             * H5Aopen_by_idx doesn't open in any particular order so just open as they come and sort them in a hashmap
+             * HDF5Constants.H5_INDEX_CRT_ORDER means index on creation order
+             * HDF5Constants.H5_ITER_NATIVE means no particular order, whatever is fastest
+             * Search for constants here: https://docs.hdfgroup.org/hdf5/develop/_h5public_8h.html
+             */
+            val attributeID = H5.H5Aopen_by_idx(traceDataFolderID, ".", HDF5Constants.H5_INDEX_CRT_ORDER,
+                HDF5Constants.H5_ITER_NATIVE, i, HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT)
+
+            val attributeFullName = H5.H5Aget_name(attributeID) //This will return a string "<index> <attribute name>" e.g. "0 times"
+            val attributeInfo = attributeFullName.split(" ")
+            val index = attributeInfo[0].toInt() //TODO check type casting
+            val name = attributeInfo[1].replace("\'", "")
+
+            val data = traceDataset.value
+            val dataForIndex = FloatArray(data.size)
+            for(j in 0 until data.size){
+                val row = data[j]
+                val valueForIndex = row[index]
+                dataForIndex[j] = valueForIndex
+            }
+            sortedTraces[name] = dataForIndex
+        }
+        return sortedTraces
     }
 }

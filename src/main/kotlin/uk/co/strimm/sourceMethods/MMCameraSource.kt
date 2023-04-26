@@ -125,15 +125,12 @@ open class MMCameraSource() : SourceMethod {
 
     @Synchronized
     fun runSnapped() : STRIMMBuffer? {
-
-
         //snap acquisition
         if (mod(dataID, 100) == 0){
             println("snap " + dataID + "  time: " + GUIMain.softwareTimerService.getTime())
-
         }
 
-            core!!.snapImage()
+        core!!.snapImage()
 
         try {
             val pix = core!!.image
@@ -217,7 +214,8 @@ open class MMCameraSource() : SourceMethod {
                         )
 
                     }
-                } else if (numChannels == 4) {
+                }
+                else if (numChannels == 4) {
                     if (coreBytesPerPixel != 8) {
                         println("Core format clashes with cfg")
                     } else {
@@ -256,7 +254,8 @@ open class MMCameraSource() : SourceMethod {
                             1
                         )
                     }
-                } else {
+                }
+                else {
                     println("Number of channels not supported")
                 }
             }
@@ -268,8 +267,8 @@ open class MMCameraSource() : SourceMethod {
             println(core.toString())
             println(ex.message)  //something is going on with the camera
         }
-        return STRIMMPixelBuffer(null, 0, 0, "", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
 
+        return STRIMMPixelBuffer(null, 0, 0, "", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
     }
 
     @Synchronized
@@ -418,6 +417,7 @@ open class MMCameraSource() : SourceMethod {
         Thread.sleep(2000)  //TODO does it need this?
         //Unloads all devices from the core, clears all configuration data and property blocks.
     }
+
     fun loadCfg() {
         if (source.sourceCfg != ""){
             properties = hashMapOf<String, String>()

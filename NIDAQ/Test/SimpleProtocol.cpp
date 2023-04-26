@@ -1228,7 +1228,7 @@ int		SimpleProtocol::GetIndexFromChannel(int type, int ch) {
 	}
 }
 int		SimpleProtocol::GetChannelFromIndex(int type, int ix) {
-
+	cout << "Getting channel from index " << ix << endl;
 	if (type == 0) {
 		return AOChannels[ix];
 	}

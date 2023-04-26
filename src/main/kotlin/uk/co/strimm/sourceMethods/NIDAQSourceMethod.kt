@@ -136,8 +136,11 @@ class NIDAQSourceMethod () : SourceMethod {
                     numAIChannels = GUIMain.protocolService.NIDAQ_Source_GetNumAIChannels(deviceID)
                     numDOChannels = GUIMain.protocolService.NIDAQ_Source_GetNumDOChannels(deviceID)
                     numDIChannels = GUIMain.protocolService.NIDAQ_Source_GetNumDIChannels(deviceID)
+
+                    println("HERE1")
                     if (numAOChannels > 0) {
                         AOChannels = IntArray(numAOChannels)
+                        println("HERE2")
                         for (ix in 0..numAOChannels - 1) {
                             AOChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 0, ix)
                         }
@@ -145,6 +148,7 @@ class NIDAQSourceMethod () : SourceMethod {
                     }
                     if (numAIChannels > 0) {
                         AIChannels = IntArray(numAIChannels)
+                        println("HERE3")
                         for (ix in 0..numAIChannels - 1) {
                             AIChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 1, ix)
                         }
@@ -152,6 +156,7 @@ class NIDAQSourceMethod () : SourceMethod {
                     }
                     if (numDOChannels > 0) {
                         DOChannels = IntArray(numDOChannels)
+                        println("HERE4")
                         for (ix in 0..numDOChannels - 1) {
                             DOChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 2, ix)
                         }
@@ -160,21 +165,29 @@ class NIDAQSourceMethod () : SourceMethod {
                     }
                     if (numDIChannels > 0) {
                         DIChannels = IntArray(numDIChannels)
+                        println("HERE5")
                         for (ix in 0..numDIChannels - 1) {
+                            println("HERE9")
                             DIChannels!![ix] = GUIMain.protocolService.NIDAQ_Source_GetChannelFromIndex(deviceID, 3, ix)
+                            println("HERE10")
                         }
+                        println("HERE11")
                         DIPort = GUIMain.protocolService.NIDAQ_Source_GetDIPort(deviceID)
+                        println("HERE12")
                         dataDI = IntArray(numSamples * numDIChannels)
                     }
 
                     pTimes = DoubleArray(numSamples)
                     numSamples_old = numSamples
+                    println("HERE6")
                 }
 
                 var status = 1
                 //Only run the NIDAQ protocol if it's the first time and no repeats, or it is repeated
                 if ((bFirst && !bRepeat) || bRepeat) {
+                    println("HERE7")
                     val ret = GUIMain.protocolService.NIDAQ_Source_Run(deviceID, pTimes, dataAO, dataAI, dataDO, dataDI)
+                    println("HERE8")
                     if ((ret < 0)) {
                         GUIMain.loggerService.log(Level.INFO, "NIDAQ return status of -1 received (this may be expected)")
                         status = 0

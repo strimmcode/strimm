@@ -88,7 +88,7 @@ class ROIFlowMethod() : FlowMethod {
             return STRIMMSignalBuffer(data, times, numSamples, channelNames, image.dataID, image.status)
         }
         else {
-            return STRIMMBuffer(0,0)
+            return STRIMMBuffer(0,2)
         }
 
     }
@@ -286,10 +286,6 @@ class ROIFlowMethod() : FlowMethod {
 
                             val average = calculateAverage(viewCursor)
                             results.add(Pair(roi.name, average))
-
-
-
-
                         }
 
                     } catch (ex: Exception) {
@@ -298,9 +294,7 @@ class ROIFlowMethod() : FlowMethod {
                             "Could not read rectangle overlay data. Error: " + ex.message
                         )
                     }
-
                 }
-
             }
         }
 
