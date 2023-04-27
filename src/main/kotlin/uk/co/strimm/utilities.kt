@@ -295,3 +295,13 @@ open class STRIMMImage(val images : List<ImageData>, dataID : Int, var messageSz
 data class DisplayInfo(var displayName : String, var width : Long, var height : Long, var pixelType : String , var numChannels : Int, var previewInterval : Int, var lut : String )
 //data class ResizeValues(val x : Long?, val y : Long?, val w : Long?, val h : Long?)
 data class RoiInfo(val roi : ROI, val overlay : Overlay )
+
+class HDFImageDataset{
+    var frameNumber = 0
+    var bitDepth = 0
+    var byteData : ByteArray? = null
+    var shortData : ShortArray? = null
+    var floatData : FloatArray? = null
+    var width = 0
+    var height = 0
+}

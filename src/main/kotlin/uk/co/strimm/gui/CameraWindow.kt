@@ -32,21 +32,20 @@ import javax.swing.*
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Camera Feed")
 class CameraWindowPlugin : AbstractDockableWindow() {
     override var title = ""
-    lateinit var cameraWindowController : CameraWindow
+    lateinit var cameraWindowController: CameraWindow
 
     override fun
-    setCustomData(data: Any?) {
-            if (data is DisplayInfo){
+            setCustomData(data: Any?) {
+        if (data is DisplayInfo) {
             cameraWindowController.displayInfo = data
             dockableWindowMultiple.titleText = data.displayName
-        }
-        else if(data is Dataset){
+        } else if (data is Dataset) {
             cameraWindowController.dataset = data
-       }
+        }
     }
 
-    override var dockableWindowMultiple : DefaultMultipleCDockable = run{
-        this.createDock(title).apply{
+    override var dockableWindowMultiple: DefaultMultipleCDockable = run {
+        this.createDock(title).apply {
             add(windowPanel)
             this.titleText = title
             dockableWindowMultiple = this
@@ -55,24 +54,21 @@ class CameraWindowPlugin : AbstractDockableWindow() {
     }
 }
 
-class CameraWindow constructor(val windowPanel: JPanel){
+class CameraWindow constructor(val windowPanel: JPanel) {
 
-    var displayInfo : DisplayInfo? = null
-    var dataset : Dataset? = null
-    var display : Display<*>? = null
-    var view : DatasetView? = null
-    var displayWindow : DisplayWindow? = null
-    var associatedActor : ActorRef? = null
+    var displayInfo: DisplayInfo? = null
+    var dataset: Dataset? = null
+    var display: Display<*>? = null
+    var view: DatasetView? = null
+    var displayWindow: DisplayWindow? = null
+    var associatedActor: ActorRef? = null
     var datasetName = "Dataset" + Random().nextInt(1000000)//This will eventually be
 
     var numChannels = 0
 
-    var sink : Sink? = null
+    var sink: Sink? = null
 
-    var layer : JLayeredPane? = null
-
-
-
+    var layer: JLayeredPane? = null
 
     /**
      * This method is called when a new camera display needs to be initialised, with a specific width an height however.
@@ -81,16 +77,13 @@ class CameraWindow constructor(val windowPanel: JPanel){
      * @param width The new width of the camera feed
      * @param height The new height of the camera feed
      */
-    fun initialiseDisplay(width : Long, height: Long){
-
+    fun initialiseDisplay(width: Long, height: Long) {
         java.awt.EventQueue.invokeLater {
             run {
                 if (windowPanel.componentCount > 0) {
                     windowPanel.remove(0)
                 }
-
                 windowPanel.updateUI()
-
             }
         }
     }
@@ -98,29 +91,32 @@ class CameraWindow constructor(val windowPanel: JPanel){
     /**
      * This is called when the camera feed is first created.
      */
-    fun initialiseDisplay(){
-         if(windowPanel.componentCount > 0) {
+    fun initialiseDisplay() {
+        if (windowPanel.componentCount > 0) {
             windowPanel.remove(0)
         }
 
         windowPanel.updateUI()
-        if(dataset == null) {
+        if (dataset == null) {
             println(displayInfo!!.width.toString() + "  " + displayInfo!!.height.toString() + "   " + displayInfo!!.displayName + "   " + displayInfo!!.pixelType + "  " + displayInfo!!.numChannels)
-            createDatasetAndAddToPanel(displayInfo!!.width, displayInfo!!.height, displayInfo!!.displayName, displayInfo!!)
+            createDatasetAndAddToPanel(
+                displayInfo!!.width,
+                displayInfo!!.height,
+                displayInfo!!.displayName,
+                displayInfo!!
+            )
         }
-        else{
+        else {
             createDisplayAndAddToPanel()
         }
 
         windowPanel.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                if(e.button == MouseEvent.BUTTON3){
+                if (e.button == MouseEvent.BUTTON3) {
                     println("RIGHT CLICK1")
                 }
             }
         })
-
-
     }
 
     /**
@@ -128,7 +124,7 @@ class CameraWindow constructor(val windowPanel: JPanel){
      * already exists. This is therefore only used when loading a previous experiment. This also contains a bug fix
      * where we need to force a keypress
      */
-    private fun createDisplayAndAddToPanel(){
+    private fun createDisplayAndAddToPanel() {
         display = GUIMain.displayService.createDisplayQuietly(dataset)
         view = (display as ImageDisplay).activeView as DatasetView
         //Create a display window to actually display the image
@@ -148,9 +144,9 @@ class CameraWindow constructor(val windowPanel: JPanel){
                 }
             }
     }
-    //could create a dataset/panel which is not attached to a camera
-    private fun createDatasetAndAddToPanel(width: Long, height: Long, label : String, displayInfo: DisplayInfo) {
 
+    //could create a dataset/panel which is not attached to a camera
+    private fun createDatasetAndAddToPanel(width: Long, height: Long, label: String, displayInfo: DisplayInfo) {
         datasetName = label
         var lutSz = displayInfo.lut
         numChannels = displayInfo.numChannels
@@ -163,7 +159,7 @@ class CameraWindow constructor(val windowPanel: JPanel){
                     arrayOf(Axes.X, Axes.Y)
                 ) else GUIMain.datasetService.create(
                     UnsignedByteType(),
-                    longArrayOf(width, height,displayInfo.numChannels.toLong()),
+                    longArrayOf(width, height, displayInfo.numChannels.toLong()),
                     datasetName,
                     arrayOf(Axes.X, Axes.Y, Axes.CHANNEL)
                 )
@@ -172,10 +168,10 @@ class CameraWindow constructor(val windowPanel: JPanel){
                     UnsignedShortType(),
                     longArrayOf(width, height),
                     datasetName,
-                    arrayOf(Axes.X, Axes.Y)
-                ) else GUIMain.datasetService.create(
+                    arrayOf(Axes.X, Axes.Y))
+                else GUIMain.datasetService.create(
                     UnsignedShortType(),
-                    longArrayOf(width, height,displayInfo.numChannels.toLong()),
+                    longArrayOf(width, height, displayInfo.numChannels.toLong()),
                     datasetName,
                     arrayOf(Axes.X, Axes.Y, Axes.CHANNEL)
                 )
@@ -187,7 +183,7 @@ class CameraWindow constructor(val windowPanel: JPanel){
                     arrayOf(Axes.X, Axes.Y)
                 ) else GUIMain.datasetService.create(
                     UnsignedIntType(),
-                    longArrayOf(width, height,displayInfo.numChannels.toLong()),
+                    longArrayOf(width, height, displayInfo.numChannels.toLong()),
                     datasetName,
                     arrayOf(Axes.X, Axes.Y, Axes.CHANNEL)
                 )
@@ -199,7 +195,7 @@ class CameraWindow constructor(val windowPanel: JPanel){
                     arrayOf(Axes.X, Axes.Y)
                 ) else GUIMain.datasetService.create(
                     UnsignedLongType(),
-                    longArrayOf(width, height,displayInfo.numChannels.toLong()),
+                    longArrayOf(width, height, displayInfo.numChannels.toLong()),
                     datasetName,
                     arrayOf(Axes.X, Axes.Y, Axes.CHANNEL)
                 )
@@ -211,7 +207,7 @@ class CameraWindow constructor(val windowPanel: JPanel){
                     arrayOf(Axes.X, Axes.Y)
                 ) else GUIMain.datasetService.create(
                     FloatType(),
-                    longArrayOf(width, height,displayInfo.numChannels.toLong()),
+                    longArrayOf(width, height, displayInfo.numChannels.toLong()),
                     datasetName,
                     arrayOf(Axes.X, Axes.Y, Axes.CHANNEL)
                 )
@@ -223,7 +219,7 @@ class CameraWindow constructor(val windowPanel: JPanel){
                     arrayOf(Axes.X, Axes.Y)
                 ) else GUIMain.datasetService.create(
                     DoubleType(),
-                    longArrayOf(width, height,displayInfo.numChannels.toLong()),
+                    longArrayOf(width, height, displayInfo.numChannels.toLong()),
                     datasetName,
                     arrayOf(Axes.X, Axes.Y, Axes.CHANNEL)
                 )
@@ -234,33 +230,21 @@ class CameraWindow constructor(val windowPanel: JPanel){
         view = (display as ImageDisplay).activeView as DatasetView
 
         //todo color table for grey images and find out about channels>1
-        //
         if (lutSz != "") {
             var colorTable = GUIMain.lutService.loadLUT(File(".\\luts\\" + lutSz))
             (view as DatasetView).setColorTable(colorTable, 0)
         }
 
-
-
-
-
-
-
 // add the rois to the displayWindow
         var overlaysROIInfo = GUIMain.experimentService.loadtimeRoiList[sink!!.sinkName]  //TODO is this init yet
-        if (overlaysROIInfo != null){
-            val overlays = overlaysROIInfo.map{
-                    it -> it.overlay
+        if (overlaysROIInfo != null) {
+            val overlays = overlaysROIInfo.map { it ->
+                it.overlay
             }
 
             GUIMain.overlayService.addOverlays(display as ImageDisplay, overlays)
             GUIMain.experimentService.experimentStream.cameraDisplays[sink!!.sinkName] = display as ImageDisplay
-
-
         }
-
-
-
 
         //Create a display window to actually display the image
         displayWindow = GUIMain.uiService.defaultUI.createDisplayWindow(display)
@@ -271,15 +255,13 @@ class CameraWindow constructor(val windowPanel: JPanel){
 //        val hhh = can.viewportWidth
 //        val off = can.panOffset
 
-
-
-
-
         GUIMain.uiService.viewerPlugins
             .map {
-                GUIMain.pluginService.createInstance(it) }
+                GUIMain.pluginService.createInstance(it)
+            }
             .find {
-                it != null && it.canView(display) && it.isCompatible(GUIMain.uiService.defaultUI) }
+                it != null && it.canView(display) && it.isCompatible(GUIMain.uiService.defaultUI)
+            }
             ?.let {
                 GUIMain.threadService.queue {
                     (displayWindow as SwingDisplayWindow).apply {
@@ -305,16 +287,12 @@ class CameraWindow constructor(val windowPanel: JPanel){
 //                            jlab.setBounds(2000, 2000, 40, 20)
 //                            layer!!.add(jlab)
 //                        }
-
-
-
-
                     }
                 }
             }
     }
 
-    fun pressMinusButton(){
+    fun pressMinusButton() {
         /*
         * We have to force a minus sign keypress due to a Swing SDI UI bug otherwise the display
         * will just be white
@@ -324,5 +302,4 @@ class CameraWindow constructor(val windowPanel: JPanel){
         val robot = Robot()
         robot.keyPress(KeyEvent.VK_MINUS)
     }
-
 }

@@ -286,33 +286,22 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                 self.tell(Kill.getInstance(), self)
                 println("success terminate actor *******")
             }
-            .match<List<*>>(List::class.java){
-                    imm ->
-
+            .match<List<*>>(List::class.java){ imm ->
                 if (GUIMain.softwareTimerService.getTime() > timeLast + displayInfo!!.previewInterval) {
-                    //
-                    //
                     //check if there are new runtime rois and give a new max number as an index
 //                    val overlays = GUIMain.overlayService.getOverlays()
 //                    val disp = GUIMain.experimentService.experimentStream.cameraDisplays[sink!!.sinkName]
 //                    val over = GUIMain.overlayService.getOverlays(disp) //overlays in disp but might be reapeted
 //                    val filteredOverlays = overlays.filter{it in over}
-//
-//
 //                    val can = (plugin.cameraWindowController.display as ImageDisplay).canvas
-
-
-
                     //this 'switch' statement cannot distinguish types of List hence
                     //says List<*> so will match all lists
                     //Hence the addition of a className to STRIMMBuffer in order to differentiate
                     //type in situations like this
 
-
                     imm as List<STRIMMBuffer>
                     //STRIMMPixelBuffer is a single image
                     if (imm[0].className == "STRIMMPixelBuffer"){
-
                         val imageList1 = imm as List<STRIMMPixelBuffer>
                         var im1 =  imageList1[0]
                         //println("dataID " + im1.dataID)
