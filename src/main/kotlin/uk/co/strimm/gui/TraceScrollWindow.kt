@@ -5,14 +5,12 @@ import javafx.application.Platform
 import javafx.embed.swing.JFXPanel
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
-import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
 import javafx.scene.control.Button
-import javafx.scene.control.Label
 import javafx.scene.image.ImageView
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
@@ -20,7 +18,6 @@ import javafx.scene.layout.VBox
 import org.scijava.plugin.Plugin
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
-import uk.co.strimm.setIcon
 import java.util.logging.Level
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Trace Scroll Feed")
@@ -73,13 +70,18 @@ class TraceScrollWindow{
     var yAxis = NumberAxis()
     var lineChart = LineChart<Number, Number>(xAxis, yAxis)
 
-    var yMin = 0.0F
-    var yMax = 0.0F
+    var shiftAmount = 500 //When a shift button is clicked, how much will it shift by (unit is the time unit). This is the initial value and will change if the x axis range is changed
+    var xTickUnit = 100.0
+    var yTickUnit = 100.0
+    var changeFactor = 0.25
+    var times = floatArrayOf()
 
-    var expandYButton = Button()
-    var contractYButton = Button()
-    var expandXButton = Button()
-    var contractXButton = Button()
+    val maxInitialDataPoints = 1000
+
+    var zoomOutYButton = Button()
+    var zoomInYButton = Button()
+    var zoomInXButton = Button()
+    var zoomOutXButton = Button()
     var shiftXLeftButton = Button()
     var shiftXRightButton = Button()
 
@@ -89,17 +91,23 @@ class TraceScrollWindow{
         borderPane.center = lineChart
 
         val yAxisButtonBox = VBox()
-        yAxisButtonBox.children.addAll(contractYButton, expandYButton)
+        yAxisButtonBox.children.addAll(zoomInYButton, zoomOutYButton)
         yAxisButtonBox.spacing = 5.0
         borderPane.left = yAxisButtonBox
 
         val xAxisButtonBox = HBox()
         xAxisButtonBox.alignment = Pos.TOP_RIGHT
         xAxisButtonBox.spacing = 5.0
-        xAxisButtonBox.children.addAll(contractXButton, expandXButton, shiftXLeftButton, shiftXRightButton)
+        xAxisButtonBox.children.addAll(zoomInXButton, zoomOutXButton, shiftXLeftButton, shiftXRightButton)
         borderPane.bottom = xAxisButtonBox
 
         setButtonProperties()
+        addShiftXRightButtonListener()
+        addShiftXLeftButtonListener()
+        addZoomOutYButtonListener()
+        addZoomInYButtonListener()
+        addZoomInXButtonListener()
+        addZoomOutXButtonListener()
 
         initialiseChart()
     }
@@ -118,11 +126,11 @@ class TraceScrollWindow{
 
     fun setButtonProperties(){
         //TODO hardcoded paths, move to constants file
-        contractYButton.graphic = ImageView("/icons/button_contract_y.png")
-        expandYButton.graphic = ImageView("/icons/button_expand_y.png")
+        zoomInYButton.graphic = ImageView("/icons/button_expand_y.png")
+        zoomOutYButton.graphic = ImageView("/icons/button_contract_y.png")
 
-        contractXButton.graphic = ImageView("/icons/button_contract_x.png")
-        expandXButton.graphic = ImageView("/icons/button_expand_x.png")
+        zoomInXButton.graphic = ImageView("/icons/button_expand_x.png")
+        zoomOutXButton.graphic = ImageView("/icons/button_contract_x.png")
 
         shiftXLeftButton.graphic = ImageView("/icons/button_left_arrow.png")
         shiftXRightButton.graphic = ImageView("/icons/button_right_arrow.png")
@@ -138,33 +146,51 @@ class TraceScrollWindow{
         xAxis.isAutoRanging = false
         yAxis.isAutoRanging = false
 
-        xAxis.isMinorTickVisible = true
+        xAxis.isMinorTickVisible = false
+        xAxis.isTickMarkVisible = true
         xAxis.isTickLabelsVisible = true
+        xAxis.tickUnit = xTickUnit
+        xAxis.label = "Time (ms)" //TODO get from file eventually
 
         yAxis.isTickLabelsVisible = true
-        yAxis.isMinorTickVisible = true
+        yAxis.isMinorTickVisible = false
+        yAxis.isTickMarkVisible = true
+        yAxis.tickUnit = yTickUnit
+        yAxis.label = "Value" //TODO get from file eventually
     }
 
     fun populateChart(){
         if(data.size > 0) {
+            times = data["times"]!!
+            var yMin = 0.0F
+            var yMax = 0.0F
+
             for (trace in data) {
                 if(trace.key.toLowerCase() != "times") { //TODO hardcoded trace name
-                    val xData = generateXdata(trace.value.size)
                     val series = XYChart.Series<Number, Number>()
                     series.name = trace.key
 
-                    if (trace.value.min()!! < yMin) {
-                        yMin = trace.value.min()!!
+
+                    var initialPlotLimit = maxInitialDataPoints
+                    if(trace.value.size < maxInitialDataPoints){
+                        initialPlotLimit = trace.value.size
                     }
 
-                    if (trace.value.max()!! > yMax) {
-                        yMax = trace.value.max()!!
+                    for(i in 0 until initialPlotLimit){
+                        val dataPoint = trace.value[i]
+                        if(dataPoint < yMin){
+                            yMin = dataPoint
+                        }
+
+                        if(dataPoint > yMax){
+                            yMax = dataPoint
+                        }
+
+                        series.data.add(XYChart.Data<Number, Number>(times[i], dataPoint))
                     }
 
-                    for (i in 0 until trace.value.size) {
-                        val dataXYPoint = XYChart.Data<Number, Number>(xData[i], trace.value[i])
-                        series.data.add(dataXYPoint)
-                    }
+                    xAxis.lowerBound = 0.0
+                    xAxis.upperBound = initialPlotLimit.toDouble()
                     lineChart.data.add(series)
                 }
             }
@@ -177,7 +203,78 @@ class TraceScrollWindow{
         }
     }
 
-    fun generateXdata(size: Int) : List<Int>{
-        return (0 until size).toList()
+    fun addShiftXRightButtonListener(){
+        shiftXRightButton.setOnAction {
+            val maxTime = times.max()!!
+            if((xAxis.upperBound + shiftAmount) <= maxTime) {
+                xAxis.lowerBound += shiftAmount
+                xAxis.upperBound += shiftAmount
+            }
+            else{
+                xAxis.lowerBound = maxTime.toDouble()-shiftAmount
+                xAxis.upperBound = maxTime.toDouble()
+            }
+        }
+    }
+
+    fun addShiftXLeftButtonListener(){
+        shiftXLeftButton.setOnAction {
+            if((xAxis.lowerBound - shiftAmount) >= 0) {
+                xAxis.lowerBound -= shiftAmount
+                xAxis.upperBound -= shiftAmount
+            }
+            else{
+                xAxis.lowerBound = 0.0
+                xAxis.upperBound = shiftAmount.toDouble()
+            }
+        }
+    }
+
+    fun addZoomInYButtonListener(){
+        zoomInYButton.setOnAction {
+            yAxis.lowerBound += yAxis.lowerBound*changeFactor
+            yAxis.upperBound -= yAxis.upperBound*changeFactor
+        }
+    }
+
+    fun addZoomOutYButtonListener(){
+        zoomOutYButton.setOnAction {
+            yAxis.lowerBound -= yAxis.lowerBound*changeFactor
+            yAxis.upperBound += yAxis.upperBound*changeFactor
+        }
+    }
+
+    fun addZoomInXButtonListener(){
+        zoomInXButton.setOnAction {
+            println("Zoom in")
+            xAxis.lowerBound += xAxis.lowerBound*changeFactor
+            xAxis.upperBound -= xAxis.upperBound*changeFactor
+        }
+    }
+
+    fun addZoomOutXButtonListener(){
+        zoomOutXButton.setOnAction {
+            println("Zoom out")
+            if((xAxis.lowerBound + (xAxis.lowerBound*changeFactor)) < 0){
+                xAxis.lowerBound = 0.0
+            }
+            else{
+                xAxis.lowerBound -= xAxis.lowerBound*changeFactor
+            }
+
+            println("Max time is: ${times.max()!!}")
+            println("Old upper bound value is: ${xAxis.upperBound}")
+            val newVal = xAxis.upperBound + (xAxis.upperBound * changeFactor)
+            println("New upper bound value is: $newVal")
+            println("Max time is: ${times.max()!!}")
+            if(newVal > times.max()!!){
+                println("Max limit hit")
+                xAxis.upperBound = times.max()!!.toDouble()
+            }
+            else {
+                println("Max limit not hit")
+                xAxis.upperBound  = newVal
+            }
+        }
     }
 }

@@ -42,6 +42,9 @@ class ExperimentService  : AbstractService(), ImageJService {
     val imageHDFDatasets = hashMapOf<String, ArrayList<HDFImageDataset>>()
     val traceHDFDatasets = hashMapOf<String, Array<FloatArray>>() //<name as path, data>
 
+    val imageDataGroupName = "imageData"
+    val traceDataGroupName = "traceData"
+    val datasetString = "data" //The final node will be a dataset called "data"
 
     //convertGsonToConfig()    destroy the existing stream, capture the configFile, then load the expConfig from the JSON
     fun convertGsonToConfig(configFile: File): Boolean {
@@ -150,12 +153,8 @@ class ExperimentService  : AbstractService(), ImageJService {
 
     fun loadH5File(path : String, name: String){
         GUIMain.loggerService.log(Level.INFO, "Loading H5 file...")
-        //TODO find a way of getting the group and dataset names programmatically instead of hardcoding
-        val sinkGroupString = "retigaSave"
-        val lowerLevelGroupString = "0"
-        val traceFolderGroupString = "traceData"
-        val imageFolderGroupString = "imageData"
-        val traceDatasetString = "data"
+
+        val rootPath = "/"
 
         try {
             val fileID = H5.H5Fopen("$path/$name", HDF5Constants.H5F_ACC_RDWR, HDF5Constants.H5P_DEFAULT)
@@ -163,58 +162,52 @@ class ExperimentService  : AbstractService(), ImageJService {
                 throw Exception("Could not open HDF file $path/$name")
             }
 
-            val sinkGroupID = H5.H5Gopen(fileID, sinkGroupString, HDF5Constants.H5P_DEFAULT)
-            if(sinkGroupID <= 0){
-                throw Exception("Could not find HDF group $sinkGroupString")
-            }
+            //Start at the root and get all children
+            val fileAsGroupID = H5.H5Gopen(fileID, "/", HDF5Constants.H5P_DEFAULT)
+            val numMembers = H5.H5Gn_members(fileAsGroupID, "/")
+            val childNames = arrayOfNulls<String>(numMembers)
+            val lTypes = IntArray(numMembers)
+            val childRefs = LongArray(numMembers)
+            val childTypes = IntArray(numMembers)
+            H5.H5Gget_obj_info_all(fileAsGroupID, ".", childNames, childTypes, lTypes, childRefs, HDF5Constants.H5_INDEX_NAME)
 
-            val lowerLevelGroupID = H5.H5Gopen(sinkGroupID, lowerLevelGroupString, HDF5Constants.H5P_DEFAULT)
-            if(lowerLevelGroupID <= 0){
-                throw Exception("Could not find HDF group $lowerLevelGroupString")
-            }
+            val groupIDs = getGroupIDs(childNames, rootPath, fileAsGroupID)
+            val imageGroupPaths = groupIDs.first
+            val traceGroupPaths = groupIDs.second
 
-            val imageDataFolderID = H5.H5Gopen(lowerLevelGroupID, imageFolderGroupString, HDF5Constants.H5P_DEFAULT)
-            if(imageDataFolderID <= 0){
-                throw Exception("Could not find HDF group $imageFolderGroupString")
-            }
-
-            val traceDataFolderID = H5.H5Gopen(lowerLevelGroupID, traceFolderGroupString, HDF5Constants.H5P_DEFAULT)
-            if(traceDataFolderID <= 0){
-                throw Exception("Could not find HDF group $traceFolderGroupString")
-            }
-
-            val traceDatasetHashMap = hashMapOf<String, Int>()
-            val traceDatasetID = H5.H5Dopen(traceDataFolderID, traceDatasetString, HDF5Constants.H5P_DEFAULT)
-            if(traceDatasetID <= 0){
-                throw Exception("Could not find HDF dataset $traceDatasetString")
-            }
-            else{
-                traceDatasetHashMap[traceDatasetString] = traceDatasetID
-            }
-
-            if(traceDatasetHashMap.size > 0) {
-                readTraceDatasets(traceDatasetHashMap)
-                createTracePlugins(traceDataFolderID)
-            }
-
-            val cameraDatasetHashMap = hashMapOf<Int, Int>() //Frame number, datasetID
-            val numImages = H5.H5Gn_members(lowerLevelGroupID, imageFolderGroupString)
-            val range = (0 until numImages).toList()
-            for(i in 0 until range.size){
-                val frameIndex = range[i]
-                val cameraDatasetID = H5.H5Dopen(imageDataFolderID, frameIndex.toString(), HDF5Constants.H5P_DEFAULT)
-                if(cameraDatasetID <= 0){
-                    throw Exception("Could not find HDF image dataset in $lowerLevelGroupID/$imageFolderGroupString/${range[i]}")
+            //Get all the trace data
+            val traceDatasetHashMap = hashMapOf<String, Int>()//<Dataset parent folder path string, node ID>
+            for(i in 0 until traceGroupPaths.size){
+                val groupNodeID = H5.H5Gopen(fileAsGroupID, traceGroupPaths[i], HDF5Constants.H5P_DEFAULT)
+                if(groupNodeID <= 0){
+                    throw Exception("Could not find HDF dataset ${traceGroupPaths[i]}")
                 }
                 else{
-                    cameraDatasetHashMap[frameIndex] = cameraDatasetID
+                    traceDatasetHashMap[traceGroupPaths[i]] = groupNodeID
                 }
             }
 
-            if(cameraDatasetHashMap.size > 0) {
-                readImageDatasets(cameraDatasetHashMap, imageDataFolderID)
-                createImagePlugins()
+            //Create dockable window plugins for valid trace datasets
+            if(traceDatasetHashMap.size > 0) {
+                readTraceDatasets(fileAsGroupID, traceDatasetHashMap)
+                createTracePlugins(traceDatasetHashMap)
             }
+
+            val imageDatasetHashMap = hashMapOf<String, Int>()//<Dataset parent folder path string, node ID>
+            for(i in 0 until imageGroupPaths.size){
+                val groupNodeID = H5.H5Gopen(fileAsGroupID, imageGroupPaths[i], HDF5Constants.H5P_DEFAULT)
+                if(groupNodeID <= 0){
+                    throw Exception("Could not find HDF dataset ${imageGroupPaths[i]}")
+                }
+                else{
+                    imageDatasetHashMap[imageGroupPaths[i]] = groupNodeID
+                }
+            }
+
+//            if(imageDatasetHashMap.size > 0) {
+//                readImageDatasets(imageDatasetHashMap, fileAsGroupID)
+//                createImagePlugins()
+//            }
         }
         catch(ex : Exception){
             GUIMain.loggerService.log(Level.SEVERE, "Failed to load h5 file")
@@ -223,26 +216,38 @@ class ExperimentService  : AbstractService(), ImageJService {
         }
     }
 
-    fun readImageDatasets(datasetIDs : HashMap<Int, Int>, parentFolderID : Int){
+    fun getGroupIDs(childNames : Array<String?>, rootPath : String, fileAsGroupID: Int) : Pair<ArrayList<String>, ArrayList<String>>{
+        val imageGroupIDs = arrayListOf<String>()
+        val traceGroupIDs = arrayListOf<String>()
+        //Determine if children contain image data or trace data
+        for(i in 0 until childNames.size){
+            val childName = childNames[i]
+            val childPath = rootPath + childName
+            val isImageDataset = isImageDataset(childPath, fileAsGroupID)
+            if(isImageDataset.first){
+                imageGroupIDs.add(isImageDataset.second)
+            }
+            else{
+                traceGroupIDs.add(isImageDataset.second)
+            }
+        }
+        return Pair(imageGroupIDs, traceGroupIDs)
+    }
+
+    fun readImageDatasets(datasetIDs : HashMap<String, Int>, fileAsGroupID: Int){
         val bitDepthAttrString = "bitDepth"
 
         val allImages = ArrayList<HDFImageDataset>()
         for(datasetName in datasetIDs.keys){
             try{
-                if(datasetName % 100 == 0){
-                    GUIMain.loggerService.log(Level.INFO, "Read $datasetName images")
-                }
-
-                val datasetID = datasetIDs[datasetName]!!
-                val datasetSpace = H5.H5Dget_space(datasetID)
-
-                val folderInfo = H5.H5Oget_info(parentFolderID)
+                val folderID = datasetIDs[datasetName]!!
+                val folderInfo = H5.H5Oget_info(folderID)
                 val numAttributes = folderInfo.num_attrs
                 var bitDepth = 8
                 //Iterate through the attributes on the "imageData" folder and find the "bitDepth" attribute
                 for(i in 0 until numAttributes) {
                     val attributeID = H5.H5Aopen_by_idx(
-                        parentFolderID, ".", HDF5Constants.H5_INDEX_CRT_ORDER,
+                        folderID, ".", HDF5Constants.H5_INDEX_CRT_ORDER,
                         HDF5Constants.H5_ITER_NATIVE, i, HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT)
 
                     val attributeFullName = H5.H5Aget_name(attributeID) //This will return a string "<index> <attribute name>" e.g. "0 times"
@@ -255,95 +260,57 @@ class ExperimentService  : AbstractService(), ImageJService {
                     }
                 }
 
+                var dataTypeConstant = HDF5Constants.H5T_NATIVE_B8
                 when(bitDepth){
-                    8 -> {
-                        //TODO fully test data with 8bit bitdepth
-                        val dataTypeConstant = HDF5Constants.H5T_NATIVE_B8
-
-                        val dims = LongArray(3) //Assumption that this will only ever be 2D (reasonable)
-                        val maxDims = LongArray(3) //Don't see a need to use this but needed for method call
-                        H5.H5Sget_simple_extent_dims(datasetSpace, dims, maxDims) //Populates dims and maxDims
-
-                        /**
-                         * Image data is actually 3D in the file (1 x w x h) but reading into a 3D array is too slow
-                         * Reading into a 1D array instead is much faster. We can then process the data into 2D arrays
-                         * for images later
-                         */
-                        val dataRead = ByteArray(dims[0].toInt()*dims[1].toInt()*dims[2].toInt())
-                        H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
-
-                        val image = HDFImageDataset()
-                        image.bitDepth = 8
-                        image.byteData = dataRead
-                        image.frameNumber = datasetName
-                        image.width = dims[1].toInt()
-                        image.height = dims[2].toInt()
-                        allImages.add(image)
-                    }
-                    16 ->{
-                        val dataTypeConstant = HDF5Constants.H5T_NATIVE_SHORT
-                        val dims = LongArray(3) //Assumption that this will only ever be 2D (reasonable)
-                        val maxDims = LongArray(3) //Don't see a need to use this but needed for method call
-                        H5.H5Sget_simple_extent_dims(datasetSpace, dims, maxDims) //Populates dims and maxDims
-
-                        /**
-                         * Image data is actually 3D in the file (1 x w x h) but reading into a 3D array is too slow
-                         * Reading into a 1D array instead is much faster. We can then process the data into 2D arrays
-                         * for images later
-                         */
-                        val dataRead = ShortArray(dims[0].toInt()*dims[1].toInt()*dims[2].toInt())
-                        H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
-
-                        val image = HDFImageDataset()
-                        image.bitDepth = 16
-                        image.shortData = dataRead
-                        image.frameNumber = datasetName
-                        image.width = dims[1].toInt()
-                        image.height = dims[2].toInt()
-                        allImages.add(image)
-                    }
-                    32 -> {
-                        //TODO fully test data with 32bit bitdepth
-                        val dataTypeConstant = HDF5Constants.H5T_NATIVE_FLOAT
-                        val dims = LongArray(3) //Assumption that this will only ever be 2D (reasonable)
-                        val maxDims = LongArray(3) //Don't see a need to use this but needed for method call
-                        H5.H5Sget_simple_extent_dims(datasetSpace, dims, maxDims) //Populates dims and maxDims
-
-                        /**
-                         * Image data is actually 3D in the file (1 x w x h) but reading into a 3D array is too slow
-                         * Reading into a 1D array instead is much faster. We can then process the data into 2D arrays
-                         * for images later
-                         */
-                        val dataRead = FloatArray(dims[0].toInt()*dims[1].toInt()*dims[2].toInt())
-                        H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
-
-                        val image = HDFImageDataset()
-                        image.bitDepth = 32
-                        image.floatData = dataRead
-                        image.frameNumber = datasetName
-                        image.width = dims[1].toInt()
-                        image.height = dims[2].toInt()
-                        allImages.add(image)
-                    }
-                    else -> {
-                        GUIMain.loggerService.log(Level.WARNING, "Bit depth of image data not recognised")
-                    }
+                    8 -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_B8}
+                    16 -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_SHORT}
+                    32 -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_FLOAT}
+                    else -> {GUIMain.loggerService.log(Level.WARNING, "Bit depth of $bitDepth not recognised. Trying with bitDepth=8")}
                 }
+
+                val numMembers = H5.H5Gn_members(fileAsGroupID, datasetName)
+                for(i in 0 until numMembers){
+                    if(i % 100 == 0){
+                        GUIMain.loggerService.log(Level.INFO, "Read $i images")
+                    }
+                    val datasetID = H5.H5Dopen(fileAsGroupID, "$datasetName/$i", HDF5Constants.H5P_DEFAULT)
+                    val dims = LongArray(3) //Assumption that this will only ever be 2D (reasonable)
+                    val maxDims = LongArray(3) //Don't see a need to use this but needed for method call
+                    val datasetSpace = H5.H5Dget_space(datasetID)
+                    H5.H5Sget_simple_extent_dims(datasetSpace, dims, maxDims) //Populates dims and maxDims
+
+                    /**
+                     * Image data is actually 3D in the file (1 x w x h) but reading into a 3D array is too slow
+                     * Reading into a 1D array instead is much faster. We can then process the data into 2D arrays
+                     * for images later
+                     */
+                    val dataRead = ShortArray(dims[0].toInt()*dims[1].toInt()*dims[2].toInt())
+                    H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
+
+                    val image = HDFImageDataset()
+                    image.bitDepth = bitDepth
+                    image.shortData = dataRead
+                    image.frameNumber = i
+                    image.width = dims[1].toInt()
+                    image.height = dims[2].toInt()
+                    allImages.add(image)
+                }
+
+                imageHDFDatasets[datasetName] = allImages
             }
             catch(ex : Exception){
                 GUIMain.loggerService.log(Level.SEVERE, "Failed to read image dataset $datasetName. Message: ${ex.message}")
                 GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             }
         }
-
-        imageHDFDatasets[parentFolderID.toString()] = allImages
     }
 
-    fun readTraceDatasets(datasetIDs : HashMap<String, Int>){
-        for(datasetName in datasetIDs.keys){
-            GUIMain.loggerService.log(Level.INFO, "Reading trace dataset $datasetName")
+    fun readTraceDatasets(fileAsGroupID : Int, datasetIDs : HashMap<String, Int>){
+        for(parentFolderPath in datasetIDs.keys){
+            GUIMain.loggerService.log(Level.INFO, "Reading trace dataset $parentFolderPath/$datasetString")
             try{
-                val datasetID = datasetIDs[datasetName]!!
+                //Assumption that a traceData group will only have one child that is a dataset called "data"
+                val datasetID = H5.H5Dopen(fileAsGroupID, "$parentFolderPath/$datasetString", HDF5Constants.H5P_DEFAULT)
                 val datasetSpace = H5.H5Dget_space(datasetID)
 
                 var dataTypeConstant = H5.H5Sget_simple_extent_type(datasetSpace)
@@ -358,10 +325,10 @@ class ExperimentService  : AbstractService(), ImageJService {
                 val dataRead : Array<FloatArray> = Array(dims[0].toInt()) { FloatArray(dims[1].toInt())} //Column, then row
                 H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
 
-                traceHDFDatasets[datasetName] = dataRead
+                traceHDFDatasets["$parentFolderPath/$datasetString"] = dataRead
             }
             catch(ex : Exception){
-                GUIMain.loggerService.log(Level.SEVERE, "Failed to read trace dataset $datasetName. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, "Failed to read trace dataset $parentFolderPath/$datasetString. Message: ${ex.message}")
                 GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             }
         }
@@ -369,15 +336,16 @@ class ExperimentService  : AbstractService(), ImageJService {
 
     fun createImagePlugins(){
         for(imageDataset in imageHDFDatasets){
-            val plugin = GUIMain.dockableWindowPluginService.createPlugin(CameraScrollWindowPlugin::class.java, imageDataset, false, "TraceScrollWindow")
+            val plugin = GUIMain.dockableWindowPluginService.createPlugin(CameraScrollWindowPlugin::class.java, imageDataset, false, "ImageScrollWindow")
             plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
             plugin.cameraScrollWindowController.populateImages()
         }
     }
 
-    fun createTracePlugins(traceDataFolderID : Int){
+    fun createTracePlugins(traceDataFolderIDs : HashMap<String, Int>){
         for(traceDataset in traceHDFDatasets){ //Each entry represents all the trace data from one sink
-            val sortedData = sortTraces(traceDataFolderID, traceDataset)
+            val parentFolderPath = traceDataset.key.replace("/$datasetString", "")
+            val sortedData = sortTraces(traceDataFolderIDs[parentFolderPath]!!, traceDataset)
             val plugin = GUIMain.dockableWindowPluginService.createPlugin(TraceScrollWindowPlugin::class.java, sortedData, false, "TraceScrollWindow")
             plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
             Platform.runLater {
@@ -386,8 +354,8 @@ class ExperimentService  : AbstractService(), ImageJService {
         }
     }
 
-    fun sortTraces(traceDataFolderID : Int, traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>) : HashMap<String, FloatArray>{
-        val folderInfo = H5.H5Oget_info(traceDataFolderID)
+    fun sortTraces(traceDataParentID : Int, traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>) : HashMap<String, FloatArray>{
+        val folderInfo = H5.H5Oget_info(traceDataParentID)
         val numAttributes = folderInfo.num_attrs
 
         val sortedTraces = hashMapOf<String, FloatArray>()
@@ -399,7 +367,7 @@ class ExperimentService  : AbstractService(), ImageJService {
              * HDF5Constants.H5_ITER_NATIVE means no particular order, whatever is fastest
              * Search for constants here: https://docs.hdfgroup.org/hdf5/develop/_h5public_8h.html
              */
-            val attributeID = H5.H5Aopen_by_idx(traceDataFolderID, ".", HDF5Constants.H5_INDEX_CRT_ORDER,
+            val attributeID = H5.H5Aopen_by_idx(traceDataParentID, ".", HDF5Constants.H5_INDEX_CRT_ORDER,
                 HDF5Constants.H5_ITER_NATIVE, i, HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT)
 
             val attributeFullName = H5.H5Aget_name(attributeID) //This will return a string "<index> <attribute name>" e.g. "0 times"
@@ -417,5 +385,59 @@ class ExperimentService  : AbstractService(), ImageJService {
             sortedTraces[name] = dataForIndex
         }
         return sortedTraces
+    }
+
+    /**
+     * Recursively goes through the children of a group in the HDF5 file. Both trace and image datasets will have two
+     * groups - "imageData" and "traceData". In image datasets both of these groups will have children, in trace
+     * datasets only the "traceData" group will have children. This method uses that logic to determine if a group
+     * contains and image dataset or a trace dataset
+     * @param groupNodePath The path to the node representing the top level group. This will come from the name of
+     * the sink specified in the experiment config
+     * @param fileAsGroupID The ID of the file, but read as a group using H5.H5GOpen()
+     * @return True if the group node is an image datasets. False if the group node is a trace dataset
+     */
+    fun isImageDataset(groupNodePath : String, fileAsGroupID : Int) : Pair<Boolean, String>{
+        val isImageDataset: Pair<Boolean, String>
+
+        val numMembers = H5.H5Gn_members(fileAsGroupID, groupNodePath)
+        if(numMembers == 0){
+            GUIMain.loggerService.log(Level.WARNING, "HDF file group has no more members. Group: $groupNodePath")
+            return Pair(false, "")
+        }
+
+        val childNames = arrayOfNulls<String>(numMembers)
+        val lTypes = IntArray(numMembers)
+        val childRefs = LongArray(numMembers)
+        val childTypes = IntArray(numMembers)
+        H5.H5Gget_obj_info_all(fileAsGroupID, groupNodePath, childNames, childTypes, lTypes, childRefs, HDF5Constants.H5_INDEX_NAME)
+
+        if(childNames.size == 2 && childNames.any { x -> x == imageDataGroupName } && childNames.any { x -> x == traceDataGroupName }){
+            var numImageDatasetMembers = 0
+            var numTraceDatasetMembers = 0
+            var imageDatasetPath = ""
+            var traceDatasetPath = ""
+            for(i in 0 until childNames.size){
+                if(childNames[i]!! == imageDataGroupName) {
+                    numImageDatasetMembers = H5.H5Gn_members(fileAsGroupID, groupNodePath + "/" + childNames[i])
+                    imageDatasetPath = groupNodePath + "/" + childNames[i]
+                }
+
+                if(childNames[i]!! == traceDataGroupName) {
+                    numTraceDatasetMembers = H5.H5Gn_members(fileAsGroupID, groupNodePath + "/" + childNames[i])
+                    traceDatasetPath = groupNodePath + "/" + childNames[i]
+                }
+            }
+
+            if(numImageDatasetMembers == 0 && numTraceDatasetMembers > 0){
+                return Pair(false, traceDatasetPath)
+            }
+
+            return Pair(true, imageDatasetPath)
+        }
+        else{
+            isImageDataset = isImageDataset(groupNodePath + "/" + childNames.first(), fileAsGroupID)
+        }
+        return isImageDataset
     }
 }
