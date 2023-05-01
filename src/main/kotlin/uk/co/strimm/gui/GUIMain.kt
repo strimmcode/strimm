@@ -42,6 +42,7 @@ import java.awt.event.WindowAdapter
 import java.io.*
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.logging.Level
 import javax.swing.*
 
 //TODO  REMOTE CONTROL
@@ -101,6 +102,12 @@ class GUIMain : Command {
         // saveJSON.toolTipText = ComponentTexts.AcquisitionButtons.FULL_VIEW_TOOLTIP
         saveJSON.isEnabled = false
         saveJSON.icon = setIcon(firstButton.width, firstButton.height, "/icons/saveROI.png", "Save ROIs", loggerService)
+
+        closeAllWindowsExistingExpButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
+        closeAllWindowsExistingExpButton.toolTipText = "Close all windows"
+        closeAllWindowsExistingExpButton.isEnabled = false
+        closeAllWindowsExistingExpButton.icon =
+            setIcon(firstButton.width, firstButton.height, "/icons/close_all_button.png", "Close all windows", loggerService)
 
         loadExistingExperimentButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
         loadExistingExperimentButton.toolTipText = "Load existing experiment"
@@ -164,7 +171,20 @@ class GUIMain : Command {
         imageJButtonBar.add(stopExperimentButton)
         addStopButtonListener()
 
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.add(closeAllWindowsExistingExpButton)
+        addCloseAllWindowsExistinExpButtonListener()
         strimmUIService.state = UIstate.IDLE
+    }
+
+    private fun addCloseAllWindowsExistinExpButtonListener(){
+        closeAllWindowsExistingExpButton.addActionListener {
+            loggerService.log(Level.INFO, "Closing all open windows")
+            dockableWindowPluginService.dockableWindows.forEach { x -> x.value.close() }
+            closeAllWindowsExistingExpButton.isEnabled = false
+        }
     }
 
     private fun addExistingExperimentButtonListener(){
@@ -482,7 +502,9 @@ class GUIMain : Command {
         }
 
         var selectedFile: File? = null // the currently loaded JSON
-        val loadExistingExperimentButton = JButton() // loads the JSON, brings STRIMM to a WAITING state
+        val loadExistingExperimentButton = JButton() // loads a h5 file containing an existing experiment. Will display all data for quick viewing
+        val closeAllWindowsExistingExpButton = JButton() // Button for specifically closing windows opened from loadExistingExperimentButton functionality
+
         val loadExperimentConfigButton = JButton() // loads the JSON, brings STRIMM to a WAITING state
         val startPreviewExperimentButton =
             JButton() // runs the JSON, but does not store any frames, STRIMM is in a PREVIEW state

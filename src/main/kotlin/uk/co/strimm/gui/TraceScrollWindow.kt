@@ -70,7 +70,8 @@ class TraceScrollWindow{
     var yAxis = NumberAxis()
     var lineChart = LineChart<Number, Number>(xAxis, yAxis)
 
-    var shiftAmount = 500 //When a shift button is clicked, how much will it shift by (unit is the time unit). This is the initial value and will change if the x axis range is changed
+    var shiftXAmount = 500 //When a shift button is clicked, how much will it shift by (unit is the time unit). This is the initial value and will change if the x axis range is changed
+    var shiftYAmount = 500
     var xTickUnit = 100.0
     var yTickUnit = 100.0
     var changeFactor = 0.25
@@ -84,6 +85,8 @@ class TraceScrollWindow{
     var zoomOutXButton = Button()
     var shiftXLeftButton = Button()
     var shiftXRightButton = Button()
+    var shiftYUpButton = Button()
+    var shiftYDownButton = Button()
 
     @FXML
     fun initialize(){
@@ -91,7 +94,7 @@ class TraceScrollWindow{
         borderPane.center = lineChart
 
         val yAxisButtonBox = VBox()
-        yAxisButtonBox.children.addAll(zoomInYButton, zoomOutYButton)
+        yAxisButtonBox.children.addAll(shiftYUpButton, shiftYDownButton, zoomInYButton, zoomOutYButton)
         yAxisButtonBox.spacing = 5.0
         borderPane.left = yAxisButtonBox
 
@@ -108,6 +111,8 @@ class TraceScrollWindow{
         addZoomInYButtonListener()
         addZoomInXButtonListener()
         addZoomOutXButtonListener()
+        addShiftYUpButtonListener()
+        addShiftYDownButtonListener()
 
         initialiseChart()
     }
@@ -134,6 +139,9 @@ class TraceScrollWindow{
 
         shiftXLeftButton.graphic = ImageView("/icons/button_left_arrow.png")
         shiftXRightButton.graphic = ImageView("/icons/button_right_arrow.png")
+
+        shiftYUpButton.graphic = ImageView("/icons/button_up_arrow.png")
+        shiftYDownButton.graphic = ImageView("/icons/button_down_arrow.png")
     }
 
     fun setAxisFeatures(){
@@ -206,12 +214,12 @@ class TraceScrollWindow{
     fun addShiftXRightButtonListener(){
         shiftXRightButton.setOnAction {
             val maxTime = times.max()!!
-            if((xAxis.upperBound + shiftAmount) <= maxTime) {
-                xAxis.lowerBound += shiftAmount
-                xAxis.upperBound += shiftAmount
+            if((xAxis.upperBound + shiftXAmount) <= maxTime) {
+                xAxis.lowerBound += shiftXAmount
+                xAxis.upperBound += shiftXAmount
             }
             else{
-                xAxis.lowerBound = maxTime.toDouble()-shiftAmount
+                xAxis.lowerBound = maxTime.toDouble()-shiftXAmount
                 xAxis.upperBound = maxTime.toDouble()
             }
         }
@@ -219,14 +227,30 @@ class TraceScrollWindow{
 
     fun addShiftXLeftButtonListener(){
         shiftXLeftButton.setOnAction {
-            if((xAxis.lowerBound - shiftAmount) >= 0) {
-                xAxis.lowerBound -= shiftAmount
-                xAxis.upperBound -= shiftAmount
+            if((xAxis.lowerBound - shiftXAmount) >= 0) {
+                xAxis.lowerBound -= shiftXAmount
+                xAxis.upperBound -= shiftXAmount
             }
             else{
                 xAxis.lowerBound = 0.0
-                xAxis.upperBound = shiftAmount.toDouble()
+                xAxis.upperBound = shiftXAmount.toDouble()
             }
+        }
+    }
+
+    fun addShiftYUpButtonListener(){
+        shiftYUpButton.setOnAction {
+            yAxis.lowerBound += shiftYAmount
+            yAxis.upperBound += shiftYAmount
+        }
+    }
+
+    fun addShiftYDownButtonListener(){
+        shiftYDownButton.setOnAction {
+            //Unlike shifting the x axis, we don't have to guard against going into the negative because data on
+            //the y axis could be negative
+            yAxis.lowerBound -= shiftYAmount
+            yAxis.upperBound -= shiftYAmount
         }
     }
 
@@ -234,6 +258,8 @@ class TraceScrollWindow{
         zoomInYButton.setOnAction {
             yAxis.lowerBound += yAxis.lowerBound*changeFactor
             yAxis.upperBound -= yAxis.upperBound*changeFactor
+
+            shiftYAmount -= (shiftYAmount*changeFactor).toInt()
         }
     }
 
@@ -241,40 +267,69 @@ class TraceScrollWindow{
         zoomOutYButton.setOnAction {
             yAxis.lowerBound -= yAxis.lowerBound*changeFactor
             yAxis.upperBound += yAxis.upperBound*changeFactor
+
+            shiftYAmount += (shiftYAmount*changeFactor).toInt()
         }
     }
 
     fun addZoomInXButtonListener(){
         zoomInXButton.setOnAction {
-            println("Zoom in")
             xAxis.lowerBound += xAxis.lowerBound*changeFactor
             xAxis.upperBound -= xAxis.upperBound*changeFactor
+
+            shiftXAmount -= (shiftXAmount*changeFactor).toInt()
         }
     }
 
     fun addZoomOutXButtonListener(){
         zoomOutXButton.setOnAction {
-            println("Zoom out")
-            if((xAxis.lowerBound + (xAxis.lowerBound*changeFactor)) < 0){
+            if((xAxis.lowerBound - (xAxis.lowerBound*changeFactor)) < 0){
                 xAxis.lowerBound = 0.0
             }
             else{
                 xAxis.lowerBound -= xAxis.lowerBound*changeFactor
             }
 
-            println("Max time is: ${times.max()!!}")
-            println("Old upper bound value is: ${xAxis.upperBound}")
             val newVal = xAxis.upperBound + (xAxis.upperBound * changeFactor)
-            println("New upper bound value is: $newVal")
-            println("Max time is: ${times.max()!!}")
             if(newVal > times.max()!!){
-                println("Max limit hit")
                 xAxis.upperBound = times.max()!!.toDouble()
             }
             else {
-                println("Max limit not hit")
                 xAxis.upperBound  = newVal
             }
+
+            shiftXAmount += (shiftXAmount*changeFactor).toInt()
         }
     }
+
+    //Leave commented out for now. This was intended to make sure the data in the chart was only that in view, making
+    //render times more efficient. But it's very fiddly and time consuming to implement
+//    fun FloatArray.closestValue(value: Double) = minBy { abs(value - it) }
+//
+//    fun redrawTraces(newStartValue : Double, newStopValue : Double){
+//        for(i in 0 until lineChart.data.size){
+//            if(lineChart.data[i].name != "times") {
+//                val firstValue = lineChart.data[i].data.first().xValue.toDouble()
+//                var lastValue = lineChart.data[i].data.last().xValue.toDouble()
+//                val correspondingTrace = data[i.toString()]
+//
+//                if (newStopValue > lastValue) {
+//                    val lastValueTime = times.closestValue(newStopValue)
+//                    val oldLastValueIndex = lineChart.data[i].data.size
+//                    val lastValueTimeIndex = times.indexOf(lastValueTime!!) - 1
+//                    val slice = correspondingTrace!!.slice(IntRange(oldLastValueIndex, lastValueTimeIndex))
+//                    for (j in 0 until slice.size) {
+//                        if (newStopValue > lastValue) {
+////                        println("Adding to data at index ${lineChart.data[i].data.size} time=${times[oldLastValueIndex+j]}")
+//                            lineChart.data[i].data.add(
+//                                lineChart.data[i].data.size,
+//                                XYChart.Data<Number, Number>(times[oldLastValueIndex + j], slice[j])
+//                            )
+//                            lastValue = times[j].toDouble()
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 }

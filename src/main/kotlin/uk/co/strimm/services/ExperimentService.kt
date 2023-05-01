@@ -204,10 +204,11 @@ class ExperimentService  : AbstractService(), ImageJService {
                 }
             }
 
-//            if(imageDatasetHashMap.size > 0) {
-//                readImageDatasets(imageDatasetHashMap, fileAsGroupID)
-//                createImagePlugins()
-//            }
+            if(imageDatasetHashMap.size > 0) {
+                readImageDatasets(imageDatasetHashMap, fileAsGroupID)
+                createImagePlugins()
+            }
+            GUIMain.closeAllWindowsExistingExpButton.isEnabled = true
         }
         catch(ex : Exception){
             GUIMain.loggerService.log(Level.SEVERE, "Failed to load h5 file")
