@@ -6,6 +6,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.ActorMaterializerSettings
 import bibliothek.gui.dock.common.CControl
 import bibliothek.gui.dock.common.CGrid
+import hdf.hdf5lib.H5
 import io.scif.services.DatasetIOService
 import javafx.application.Platform
 import javafx.scene.paint.Color
@@ -30,11 +31,13 @@ import org.scijava.ui.UIService
 import org.scijava.ui.swing.SwingToolBar
 import org.scijava.ui.swing.sdi.SwingSDIUI
 import uk.co.strimm.ComponentTexts
+import uk.co.strimm.HDFImageDataset
 import uk.co.strimm.actors.messages.ask.AskInitHDF5File
 import uk.co.strimm.experiment.ROI
 import uk.co.strimm.services.*
 import uk.co.strimm.setIcon
 import java.awt.BorderLayout
+import java.awt.Dialog
 //import java.awt.Color
 //import java.awt.Color
 import java.awt.Dimension
@@ -103,11 +106,11 @@ class GUIMain : Command {
         saveJSON.isEnabled = false
         saveJSON.icon = setIcon(firstButton.width, firstButton.height, "/icons/saveROI.png", "Save ROIs", loggerService)
 
-        closeAllWindowsExistingExpButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
+        closeAllWindowsExistingExpButton.maximumSize = Dimension(firstButton.width + 30, firstButton.height + 5)
         closeAllWindowsExistingExpButton.toolTipText = "Close all windows"
         closeAllWindowsExistingExpButton.isEnabled = false
         closeAllWindowsExistingExpButton.icon =
-            setIcon(firstButton.width, firstButton.height, "/icons/close_all_button.png", "Close all windows", loggerService)
+            setIcon(firstButton.width + 25, firstButton.height - 5, "/icons/close_all_button.png", "Close all windows", loggerService)
 
         loadExistingExperimentButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
         loadExistingExperimentButton.toolTipText = "Load existing experiment"
@@ -174,6 +177,11 @@ class GUIMain : Command {
         imageJButtonBar.addSeparator()
         imageJButtonBar.addSeparator()
         imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
         imageJButtonBar.add(closeAllWindowsExistingExpButton)
         addCloseAllWindowsExistinExpButtonListener()
         strimmUIService.state = UIstate.IDLE
@@ -182,8 +190,17 @@ class GUIMain : Command {
     private fun addCloseAllWindowsExistinExpButtonListener(){
         closeAllWindowsExistingExpButton.addActionListener {
             loggerService.log(Level.INFO, "Closing all open windows")
-            dockableWindowPluginService.dockableWindows.forEach { x -> x.value.close() }
+            val cameraScrollWindowPlugins =
+                GUIMain.dockableWindowPluginService.getPluginsOfType(CameraScrollWindowPlugin::class.java)
+            cameraScrollWindowPlugins.forEach { x -> x.value.close() }
+            val traceScrollWindowPlugins =
+                GUIMain.dockableWindowPluginService.getPluginsOfType(TraceScrollWindowPlugin::class.java)
+            traceScrollWindowPlugins.forEach { x -> x.value.close() }
+            experimentService.imageHDFDatasets = hashMapOf()
+            experimentService.traceHDFDatasets = hashMapOf()
             closeAllWindowsExistingExpButton.isEnabled = false
+            strimmUIService.windowsLoaded = 0
+            H5.H5Fclose(experimentService.hdfFileID)
         }
     }
 

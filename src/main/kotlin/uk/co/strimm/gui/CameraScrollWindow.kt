@@ -100,7 +100,7 @@ class CameraScrollWindow(val windowPanel: JPanel){
                         * https://imagej.net/2012-08-01_-_Loading_and_displaying_a_dataset_with_the_ImageJ2_API
                         */
                         val robot = Robot()
-                        robot.mouseMove(rootPane.width/2, rootPane.height/2)
+                        robot.mouseMove(windowPanel.width/2, windowPanel.height/2)
                         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK)
                         robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK)
                     }
@@ -110,8 +110,13 @@ class CameraScrollWindow(val windowPanel: JPanel){
         windowPanel.updateUI()
     }
 
+    /**
+     * Creates an ImageJ dataset from a specified bit depth. Reads from data in CameraScrollWindowController
+     * @param bitDepth The bitdepth of the iamge data
+     * @return A nullable ImageJ dataset (image stack)
+     */
     fun createDataset(bitDepth : Int) : Dataset?{
-        //Note - This code may look simple but image processing/manipulation examples very hard to interpret/find
+        //Note - This code may look simple but ImageJ processing/manipulation examples very hard to interpret/find
         val imageDataset = when(bitDepth){
             8 -> {
                 val allImages : MutableList<ArrayImg<ByteType, net.imglib2.img.basictypeaccess.array.ByteArray>> = mutableListOf()

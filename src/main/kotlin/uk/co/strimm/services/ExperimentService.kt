@@ -39,12 +39,13 @@ class ExperimentService  : AbstractService(), ImageJService {
     var loadtimeRoiList = hashMapOf<String, List<RoiInfo>>()
     var runtimeRoiList = hashMapOf<String, List<RoiInfo>>()
 
-    val imageHDFDatasets = hashMapOf<String, ArrayList<HDFImageDataset>>()
-    val traceHDFDatasets = hashMapOf<String, Array<FloatArray>>() //<name as path, data>
+    var imageHDFDatasets = hashMapOf<String, ArrayList<HDFImageDataset>>()
+    var traceHDFDatasets = hashMapOf<String, Array<FloatArray>>() //<name as path, data>
 
     val imageDataGroupName = "imageData"
     val traceDataGroupName = "traceData"
     val datasetString = "data" //The final node will be a dataset called "data"
+    var hdfFileID = 0
 
     //convertGsonToConfig()    destroy the existing stream, capture the configFile, then load the expConfig from the JSON
     fun convertGsonToConfig(configFile: File): Boolean {
@@ -151,18 +152,30 @@ class ExperimentService  : AbstractService(), ImageJService {
         }
     }
 
+    /**
+     * First point of entry for loading an existing experiment from a h5 file. This will read data from the h5 file
+     * and create trace and image (camera) plugins to display the data
+     * @param path The path to the h5 file
+     * @param name The name of the h5 file with the extension
+     */
     fun loadH5File(path : String, name: String){
+        //First close any existing windows that are open
+        closeOpenWindows()
+
+        GUIMain.strimmUIService.showLoadingDataDialog()
         GUIMain.loggerService.log(Level.INFO, "Loading H5 file...")
 
         val rootPath = "/"
 
         try {
+            //Open the main file
             val fileID = H5.H5Fopen("$path/$name", HDF5Constants.H5F_ACC_RDWR, HDF5Constants.H5P_DEFAULT)
+            hdfFileID = fileID
             if(fileID <= 0){
                 throw Exception("Could not open HDF file $path/$name")
             }
 
-            //Start at the root and get all children
+            //Start at the root and get all children at level below
             val fileAsGroupID = H5.H5Gopen(fileID, "/", HDF5Constants.H5P_DEFAULT)
             val numMembers = H5.H5Gn_members(fileAsGroupID, "/")
             val childNames = arrayOfNulls<String>(numMembers)
@@ -171,11 +184,12 @@ class ExperimentService  : AbstractService(), ImageJService {
             val childTypes = IntArray(numMembers)
             H5.H5Gget_obj_info_all(fileAsGroupID, ".", childNames, childTypes, lTypes, childRefs, HDF5Constants.H5_INDEX_NAME)
 
+            //Gets the IDs of the groups representing each type of dataset. I.e. the top level group for each trace, and each image dataset
             val groupIDs = getGroupIDs(childNames, rootPath, fileAsGroupID)
             val imageGroupPaths = groupIDs.first
             val traceGroupPaths = groupIDs.second
 
-            //Get all the trace data
+            //Get all the trace data in the trace groups
             val traceDatasetHashMap = hashMapOf<String, Int>()//<Dataset parent folder path string, node ID>
             for(i in 0 until traceGroupPaths.size){
                 val groupNodeID = H5.H5Gopen(fileAsGroupID, traceGroupPaths[i], HDF5Constants.H5P_DEFAULT)
@@ -193,6 +207,7 @@ class ExperimentService  : AbstractService(), ImageJService {
                 createTracePlugins(traceDatasetHashMap)
             }
 
+            //Get all the image data in the image groups
             val imageDatasetHashMap = hashMapOf<String, Int>()//<Dataset parent folder path string, node ID>
             for(i in 0 until imageGroupPaths.size){
                 val groupNodeID = H5.H5Gopen(fileAsGroupID, imageGroupPaths[i], HDF5Constants.H5P_DEFAULT)
@@ -208,15 +223,35 @@ class ExperimentService  : AbstractService(), ImageJService {
                 readImageDatasets(imageDatasetHashMap, fileAsGroupID)
                 createImagePlugins()
             }
-            GUIMain.closeAllWindowsExistingExpButton.isEnabled = true
         }
         catch(ex : Exception){
+            GUIMain.strimmUIService.hideLoadingDataDialog()
             GUIMain.loggerService.log(Level.SEVERE, "Failed to load h5 file")
             GUIMain.loggerService.log(Level.SEVERE, ex.message!!)
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
 
+    /**
+     * Close all open windows. This is called before the h5 file is read and window plugins created
+     */
+    private fun closeOpenWindows(){
+        GUIMain.loggerService.log(Level.INFO, "Closing all open windows")
+        val cameraWindowPlugins =
+            GUIMain.dockableWindowPluginService.getPluginsOfType(CameraWindowPlugin::class.java)
+        cameraWindowPlugins.forEach { x -> x.value.close() }
+        val traceWindowPlugins =
+            GUIMain.dockableWindowPluginService.getPluginsOfType(TraceWindowPlugin::class.java)
+        traceWindowPlugins.forEach { x -> x.value.close() }
+    }
+
+    /**
+     * Get the group IDs for the image and trace datasets.
+     * @param childNames The names of all children (groups) in the first level from the file root
+     * @param rootPath The root path like a file, will almost always be "."
+     * @param fileAsGroupID The ID of the top level node but read as a group
+     * @return A pair containing the paths to the group IDs for the datasets, first is image group IDs, second is trace group IDs
+     */
     fun getGroupIDs(childNames : Array<String?>, rootPath : String, fileAsGroupID: Int) : Pair<ArrayList<String>, ArrayList<String>>{
         val imageGroupIDs = arrayListOf<String>()
         val traceGroupIDs = arrayListOf<String>()
@@ -235,6 +270,12 @@ class ExperimentService  : AbstractService(), ImageJService {
         return Pair(imageGroupIDs, traceGroupIDs)
     }
 
+    /**
+     * Goes through each image dataset and loads all image data with the appropriate bit depth. Doesn't return anything
+     * but does populate the global variable imageHDFDatasets
+     * @param datasetIDs A hashmap of the dataset IDs, key is the path, value is the ID of the node at the path
+     * @param fileAsGroupID The ID of the top level node but read as a group
+     */
     fun readImageDatasets(datasetIDs : HashMap<String, Int>, fileAsGroupID: Int){
         val bitDepthAttrString = "bitDepth"
 
@@ -245,6 +286,7 @@ class ExperimentService  : AbstractService(), ImageJService {
                 val folderInfo = H5.H5Oget_info(folderID)
                 val numAttributes = folderInfo.num_attrs
                 var bitDepth = 8
+
                 //Iterate through the attributes on the "imageData" folder and find the "bitDepth" attribute
                 for(i in 0 until numAttributes) {
                     val attributeID = H5.H5Aopen_by_idx(
@@ -259,6 +301,8 @@ class ExperimentService  : AbstractService(), ImageJService {
                         H5.H5Aread(attributeID, HDF5Constants.H5T_NATIVE_INT32, attributeValue)
                         bitDepth = attributeValue.first()
                     }
+
+                    H5.H5Aclose(attributeID)
                 }
 
                 var dataTypeConstant = HDF5Constants.H5T_NATIVE_B8
@@ -295,6 +339,8 @@ class ExperimentService  : AbstractService(), ImageJService {
                     image.width = dims[1].toInt()
                     image.height = dims[2].toInt()
                     allImages.add(image)
+
+                    H5.H5Dclose(datasetID)
                 }
 
                 imageHDFDatasets[datasetName] = allImages
@@ -306,6 +352,12 @@ class ExperimentService  : AbstractService(), ImageJService {
         }
     }
 
+    /**
+     * Goes through each trace dataset and loads all trace data. Doesn't return anything but does populate the global
+     * variable traceHDFDatasets
+     * @param datasetIDs A hashmap of the dataset IDs, key is the path, value is the ID of the node at the path
+     * @param fileAsGroupID The ID of the top level node but read as a group
+     */
     fun readTraceDatasets(fileAsGroupID : Int, datasetIDs : HashMap<String, Int>){
         for(parentFolderPath in datasetIDs.keys){
             GUIMain.loggerService.log(Level.INFO, "Reading trace dataset $parentFolderPath/$datasetString")
@@ -327,6 +379,8 @@ class ExperimentService  : AbstractService(), ImageJService {
                 H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
 
                 traceHDFDatasets["$parentFolderPath/$datasetString"] = dataRead
+
+                H5.H5Dclose(datasetID)
             }
             catch(ex : Exception){
                 GUIMain.loggerService.log(Level.SEVERE, "Failed to read trace dataset $parentFolderPath/$datasetString. Message: ${ex.message}")
@@ -335,14 +389,27 @@ class ExperimentService  : AbstractService(), ImageJService {
         }
     }
 
+    /**
+     * Create dockable window plugins for each image dataset. The plugins for image dataset use CameraScrollWindowPlugin
+     * class and are similar to the standard CameraWindowPlugin
+     */
     fun createImagePlugins(){
         for(imageDataset in imageHDFDatasets){
             val plugin = GUIMain.dockableWindowPluginService.createPlugin(CameraScrollWindowPlugin::class.java, imageDataset, false, "ImageScrollWindow")
             plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
             plugin.cameraScrollWindowController.populateImages()
+            GUIMain.strimmUIService.windowsLoaded += 1
+            if(GUIMain.strimmUIService.windowsLoaded == (traceHDFDatasets.size + imageHDFDatasets.size)){
+                GUIMain.closeAllWindowsExistingExpButton.isEnabled = true
+                GUIMain.strimmUIService.hideLoadingDataDialog()
+            }
         }
     }
 
+    /**
+     * Create dockable window plugins for each trace dataset. The plugins for trace dataset use TraceScrollWindowPlugin
+     * class and are similar to the standard TraceWindowPlugin
+     */
     fun createTracePlugins(traceDataFolderIDs : HashMap<String, Int>){
         for(traceDataset in traceHDFDatasets){ //Each entry represents all the trace data from one sink
             val parentFolderPath = traceDataset.key.replace("/$datasetString", "")
@@ -351,10 +418,22 @@ class ExperimentService  : AbstractService(), ImageJService {
             plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
             Platform.runLater {
                 plugin.traceWindowController.populateChart() //Has to be done here because plugin initialisation needs to happen before the graph is populated
+                GUIMain.strimmUIService.windowsLoaded += 1
+                if(GUIMain.strimmUIService.windowsLoaded == (traceHDFDatasets.size + imageHDFDatasets.size)){
+                    GUIMain.closeAllWindowsExistingExpButton.isEnabled = true
+                    GUIMain.strimmUIService.hideLoadingDataDialog()
+                }
             }
         }
     }
 
+    /**
+     * Sorts the trace data read from the trace dataset in the h5 file. This is needed because traces are not read
+     * in any particular order
+     * @param traceDataParentID The parent folder (group) of the trace data
+     * @param traceDataset The trace data as a hashmap entry. Key is path of the trace dataset, value is an array of all trace data
+     * @return The trace data and associated names as a HashMap<name, data>
+     */
     fun sortTraces(traceDataParentID : Int, traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>) : HashMap<String, FloatArray>{
         val folderInfo = H5.H5Oget_info(traceDataParentID)
         val numAttributes = folderInfo.num_attrs
@@ -384,6 +463,7 @@ class ExperimentService  : AbstractService(), ImageJService {
                 dataForIndex[j] = valueForIndex
             }
             sortedTraces[name] = dataForIndex
+            H5.H5Aclose(attributeID)
         }
         return sortedTraces
     }
@@ -396,7 +476,7 @@ class ExperimentService  : AbstractService(), ImageJService {
      * @param groupNodePath The path to the node representing the top level group. This will come from the name of
      * the sink specified in the experiment config
      * @param fileAsGroupID The ID of the file, but read as a group using H5.H5GOpen()
-     * @return True if the group node is an image datasets. False if the group node is a trace dataset
+     * @return Pair<isImageDataset, dataset path>. Key is true if the group node is an image datasets. False if the group node is a trace dataset
      */
     fun isImageDataset(groupNodePath : String, fileAsGroupID : Int) : Pair<Boolean, String>{
         val isImageDataset: Pair<Boolean, String>

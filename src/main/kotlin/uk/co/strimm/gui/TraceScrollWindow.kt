@@ -179,11 +179,13 @@ class TraceScrollWindow{
                     series.name = trace.key
 
 
-                    var initialPlotLimit = maxInitialDataPoints
-                    if(trace.value.size < maxInitialDataPoints){
-                        initialPlotLimit = trace.value.size
-                    }
+//                    var initialPlotLimit = maxInitialDataPoints
+//                    if(trace.value.size < maxInitialDataPoints){
+//                        initialPlotLimit = trace.value.size
+//                    }
 
+                    val initialPlotLimit = trace.value.size
+                    GUIMain.loggerService.log(Level.INFO, "Adding trace ${trace.key} to chart...")
                     for(i in 0 until initialPlotLimit){
                         val dataPoint = trace.value[i]
                         if(dataPoint < yMin){
