@@ -2,6 +2,7 @@ package uk.co.strimm.gui
 
 import bibliothek.gui.dock.common.DefaultMultipleCDockable
 import javafx.application.Platform
+import javafx.collections.ObservableList
 import javafx.embed.swing.JFXPanel
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
@@ -18,7 +19,11 @@ import javafx.scene.layout.VBox
 import org.scijava.plugin.Plugin
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.util.logging.Level
+import kotlin.math.abs
+import kotlin.math.round
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Trace Scroll Feed")
 class TraceScrollWindowPlugin : AbstractDockableWindow() {
@@ -70,10 +75,12 @@ class TraceScrollWindow{
     var yAxis = NumberAxis()
     var lineChart = LineChart<Number, Number>(xAxis, yAxis)
 
-    var shiftXAmount = 500 //When a shift button is clicked, how much will it shift by (unit is the time unit). This is the initial value and will change if the x axis range is changed
-    var shiftYAmount = 500
+    var shiftXAmount = 500.0 //When a shift button is clicked, how much will it shift by (unit is the time unit). This is the initial value and will change if the x axis range is changed
+    var shiftYAmount = 500.0
     var xTickUnit = 100.0
     var yTickUnit = 100.0
+
+    //Change factor is how much as a percent axes ranges should increase or decrease.
     var changeFactor = 0.25
     var times = floatArrayOf()
 
@@ -179,12 +186,12 @@ class TraceScrollWindow{
                     series.name = trace.key
 
 
-//                    var initialPlotLimit = maxInitialDataPoints
-//                    if(trace.value.size < maxInitialDataPoints){
-//                        initialPlotLimit = trace.value.size
-//                    }
+                    var initialPlotLimit = maxInitialDataPoints
+                    if(trace.value.size < maxInitialDataPoints){
+                        initialPlotLimit = trace.value.size
+                    }
 
-                    val initialPlotLimit = trace.value.size
+//                    val initialPlotLimit = trace.value.size
                     GUIMain.loggerService.log(Level.INFO, "Adding trace ${trace.key} to chart...")
                     for(i in 0 until initialPlotLimit){
                         val dataPoint = trace.value[i]
@@ -224,6 +231,8 @@ class TraceScrollWindow{
                 xAxis.lowerBound = maxTime.toDouble()-shiftXAmount
                 xAxis.upperBound = maxTime.toDouble()
             }
+
+            redrawChart()
         }
     }
 
@@ -235,8 +244,10 @@ class TraceScrollWindow{
             }
             else{
                 xAxis.lowerBound = 0.0
-                xAxis.upperBound = shiftXAmount.toDouble()
+                xAxis.upperBound = shiftXAmount
             }
+
+            redrawChart()
         }
     }
 
@@ -276,23 +287,30 @@ class TraceScrollWindow{
 
     fun addZoomInXButtonListener(){
         zoomInXButton.setOnAction {
-            xAxis.lowerBound += xAxis.lowerBound*changeFactor
-            xAxis.upperBound -= xAxis.upperBound*changeFactor
+            val range = xAxis.upperBound-xAxis.lowerBound
+            xAxis.lowerBound = xAxis.lowerBound + (range*changeFactor)
+            xAxis.upperBound = xAxis.upperBound -(range*changeFactor)
 
-            shiftXAmount -= (shiftXAmount*changeFactor).toInt()
+            shiftXAmount = range/2
+
+            xAxis.tickUnit = range/5
+
+            redrawChart()
         }
     }
 
     fun addZoomOutXButtonListener(){
         zoomOutXButton.setOnAction {
-            if((xAxis.lowerBound - (xAxis.lowerBound*changeFactor)) < 0){
+            val range = xAxis.upperBound-xAxis.lowerBound
+
+            if((xAxis.lowerBound - (range*changeFactor)) < 0){
                 xAxis.lowerBound = 0.0
             }
             else{
-                xAxis.lowerBound -= xAxis.lowerBound*changeFactor
+                xAxis.lowerBound -= range*changeFactor
             }
 
-            val newVal = xAxis.upperBound + (xAxis.upperBound * changeFactor)
+            val newVal = xAxis.upperBound + (range * changeFactor)
             if(newVal > times.max()!!){
                 xAxis.upperBound = times.max()!!.toDouble()
             }
@@ -300,38 +318,76 @@ class TraceScrollWindow{
                 xAxis.upperBound  = newVal
             }
 
-            shiftXAmount += (shiftXAmount*changeFactor).toInt()
+            shiftXAmount = range/2
+
+            xAxis.tickUnit = range/5
+
+            redrawChart()
         }
     }
 
-    //Leave commented out for now. This was intended to make sure the data in the chart was only that in view, making
-    //render times more efficient. But it's very fiddly and time consuming to implement
-//    fun FloatArray.closestValue(value: Double) = minBy { abs(value - it) }
-//
-//    fun redrawTraces(newStartValue : Double, newStopValue : Double){
-//        for(i in 0 until lineChart.data.size){
-//            if(lineChart.data[i].name != "times") {
-//                val firstValue = lineChart.data[i].data.first().xValue.toDouble()
-//                var lastValue = lineChart.data[i].data.last().xValue.toDouble()
-//                val correspondingTrace = data[i.toString()]
-//
-//                if (newStopValue > lastValue) {
-//                    val lastValueTime = times.closestValue(newStopValue)
-//                    val oldLastValueIndex = lineChart.data[i].data.size
-//                    val lastValueTimeIndex = times.indexOf(lastValueTime!!) - 1
-//                    val slice = correspondingTrace!!.slice(IntRange(oldLastValueIndex, lastValueTimeIndex))
-//                    for (j in 0 until slice.size) {
-//                        if (newStopValue > lastValue) {
-////                        println("Adding to data at index ${lineChart.data[i].data.size} time=${times[oldLastValueIndex+j]}")
-//                            lineChart.data[i].data.add(
-//                                lineChart.data[i].data.size,
-//                                XYChart.Data<Number, Number>(times[oldLastValueIndex + j], slice[j])
-//                            )
-//                            lastValue = times[j].toDouble()
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+    /**
+     * Method used to plot the correct subsets of traces based on UI button interactions. This is also to limit the
+     * amount of data that is plotted as plotting too much data will slow everything down greatly. This will be called
+     * if the x axis is zoomed in or zoomed out, or if the x axis is shifted left or right.
+     */
+    fun redrawChart(){
+        GUIMain.loggerService.log(Level.INFO, "Redrawing chart")
+        var newXLowerIndex = findClosestXIndex(xAxis.lowerBound, false) //Time index
+        var newXUpperIndex = findClosestXIndex(xAxis.upperBound, true) //Time index
+
+        //Clear all data
+        lineChart.data.remove(0, lineChart.data.size)
+
+        //Resolve rounding issue edge case (see findClosestXIndex())
+        if(newXUpperIndex > times.size-1){
+            newXUpperIndex -= 1
+        }
+
+        if(newXLowerIndex < 0){
+            newXLowerIndex = 0
+        }
+
+        //Repopulate graph based on new lower and upper bounds
+        val newTimes = times.slice(IntRange(newXLowerIndex, newXUpperIndex))
+        for(trace in data) {
+            if(trace.key != "times") {
+                val newSeries = XYChart.Series<Number, Number>()
+                val newTraceVals = trace.value.slice(IntRange(newXLowerIndex, newXUpperIndex))
+                for (i in 0 until newTraceVals.size) {
+                    newSeries.data.add(XYChart.Data<Number, Number>(newTimes[i], newTraceVals[i]))
+                }
+                newSeries.name = trace.key
+                lineChart.data.add(newSeries)
+            }
+        }
+    }
+
+    /**
+     * Find the closest index in the time series to a given time. Time is a double that will be the axis lower or upper
+     * bound.
+     * @param axisTme The time from the chart axis
+     * @param isUpper Flag to indicate which rounding compensaton to do (add one or subtract one)
+     * @return The closest index in the time series
+     */
+    fun findClosestXIndex(axisTime : Double, isUpper : Boolean) : Int{
+        var minDifference = Pair(0, 9999999.0)
+        for(i in 0 until times.size){
+            val difference = abs(times[i]-axisTime)
+            if (difference < minDifference.second){
+                minDifference = Pair(i, difference)
+            }
+        }
+
+        //Add or subtract an extra 1 to solve rounding issue (if the closest index is lower than the axisTime given)
+        if(isUpper) {
+            return minDifference.first + 1
+        }
+
+        if(!isUpper){
+            return minDifference.first - 1
+        }
+
+        return minDifference.first
+    }
 }
