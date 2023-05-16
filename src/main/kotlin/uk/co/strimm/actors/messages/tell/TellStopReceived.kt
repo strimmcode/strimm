@@ -1,4 +1,4 @@
 package uk.co.strimm.actors.messages.tell
 
-class TellStopReceived {
+class TellStopReceived (var isFromNIDAQ : Boolean) {
 }

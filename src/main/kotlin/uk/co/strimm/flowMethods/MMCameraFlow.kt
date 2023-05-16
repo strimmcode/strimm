@@ -239,7 +239,8 @@ class MMCameraFlow() : FlowMethod {
                         )
 
                     }
-                } else if (numChannels == 4) {
+                }
+                else if (numChannels == 4) {
                     if (coreBytesPerPixel != 8) {
                         println("Core format clashes with cfg")
                     } else {
@@ -256,7 +257,8 @@ class MMCameraFlow() : FlowMethod {
                             1
                         )
                     }
-                } else {
+                }
+                else {
                     println("Number of channels not supported")
                 }
             }
@@ -278,7 +280,8 @@ class MMCameraFlow() : FlowMethod {
                             1
                         )
                     }
-                } else {
+                }
+                else {
                     println("Number of channels not supported")
                 }
             }

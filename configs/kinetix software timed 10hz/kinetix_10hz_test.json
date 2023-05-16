@@ -2,35 +2,30 @@
 	"sourceConfig":{ 
 		"sources" : [
 			{
-				"sourceName" : "1",
+				"sourceName" : "kinetix",
 				"sourceType" : "MMCameraSource",
-				"sourceCfg" : "1_Ximea.cfg",
+				"sourceCfg" : "kinetixSource.cfg",
 				"isTimeLapse" : False,
 				"intervalMs" : 100.0
-		
-
 			}
 		]
-	},
-	
-	
+	}
 	"sinkConfig":{ 
 		"sinks" : [
 			{
-				"sinkName" : "Ximea_Save",
+				"sinkName" : "kinetixSave",
 				"sinkType" : "SinkSaveMethod",
 				"sinkCfg" : "Null.cfg",
 				"inputNames" : [
-					"1"
+					"kinetix"
 				]
 			},
-			
 			{
-				"sinkName" : "XimeaSink",
+				"sinkName" : "kinetixDisplay",
 				"sinkType" : "SinkImageJDisplayMethod",
-				"sinkCfg" : "XimeaSink.cfg",
+				"sinkCfg" : "kinetixSink.cfg",
 				"inputNames" : [
-					"1"
+					"kinetix"
 				]
 			}
 		]

@@ -1,0 +1,34 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "webcam",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "openCVSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 10.0
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "openCVSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"webcam"
+				]
+			},
+			{
+				"sinkName" : "openCVDisplay",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "openCVSink.cfg",
+				"inputNames" : [
+					"webcam"
+				]
+			}
+		]
+	}
+
+}

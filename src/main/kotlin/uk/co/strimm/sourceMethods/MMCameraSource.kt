@@ -1,4 +1,3 @@
-
 package uk.co.strimm.sourceMethods
 
 import akka.actor.ActorRef
@@ -12,51 +11,51 @@ import uk.co.strimm.experiment.Source
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
 import java.lang.Math.abs
+import java.util.logging.Level
 
-open class MMCameraSource() : SourceMethod {
-    //8/10/22 has the problem where repeated use causes a crash in core, this turned out to be that the core
-    //needs to be reset
+open class MMCameraSource : SourceMethod {
     var name = ""
     var library = ""
     var label = ""
-    var core : CMMCore? = CMMCore()
+    var core: CMMCore? = CMMCore()
 
     lateinit var source: Source
-    override lateinit var properties : HashMap<String, String>
+    override lateinit var properties: HashMap<String, String>
     override var actor: ActorRef?
         get() = TODO("Not yet implemented")
         set(value) {}
-    var dataID : Int = 0
-    //
-    var x : Int = 0
-    var y : Int = 0
-    var w : Int = 1000
-    var h : Int = 1000
+
+    var dataID: Int = 0
+    var x: Int = 0
+    var y: Int = 0
+    var w: Int = 1000
+    var h: Int = 1000
     var exposureMs = 30.0
-    var pixelType : String = "Byte"
+    var pixelType: String = "Byte"
     var numChannels = 1
     var coreBytesPerPixel = 0
     var bSnapped = false
+    var stop = false
 
 
-
-    override fun init(source : Source){
+    override fun init(source: Source) {
         this.source = source
-        //load the config file - inside (source.sourceName).cfg
         loadCfg()
         val st = StrVector()
-        st.add("./DeviceAdapters/")
-        try{
-            println("load camera ******************")
-            core!!.setDeviceAdapterSearchPaths(st)
-            core!!.loadSystemConfiguration("./DeviceAdapters/CameraMMConfigs/" + properties["MMDeviceConfig"]) // MMDeviceConfig, Ximea.cfg#
-            label = core!!.getCameraDevice()
+        st.add("./DeviceAdapters/") //TODO hardcoded path
+        try {
+            GUIMain.loggerService.log(Level.INFO, "Loading MM camera from config ${properties["MMDeviceConfig"]}")
+            core!!.deviceAdapterSearchPaths = st
+            core!!.loadSystemConfiguration("./DeviceAdapters/CameraMMConfigs/" + properties["MMDeviceConfig"])
+            label = core!!.cameraDevice
             name = core!!.getDeviceName(label)
             library = core!!.getDeviceLibrary(label)
             coreBytesPerPixel = core!!.bytesPerPixel.toInt()
-            println("success loaded camera ****************")
-        } catch(ex : Exception){
-            println("Exception: !" + ex.message)
+            GUIMain.loggerService.log(Level.INFO, "Successfully loaded camera from config ${properties["MMDeviceConfig"]}")
+        }
+        catch (ex: Exception) {
+            GUIMain.loggerService.log(Level.SEVERE,"Error trying to load MM camera from config files. Message: " + ex.message)
+            GUIMain.loggerService.log(Level.SEVERE,ex.stackTrace)
         }
 
         pixelType = properties["pixelType"]!!
@@ -66,12 +65,14 @@ open class MMCameraSource() : SourceMethod {
         w = properties["w"]!!.toInt()
         h = properties["h"]!!.toInt()
         exposureMs = properties["exposureMs"]!!.toDouble()
-        //0.0 measn use default exposure
+
         if (abs(exposureMs) > 1e-5) {
+            GUIMain.loggerService.log(Level.INFO, "Setting exposure to $exposureMs")
             core!!.setExposure(label, exposureMs)
         }
-        val exp = core!!.getExposure(label)
-        //println("Exposure is : " +  exp)
+//        val exp = core!!.getExposure(label)
+//        println("Exposure is : " +  exp)
+
         //MicroManager core supports:
         //Bytes    channels     BytesPerPixel
         //1         1               1
@@ -81,17 +82,15 @@ open class MMCameraSource() : SourceMethod {
         //float     1               4 (FLOAT)
         //
         //imageJ supports more formats than MicroManager
-
         //(also it is 3 channel byte which is displayed as RGB in IJ)
 
-
         if (w != core!!.imageWidth.toInt() || h != core!!.imageHeight.toInt())
-            core!!.setROI(x,y,w,h)
+            core!!.setROI(x, y, w, h)
         bSnapped = properties["isImageSnapped"]!!.toBoolean()
 
-        println(label.toString() + " " + library + " " + name + " " + pixelType + " " + numChannels)
+        GUIMain.loggerService.log(Level.INFO, "Camera loaded. Label=$label Library=$library Name=$name Pixel type=$pixelType Num channels=$numChannels")
         //configure the trigger for this camera
-        if (properties["isTriggered"]!!.toBoolean()){
+        if (properties["isTriggered"]!!.toBoolean()) {
             var r: List<Array<String>>? = null
             try {
                 CSVReader(FileReader("./DeviceAdapters/CameraMMConfigsTrigger/" + properties["MMDeviceConfig"])).use { reader ->
@@ -105,41 +104,43 @@ open class MMCameraSource() : SourceMethod {
                     }
                 }
             } catch (ex: java.lang.Exception) {
-                println(ex.message)
+                GUIMain.loggerService.log(Level.INFO, "Error reading $label camera trigger config. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.INFO, ex.stackTrace)
             }
         }
+
+        //This is done so when stopping the acquisiton, each core can be shut down appropriately
+        GUIMain.loggerService.log(Level.INFO, "Adding core to cores list")
+        GUIMain.experimentService.allMMCores.add(core!!)
     }
 
-
-    override fun run() : STRIMMBuffer?{
-        if (bSnapped){
-
+    override fun run(): STRIMMBuffer? {
+        if (bSnapped) {
             return runSnapped()
-        }
-        else {
+        } else {
             return runCircBuffer()
         }
-
     }
 
-
     @Synchronized
-    fun runSnapped() : STRIMMBuffer? {
+    fun runSnapped(): STRIMMBuffer? {
         //snap acquisition
-        if (mod(dataID, 100) == 0){
-            println("snap " + dataID + "  time: " + GUIMain.softwareTimerService.getTime())
-        }
+//        if (mod(dataID, 100) == 0) {
+//            println("snap " + dataID + "  time: " + GUIMain.softwareTimerService.getTime())
+//        }
 
         core!!.snapImage()
 
         try {
-            val pix = core!!.image
+            val pix = core!!.image //TODO should this use taggedImage instead?
+
             //note that ImageJ display supports many more pixelTypes and num of channels than MMan Core
             if (pixelType == "Byte") {
                 if (numChannels == 1) {
                     if (coreBytesPerPixel != 1) {
-                        println("Core format clashes with cfg")
-                    } else {
+                        GUIMain.loggerService.log(Level.WARNING, "Core format clashes with cfg")
+                    }
+                    else {
                         //8 Bit GREY
                         dataID++
                         return STRIMMPixelBuffer(
@@ -150,15 +151,14 @@ open class MMCameraSource() : SourceMethod {
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
                             dataID,
-                            1
-                        )
-
+                            1)
                     }
                 }
                 else if (numChannels == 4) {
                     if (coreBytesPerPixel != 4) {
-                        println("Core format clashes with cfg")
-                    } else {
+                        GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
+                    }
+                    else {
                         //RGB32
                         //OpenCV provides interleaved BGRA this needs to be transformed into separate stacks
                         //todo include in cfg and use a separate function for this as some cameras might issue the image as r,g,b images in a stack
@@ -168,12 +168,7 @@ open class MMCameraSource() : SourceMethod {
                         for (ch in 0..3 - 1) {
                             for (j in 0..h - 1) {
                                 for (i in 0..w - 1) {
-
-
-
-                                            pix2[i + j * w + (w * h * (2 - ch))] = pix1[ch + 4 * i + 4 * w * j]
-
-
+                                    pix2[i + j * w + (w * h * (2 - ch))] = pix1[ch + 4 * i + 4 * w * j]
                                 }
                             }
                         }
@@ -187,21 +182,22 @@ open class MMCameraSource() : SourceMethod {
                             3,
                             GUIMain.softwareTimerService.getTime(), //System.nanoTime().toDouble()/1000000.0,
                             dataID,
-                            1
-                        )
+                            1)
                     }
                 }
                 else {
-                    println("Number of channels not supported")
+                    GUIMain.loggerService.log(Level.WARNING,"Number of channels not supported")
                 }
             }
             else if (pixelType == "Short") {
                 if (numChannels == 1) {
                     if (coreBytesPerPixel != 2) {
-                        println("Core format clashes with cfg")
-                    } else {
+                        GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
+                    }
+                    else {
                         //16bit GREY
                         dataID++
+
                         return STRIMMPixelBuffer(
                             pix,
                             w,
@@ -210,15 +206,14 @@ open class MMCameraSource() : SourceMethod {
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
                             dataID,
-                            1
-                        )
-
+                            1)
                     }
                 }
                 else if (numChannels == 4) {
                     if (coreBytesPerPixel != 8) {
-                        println("Core format clashes with cfg")
-                    } else {
+                        GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
+                    }
+                    else {
                         //RGB64
                         dataID++
                         return STRIMMPixelBuffer(
@@ -229,18 +224,19 @@ open class MMCameraSource() : SourceMethod {
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
                             dataID,
-                            1
-                        )
+                            1)
                     }
-                } else {
-                    println("Number of channels not supported")
+                }
+                else {
+                    GUIMain.loggerService.log(Level.WARNING,"Number of channels not supported")
                 }
             }
             else if (pixelType == "Float") {
                 if (numChannels == 1) {
                     if (coreBytesPerPixel != 4) {
-                        println("Core format clashes with cfg")
-                    } else {
+                        GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
+                    }
+                    else {
                         //32bit float
                         dataID++
                         return STRIMMPixelBuffer(
@@ -251,156 +247,192 @@ open class MMCameraSource() : SourceMethod {
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
                             dataID,
-                            1
-                        )
+                            1)
                     }
                 }
                 else {
-                    println("Number of channels not supported")
+                    GUIMain.loggerService.log(Level.WARNING, "Number of channels not supported")
                 }
             }
             else {
-                println("Pixel type not supported")
+                GUIMain.loggerService.log(Level.WARNING, "Pixel type not supported")
             }
             // GUIMain.protocolService.GDIPrintText(core.imageWidth.toInt(),core.imageHeight.toInt(), pix, "dataID : " + dataID.toString(),50.0, 50.0, 80)
-        }catch(ex : Exception) {
-            println(core.toString())
+        } catch (ex: Exception) {
+            GUIMain.loggerService.log(Level.SEVERE, "Error reading core image")
             println(ex.message)  //something is going on with the camera
         }
 
+        //If we're here then something went wrong. We just return an empty STRIMMPixelBuffer object
         return STRIMMPixelBuffer(null, 0, 0, "", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
     }
 
     @Synchronized
-    fun runCircBuffer() : STRIMMBuffer? {
-        //does not specify the type of pix
-        //live acquisition from circular buffer - take the next image
-        if (mod(dataID, 1000) == 0){
-            println("snap " + dataID + "  time: " + GUIMain.softwareTimerService.getTime())
-
+    fun runCircBuffer(): STRIMMBuffer? {
+        if (mod(dataID, 1000) == 0) {
+            GUIMain.loggerService.log(Level.INFO,"snap " + dataID + "  software time: " + GUIMain.softwareTimerService.getTime())
         }
-        var pix : Any? = null
-        var x1 = 0
-        var x2 = 0
-        while (true) {
-            //get the current index into the circular buffer store it in x1 and
-            //then wait until that changes which means that a new image has been
-            //put onto the circular buffer
-            x1 = core!!.remainingImageCount
-            x2 = x1
-            //if the buffer is empty or the device is busy then spin
-            while (x2 == x1 || x2 == 0 || core!!.deviceBusy(label)) {
-                x2 = core!!.remainingImageCount
-            }
 
-            //
-            //collect and remove (pop) the last image (to reduce the chances of overflow
-            // which might happen more quickly if you kept the image on the circular buffer)
-            //
-            //between the end of the above while loop and the beginning of the section
-            //which retieves the image the buffer could have reset so wrap the next section in
-            //try/catch  to alert us to this happening and also to have another go at getting an
-            //image when it does happen.
-            //
+        var pix: Any? = null
+        var time = 0.0
+//        var x1 = 0
+//        var x2 = 0
+
+//        x1 = core!!.remainingImageCount
+//        GUIMain.loggerService.log(Level.INFO, "Remaining image count is $x1")
+        while (core!!.remainingImageCount == 0 && !stop) { //Spin waiting for images at the beginning
+        }
+
+        /**
+         * There may be instances where this method cannot send images faster than they are being collected.
+         * This while loop is designed to ensure all images collected through the MMCore eventually get sent and not
+         * destroyed/lost when the MMcore is reset
+         */
+        while (core!!.remainingImageCount > 0) {
             try {
-                //collect the image
-                val im = core!!.lastTaggedImage
+                val im = core!!.popNextTaggedImage()
                 pix = im.pix
-
-                break
-            } catch (ex: java.lang.Exception) {
-                //TW 2/8/21 the most likely reason for ending up here is that
-                //we attempted to get an image from an circular buffer (it has reset)
-                //so go around the while loop again and retrieve an image
-                //This will mean that we have LOST an image unless the circular buffer
-                //size is larger than the number of frames needed in the acquisition.
-                print("*****CIRCULAR BUUFER: Found 0 frames in the buffer *****")
-            }
-        }
-
-        //print("**********************")
-
-        //note that ImageJ display supports many more pixelTypes and num of channels than MMan Core
-        if (pixelType == "Byte"){
-            if (numChannels == 1){
-                if (coreBytesPerPixel != 1){
-                    println("Core format clashes with cfg")
-                }else{
-                    //8 Bit GREY
-                    dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
-
+//                GUIMain.loggerService.log(Level.INFO, "MMCameraImage number=${im.tags["ImageNumber"]}")
+//                    println("MMCameraImage elapsed time=${im.tags["ElapsedTime-ms"]}")
+//                    println("MMCameraImage PVCam frame number=${im.tags["PVCAM-FrameNr"]}")
+//                println("MMCameraImage PVCam timestamp BOF=${im.tags["PVCAM-TimeStampBOF"]}")
+                time = im.tags["ElapsedTime-ms"].toString().toDouble()
+                if (core!!.remainingImageCount == 0) {
+                    GUIMain.loggerService.log(Level.INFO, "Remaining image count is 0. Stop=true")
+                    stop = true
+                    return STRIMMPixelBuffer(null, 0, 0, "", 0, -1.0, dataID, 0)
                 }
             }
-            else if (numChannels == 4){
-                if (coreBytesPerPixel != 4){
-                    println("Core format clashes with cfg")
-                }else{
-                    //RGB32
-                    val pix1 = pix as ByteArray
-                    //convert into 3 layers - deinterleave
-                    val pix2 = ByteArray(w*h*3)
-                    for (ch in 0..3-1){
-                        for (j in 0..h-1){
-                            for (i in 0..w-1){
-                                pix2[i + j*w + (w*h*(2-ch))] = pix1[ch + 4*i + 4*w*j]
+            catch (ex: Exception) {
+                GUIMain.loggerService.log(Level.SEVERE, "Error when trying to read image from MMCore. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                break
+            }
+
+            //note that ImageJ display supports many more pixelTypes and num of channels than MMan Core
+            if (pixelType == "Byte") {
+                if (numChannels == 1) {
+                    if (coreBytesPerPixel != 1) {
+                        GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
+                    }
+                    else {
+                        //8 Bit GREY
+                        dataID++
+                        return STRIMMPixelBuffer(
+                            pix,
+                            w,
+                            h,
+                            pixelType,
+                            numChannels,
+                            time,
+                            dataID,
+                            1)
+                    }
+                }
+                else if (numChannels == 4) {
+                    if (coreBytesPerPixel != 4) {
+                        GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
+                    }
+                    else {
+                        //RGB32
+                        val pix1 = pix as ByteArray
+                        //convert into 3 layers - deinterleave
+                        val pix2 = ByteArray(w * h * 3)
+                        for (ch in 0..3 - 1) {
+                            for (j in 0..h - 1) {
+                                for (i in 0..w - 1) {
+                                    pix2[i + j * w + (w * h * (2 - ch))] = pix1[ch + 4 * i + 4 * w * j]
+                                }
                             }
                         }
+
+                        dataID++
+                        return STRIMMPixelBuffer(
+                            pix2,
+                            w,
+                            h,
+                            pixelType,
+                            3,
+                            time,
+                            dataID,
+                            1)
                     }
-
-                    dataID++
-                    return STRIMMPixelBuffer(pix2, w, h, pixelType, 3, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                }
+                else {
+                    GUIMain.loggerService.log(Level.WARNING,"Number of channels not supported")
                 }
             }
-            else{
-                println("Number of channels not supported")
-            }
-        }
-        else if (pixelType == "Short"){
-            if (numChannels == 1){
-                if (coreBytesPerPixel != 2){
-                    println("Core format clashes with cfg")
-                }else{
-                    //16bit GREY
-                    dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
-
+            else if (pixelType == "Short") {
+                if (numChannels == 1) {
+                    if (coreBytesPerPixel != 2) {
+                        GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
+                    }
+                    else {
+                        //16bit GREY
+                        dataID++
+                        return STRIMMPixelBuffer(
+                            pix,
+                            w,
+                            h,
+                            pixelType,
+                            numChannels,
+                            time,
+                            dataID,
+                            1)
+                    }
+                }
+                else if (numChannels == 4) {
+                    if (coreBytesPerPixel != 8) {
+                        GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
+                    }
+                    else {
+                        //RGB64
+                        dataID++
+                        return STRIMMPixelBuffer(
+                            pix,
+                            w,
+                            h,
+                            pixelType,
+                            numChannels,
+                            time,
+                            dataID,
+                            1)
+                    }
+                }
+                else {
+                    GUIMain.loggerService.log(Level.WARNING,"Number of channels not supported")
                 }
             }
-            else if (numChannels == 4){
-                if (coreBytesPerPixel != 8){
-                    println("Core format clashes with cfg")
-                }else{
-                    //RGB64
-                    dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+            else if (pixelType == "Float") {
+                if (numChannels == 1) {
+                    if (coreBytesPerPixel != 4) {
+                        GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
+                    }
+                    else {
+                        //32bit float
+                        dataID++
+                        return STRIMMPixelBuffer(
+                            pix,
+                            w,
+                            h,
+                            pixelType,
+                            numChannels,
+                            time,
+                            dataID,
+                            1)
+                    }
+                }
+                else {
+                    GUIMain.loggerService.log(Level.WARNING,"Number of channels not supported")
                 }
             }
-            else{
-                println("Number of channels not supported")
+            else {
+                GUIMain.loggerService.log(Level.WARNING,"Pixel type not supported")
             }
         }
-        else if (pixelType == "Float"){
-            if (numChannels == 1){
-                if (coreBytesPerPixel != 4){
-                    println("Core format clashes with cfg")
-                }else{
-                    //32bit float
-                    dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
-                }
-            }
-            else{
-                println("Number of channels not supported")
-            }
-        }
-        else{
-            println("Pixel type not supported")
-        }
-        // GUIMain.protocolService.GDIPrintText(core.imageWidth.toInt(),core.imageHeight.toInt(), pix, "dataID : " + dataID.toString(),50.0, 50.0, 80)
 
-        return STRIMMPixelBuffer(null, 0, 0,"", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
-
+        stop = true //The stop flag is used to stop this method from spinnng infinitely if there are no more images in the buffer
+        return STRIMMPixelBuffer(null, 0, 0, "", 0, -1.0, dataID, 0)
     }
 
     override fun preStart() {
@@ -408,18 +440,16 @@ open class MMCameraSource() : SourceMethod {
             StartAcquisition()
         }
     }
-    override fun postStop(){
-        //println("*****post stop****")
-        if (!bSnapped){
-            // core!!.stopSequenceAcquisition()   ////////////////is this needed?
+
+    override fun postStop() {
+        if (!bSnapped) {
         }
         core!!.reset()
         Thread.sleep(2000)  //TODO does it need this?
-        //Unloads all devices from the core, clears all configuration data and property blocks.
     }
 
     fun loadCfg() {
-        if (source.sourceCfg != ""){
+        if (source.sourceCfg != "") {
             properties = hashMapOf<String, String>()
             var r: List<Array<String>>? = null
             try {
@@ -429,24 +459,26 @@ open class MMCameraSource() : SourceMethod {
                     properties[props[0]] = props[1]
                 }
 
-            } catch (ex: Exception) {
-                println(ex.message)
             }
-
+            catch (ex: Exception) {
+                GUIMain.loggerService.log(Level.SEVERE, "Error in reading config ${source.sourceCfg} in MMCameraSource. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+            }
         }
     }
+
     private fun StartAcquisition() {
         val memSize: Long = core!!.bytesPerPixel * core!!.imageHeight * core!!.imageWidth * properties["framesInCircularBuffer"]!!.toLong() / 1024 / 1024
         try {
-            println("If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.")
+            //If error here then problems caused by setCircularBufferMemoryFootprint(), so reduce the number of frames on circular buffer or use the default -1.
+            GUIMain.loggerService.log(Level.INFO, "Size of circular buffer=$memSize mb")
             if (memSize > 0) core!!.circularBufferMemoryFootprint = memSize
             core!!.initializeCircularBuffer() //circular buffer
-            core!!.startContinuousSequenceAcquisition(0.0) //must be
-
-
-
-        } catch (ex: Exception) {
-            println(ex.message)
+            core!!.startContinuousSequenceAcquisition(0.0)
+        }
+        catch (ex: Exception) {
+            GUIMain.loggerService.log(Level.INFO, "Error initializing circular buffer and starting sequence. Message ${ex.message}")
+            GUIMain.loggerService.log(Level.INFO, ex.stackTrace)
         }
     }
 }

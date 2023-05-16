@@ -80,8 +80,8 @@ class ExtractStrimmH5:
 
 
 if __name__ == "__main__":
-    folder = "C:\\Users\\twrig\\Desktop\\Code\\FullGraph16\\"
-    file = "strimm_exp2023-01-19T07-02-19.h5"   
-    image_path = ['Moment_Save' , '0' , 'imageData']
-    trace_path = ['Moment_Save' , '0' , 'traceData']
+    folder = "C:\\strimm\\strimm\\strimm\\"
+    file = "strimm_exp2023-05-03T11-49-43.663.h5"
+    image_path = ['ximeaSave', '0', 'imageData']
+    trace_path = ['ximeaSave', '0', 'traceData']
     esh = ExtractStrimmH5(folder, file, image_path, trace_path)

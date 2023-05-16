@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder
 import hdf.hdf5lib.H5
 import hdf.hdf5lib.HDF5Constants
 import javafx.application.Platform
+import mmcorej.CMMCore
 import net.imagej.ImageJService
 import org.scijava.plugin.Plugin
 import org.scijava.service.AbstractService
@@ -16,13 +17,11 @@ import org.scijava.service.Service
 import uk.co.strimm.HDFImageDataset
 import uk.co.strimm.RoiInfo
 import uk.co.strimm.actors.messages.stop.TerminateActor
-import uk.co.strimm.actors.messages.tell.TellSaveDatasets
 import uk.co.strimm.experiment.*
 import uk.co.strimm.gui.*
 import uk.co.strimm.streams.ExperimentStream
 import java.io.File
 import java.io.FileReader
-import java.util.concurrent.CompletionStage
 import java.util.logging.Level
 
 @Plugin(type = Service::class)
@@ -46,6 +45,9 @@ class ExperimentService  : AbstractService(), ImageJService {
     val traceDataGroupName = "traceData"
     val datasetString = "data" //The final node will be a dataset called "data"
     var hdfFileID = 0
+    var isFileSaving = false
+
+    val allMMCores = arrayListOf<CMMCore>()
 
     //convertGsonToConfig()    destroy the existing stream, capture the configFile, then load the expConfig from the JSON
     fun convertGsonToConfig(configFile: File): Boolean {
@@ -96,10 +98,16 @@ class ExperimentService  : AbstractService(), ImageJService {
     //stopStream()   set AQM::bCamerasAquire to false to stop sources. Switch the killswitch, set experimentStream::isRunning to false
     //stop the acquisition of each camera and destroyStream() - which will destroy all of the actors and docking windows.
     fun stopStream(): Boolean {
-        var future =  PatternsCS.ask(GUIMain.actorService.fileManagerActor, TellSaveDatasets(), 500000) as CompletionStage<Unit>
-        future.toCompletableFuture().get()
-
         return try {
+            GUIMain.loggerService.log(Level.INFO, "Stopping stream components")
+
+            while(isFileSaving){
+                GUIMain.loggerService.log(Level.INFO, "Data is being saved")
+                Thread.sleep(100)
+            }
+
+            GUIMain.loggerService.log(Level.INFO,"Closing objects...")
+
             GUIMain.experimentService.experimentStream.isRunning = false
             //specific shutdown behaviour
             experimentStream.sourceMethods.values.forEach{
@@ -115,7 +123,7 @@ class ExperimentService  : AbstractService(), ImageJService {
             destroyStream()
             true
         } catch (ex: Exception) {
-            GUIMain.loggerService.log(Level.SEVERE, "Error in stopping Akka stream")
+            GUIMain.loggerService.log(Level.SEVERE, "Error in stopping Akka stream. Message: ${ex.message}")
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             false
         }
@@ -432,7 +440,7 @@ class ExperimentService  : AbstractService(), ImageJService {
      * in any particular order
      * @param traceDataParentID The parent folder (group) of the trace data
      * @param traceDataset The trace data as a hashmap entry. Key is path of the trace dataset, value is an array of all trace data
-     * @return The trace data and associated names as a HashMap<name, data>
+     * @return The trace data and associated names as a HashMaCore format clashes with cfgp<name, data>
      */
     fun sortTraces(traceDataParentID : Int, traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>) : HashMap<String, FloatArray>{
         val folderInfo = H5.H5Oget_info(traceDataParentID)

@@ -1,0 +1,57 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "ximea",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "ximeaSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 50.0
+			},
+			{
+				"sourceName" : "webcam",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "openCVSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "ximeaSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ximea"
+				]
+			},
+			{
+				"sinkName" : "ximeaDisplay",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "ximeaSink.cfg",
+				"inputNames" : [
+					"ximea"
+				]
+			},
+			{
+				"sinkName" : "openCVSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"webcam"
+				]
+			},
+			{
+				"sinkName" : "openCVDisplay",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "openCVSink.cfg",
+				"inputNames" : [
+					"webcam"
+				]
+			}
+		]
+	}
+
+}

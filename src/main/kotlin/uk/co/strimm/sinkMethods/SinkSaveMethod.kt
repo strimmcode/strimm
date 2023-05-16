@@ -1,5 +1,3 @@
-
-
 package uk.co.strimm.sinkMethods
 
 import akka.actor.ActorRef
@@ -10,6 +8,8 @@ import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.STRIMMSignalBuffer1
 import uk.co.strimm.actors.messages.complete.CompleteStreaming
 import uk.co.strimm.actors.messages.start.StartStreaming
+import uk.co.strimm.actors.messages.tell.TellAllStop
+import uk.co.strimm.actors.messages.tell.TellStopReceived
 import uk.co.strimm.experiment.Sink
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
@@ -19,7 +19,7 @@ import java.util.logging.Level
 //however you can also save several sources to the save SinkSaveMethod but
 //it will show repeats
 
-class SinkSaveMethod() : SinkMethod {
+class SinkSaveMethod : SinkMethod {
     lateinit var sink : Sink
     var bUseActor = false
     override lateinit var properties : HashMap<String, String>
@@ -57,10 +57,17 @@ class SinkSaveMethod() : SinkMethod {
 //        }
         GUIMain.actorService.fileManagerActor.tell(STRIMMSaveBuffer(data , sink!!.sinkName),null)
 
-        if(data.any{ x -> x.status <= 0}) {
-            GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of 0. Stopping acquisition")
-            GUIMain.stopExperimentButton.doClick()
+        if(data.any{ x -> x.status == 0}) {
+            GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of 0")
+            GUIMain.actorService.fileManagerActor.tell(TellStopReceived(false), null)
+//            GUIMain.stopExperimentButton.doClick()
         }
+        else if(data.any{ x -> x.status == -1}){
+            GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of -1")
+            GUIMain.actorService.fileManagerActor.tell(TellStopReceived(true), null)
+        }
+
+
     }
     override fun getActorRef() : ActorRef? {
         return null

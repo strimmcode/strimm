@@ -310,7 +310,11 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                         val pixelType = displayInfo!!.pixelType
                         val numChannels = displayInfo!!.numChannels
                         if (w != im1.w || h != im1.h || im1.pixelType != pixelType || im1.numChannels != numChannels){
-                            println("ERROR - the info carried by the STRIMMBuffer is different to the Sink's configured expectations")
+                            GUIMain.loggerService.log(Level.SEVERE, "The info carried by the STRIMMBuffer is different to the Sink's configured expectations")
+                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer width=${im1.w} sink width=$w")
+                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer height=${im1.w} sink height=$h")
+                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer pixelType=${im1.pixelType} sink pixelType=$pixelType")
+                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer numChannels=${im1.numChannels} sink numChannels=$numChannels")
                         }
                         val dataset = plugin.cameraWindowController.dataset!!
                         if (im1.pixelType == "Byte"){
@@ -443,7 +447,12 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                             val pixelType = displayInfo!!.pixelType
                             val numChannels = displayInfo!!.numChannels
                             if (w != im1.w || h != im1.h || im1.pixelType != pixelType || im1.numChannels != numChannels){
-                                println("ERROR - the info carried by the STRIMMBuffer is different to the Sink's configured expectations")
+                                GUIMain.loggerService.log(Level.SEVERE, "The info carried by the STRIMMBuffer is different to the Sink's configured expectations")
+                                GUIMain.loggerService.log(Level.INFO, "The info carried by the STRIMMBuffer is different to the Sink's configured expectations")
+                                GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer width=${im1.w} sink width=$w")
+                                GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer height=${im1.w} sink height=$h")
+                                GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer pixelType=${im1.pixelType} sink pixelType=$pixelType")
+                                GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer numChannels=${im1.numChannels} sink numChannels=$numChannels")
                             }
                             val dataset = plugin.cameraWindowController.dataset!!
                             if (im1.pixelType == "Byte"){

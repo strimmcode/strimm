@@ -1,0 +1,49 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "EpisodicSource",
+				"sourceType" : "NIDAQSourceMethod",
+				"sourceCfg" : "episodic_HT_10hz_Trace_Source.cfg",
+				"isTimeLapse" : False
+			},
+			{
+				"sourceName" : "kinetics",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "kinetix_HT_10hz_Source.cfg",
+				"isTimeLapse" : False
+			}
+		]
+	},
+	"flowConfig":{
+		"flows" : [
+			{
+				"flowName" : "EpisodicFlow",
+				"flowType" : "NIDAQBuffer_to_SignalBufferFlow",
+				"inputNames" : [
+					"EpisodicSource"
+				]
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "TraceSaveSink",				
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"EpisodicFlow"
+				]
+			},
+			{
+				"sinkName" : "kineticsSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"kinetics"
+				]
+			}
+		]
+	}
+}

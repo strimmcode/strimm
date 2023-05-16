@@ -1,0 +1,62 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "webcam",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "openCVSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "ROIFlow",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "openCVROIFlow.cfg",
+				"inputNames" : [
+					"webcam"
+				]
+			}
+	    ]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "ROITraceSink",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "openCVROISink.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			},
+			{
+				"sinkName" : "ROISaveSink",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			},
+			{
+				"sinkName" : "openCVSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"webcam"
+				]
+			},
+			{
+				"sinkName" : "openCVDisplay",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "openCVSink.cfg",
+				"inputNames" : [
+					"webcam"
+				]
+			}
+		]
+	}
+
+}
