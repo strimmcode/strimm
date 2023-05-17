@@ -11,17 +11,21 @@ import javafx.scene.Scene
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
-import javafx.scene.control.Button
+import javafx.scene.control.*
 import javafx.scene.image.ImageView
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import org.scijava.plugin.Plugin
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
+import java.awt.Panel
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.logging.Level
+import javax.swing.JDialog
+import javax.swing.JOptionPane
 import kotlin.math.abs
 import kotlin.math.round
 
@@ -95,6 +99,8 @@ class TraceScrollWindow{
     var shiftYUpButton = Button()
     var shiftYDownButton = Button()
 
+    var showHideButton = Button()
+
     @FXML
     fun initialize(){
         tracePane.children.add(borderPane)
@@ -108,7 +114,7 @@ class TraceScrollWindow{
         val xAxisButtonBox = HBox()
         xAxisButtonBox.alignment = Pos.TOP_RIGHT
         xAxisButtonBox.spacing = 5.0
-        xAxisButtonBox.children.addAll(zoomInXButton, zoomOutXButton, shiftXLeftButton, shiftXRightButton)
+        xAxisButtonBox.children.addAll(showHideButton, zoomInXButton, zoomOutXButton, shiftXLeftButton, shiftXRightButton)
         borderPane.bottom = xAxisButtonBox
 
         setButtonProperties()
@@ -120,6 +126,8 @@ class TraceScrollWindow{
         addZoomOutXButtonListener()
         addShiftYUpButtonListener()
         addShiftYDownButtonListener()
+
+        addShowHideButtonListener()
 
         initialiseChart()
     }
@@ -217,6 +225,36 @@ class TraceScrollWindow{
         }
         else{
             GUIMain.loggerService.log(Level.WARNING, "No trace data found in TraceScrollWindow")
+        }
+    }
+
+    fun addShowHideButtonListener(){
+        showHideButton.setOnAction {
+            val dialog = Dialog<String>()
+            dialog.title = "Show/Hide traces"
+            val checkVBox = VBox()
+            checkVBox.spacing = 5.0
+            checkVBox.minWidth = 100.0
+            checkVBox.minHeight = 500.0
+
+            var checkBoxCount = 0
+            for(trace in data){
+                val traceName = trace.key
+                if(traceName != "times"){
+                    val chk = CheckBox(traceName)
+                    chk.minWidth = 50.0
+                    chk.minHeight = 20.0
+                    checkVBox.children.add(chk)
+                    checkBoxCount++
+                }
+            }
+            dialog.dialogPane.children.add(checkVBox)
+            dialog.dialogPane.minWidth = 100.0
+            dialog.dialogPane.minHeight = (checkBoxCount*25) + 25.toDouble()
+
+            val okButton = Button("OK")
+            dialog.dialogPane.children.add(okButton)
+            dialog.showAndWait()
         }
     }
 
