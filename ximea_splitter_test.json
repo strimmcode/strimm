@@ -1,0 +1,86 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "ximeaCamera",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "ximeaSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 10.0
+			}
+		]
+	},
+	"flowConfig":{ 
+		"flows" : [
+			{
+				"flowName" : "ximeaSplit1",
+				"flowType" : "ImageSplitterFlow",
+				"flowCfg" : "MMCameraROIFlow.cfg",
+				"inputNames" : [
+					"ximeaCamera"
+				],
+				"splitCoordinates" : [
+					{
+						"x" : 0,
+						"y" : 0,
+						"w" : 512,
+						"h" : 512
+					}
+				]
+			},
+			{
+				"flowName" : "ximeaSplit2",
+				"flowType" : "ImageSplitterFlow",
+				"flowCfg" : "MMCameraROIFlow.cfg",
+				"inputNames" : [
+					"ximeaCamera"
+				],
+				"splitCoordinates" : [
+					{
+						"x" : 500,
+						"y" : 500,
+						"w" : 512,
+						"h" : 512
+					}
+				]
+			}
+	    ]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "ximeaSaveSplit1",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ximeaSplit1"
+				]
+			},
+			{
+				"sinkName" : "ximeaDisplaySplit1",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "ximeaSink.cfg",
+				"inputNames" : [
+					"ximeaSplit1"
+				]
+			},
+			{
+				"sinkName" : "ximeaSaveSplit2",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ximeaSplit2"
+				]
+			},
+			{
+				"sinkName" : "ximeaDisplaySplit2",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "ximeaSink2.cfg",
+				"inputNames" : [
+					"ximeaSplit2"
+				]
+			}
+		]
+	}
+
+}

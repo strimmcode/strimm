@@ -37,19 +37,13 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
     var bNumOverlaysChanged = false
     var bStart = true
 
-
-
-
     fun EndThread(){
         bExit = true
     }
-    override fun run() {
 
+    override fun run() {
         while (!bExit) {
             val can = display.canvas
-
-
-
 
            // println("camera thread " + can.zoomFactor)
             val overlays = GUIMain.overlayService.getOverlays() //total number of overlays
@@ -60,8 +54,6 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
             if (overlays.size != numOverlays){
                 numOverlays = overlays.size
                 bNumOverlaysChanged = true
-
-
 
                 println("number of overlays in " + display + " " + filteredOverlays.size)
                 var max_val = -1
@@ -88,8 +80,6 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
                         it.fillColor = ColorRGB((255.0 * 0.0).toInt(), (255.0 * 0.0).toInt(), (255.0 * 0.0).toInt())
                         it.alpha = 0
                         it.lineColor = ColorRGB((255.0 * col.red).toInt(), (255.0 * col.green).toInt(), (255.0 * col.blue).toInt())
-
-
                     }
                 }
                 println("**")
@@ -100,15 +90,12 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
 
             }
 
-
             if (cam.layer != null) {
                 val ic = can.dataToPanelCoords(RealCoords(3000.0, 3000.0))
                 for (f in 0..filteredOverlays.size - 1) {
                     val com = cam.layer!!.getComponent(f) as JLabel
                     com.setBounds(ic.x, ic.y, 40, 20)
                 }
-//
-//
 
                 //number code using labels - buggy but mostly works
                 //221224
@@ -139,15 +126,12 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
 
                         var zoom_level = can.zoomFactor
 
-
-
                         val ic = can.dataToPanelCoords(RealCoords(x_rc, y_rc))
 
                         if (zoom_level < 1.0) {
 
                             ic.x = (x_rc.toDouble() * zoom_level).toInt()
                             ic.y = (y_rc.toDouble() * zoom_level).toInt()
-
                         }
 
 //                        println("*****AAAA")
@@ -156,11 +140,7 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
                         val com = cam.layer!!.getComponent(f) as JLabel
                         com.text = txt
                         com.setBounds(ic.x, ic.y, 40, 20)
-
-
-
                     }
-
                 }
                 else {
 //                        val channelIx = cam.view!!.planePosition.getLongPosition(0)
@@ -189,22 +169,12 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
                         val com = cam.layer!!.getComponent(f) as JLabel
                         com.text = txt
                         com.setBounds(ic.x, ic.y, 40, 20)
-
-
                     }
                 }
             }
-
-
-
-
-
-
-
             Thread.sleep(50)
         }
     }
-
 }
 
 //The CameraActor receives STRIMMImage samples from the akka graph
@@ -244,7 +214,6 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
             }
             .match<TellDisplaySink>(TellDisplaySink::class.java){sinkMessage->
                 sink = sinkMessage.sink
-
             }
             .match<TellDisplayInfo>(TellDisplayInfo::class.java){displayInfoMessage->
                 displayInfo = displayInfoMessage.displayInfo
@@ -316,12 +285,17 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                             GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer pixelType=${im1.pixelType} sink pixelType=$pixelType")
                             GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer numChannels=${im1.numChannels} sink numChannels=$numChannels")
                         }
+
                         val dataset = plugin.cameraWindowController.dataset!!
                         if (im1.pixelType == "Byte"){
                             val pix = im1.pix as ByteArray
                             for (ch in 0..numChannels-1) {
-                                if (ch < numChannels-1) dataset.setPlaneSilently(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
-                                else dataset.setPlane(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
+                                if (ch < numChannels-1) {
+                                    dataset.setPlaneSilently(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
+                                }
+                                else {
+                                    dataset.setPlane(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
+                                }
 
                                 if (bNormalise) {
                                     val minMax = pix.fold(
@@ -337,8 +311,6 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                                     }
                                     plugin.cameraWindowController.view?.setChannelRange(ch, minMax.first, minMax.second)
                                 }
-
-
                             }
                         }
                         else if (im1.pixelType == "Short"){
@@ -580,16 +552,11 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
 
                     }
 
-
                     timeLast = GUIMain.softwareTimerService.getTime()
-                      }
-
-
+                }
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
-            .matchAny{
-            }
+            .matchAny{}
             .build()
     }
-
 }

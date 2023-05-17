@@ -152,17 +152,19 @@ class CameraWindow constructor(val windowPanel: JPanel) {
         numChannels = displayInfo.numChannels
         dataset = when (displayInfo.pixelType) {
             "Byte" ->
-                if (displayInfo.numChannels == 1) GUIMain.datasetService.create(
-                    UnsignedByteType(),
-                    longArrayOf(width, height),
-                    datasetName,
-                    arrayOf(Axes.X, Axes.Y)
-                ) else GUIMain.datasetService.create(
-                    UnsignedByteType(),
+                if (displayInfo.numChannels == 1) {
+                    GUIMain.datasetService.create(
+                        UnsignedByteType(),
+                        longArrayOf(width, height),
+                        datasetName,
+                        arrayOf(Axes.X, Axes.Y))
+                }
+                else {
+                    GUIMain.datasetService.create(UnsignedByteType(),
                     longArrayOf(width, height, displayInfo.numChannels.toLong()),
                     datasetName,
-                    arrayOf(Axes.X, Axes.Y, Axes.CHANNEL)
-                )
+                    arrayOf(Axes.X, Axes.Y, Axes.CHANNEL))
+                }
             "Short" ->
                 if (displayInfo.numChannels == 1) GUIMain.datasetService.create(
                     UnsignedShortType(),

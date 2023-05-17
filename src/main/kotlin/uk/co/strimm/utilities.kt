@@ -73,7 +73,7 @@ open class STRIMMBuffer(var dataID : Int, val status : Int, val className : Stri
 }
 open class STRIMMSaveBuffer(val data : List<STRIMMBuffer>, val name : String){
 }
-open class STRIMMPixelBuffer(var pix : Any?, val w : Int, val h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Double, dataID : Int, status : Int) :
+open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Double, dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status, "STRIMMPixelBuffer"){
     override var imageData = pix
     override open var traceData = arrayOf<Double>(dataID.toDouble(), timeAcquired.toDouble())

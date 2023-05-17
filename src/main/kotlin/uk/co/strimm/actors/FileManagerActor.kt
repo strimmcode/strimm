@@ -776,7 +776,6 @@ class FileManagerActor : AbstractActor() {
                                         HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                                     )
 
-                                    println("FAM: new dataset is size=${it.data.size}")
                                     handles["group_" + it.name + "_node"] = group_node
                                     traceDataNumberMap[it.name] =
                                         LongArray(data[0].size) //data[0].size is the number of sub images

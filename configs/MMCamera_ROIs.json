@@ -18,7 +18,13 @@
 				"flowCfg" : "MMCameraROIFlow.cfg",
 				"inputNames" : [
 					"OpenCVCamera"
-				]
+				],
+				"splitCoordinates" : {
+					"x" : 0.0,
+					"y" : 0.0,
+					"w" : 10.0,
+					"h" : 10.0
+				}
 			}
 	    ]
 	},

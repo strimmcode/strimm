@@ -6,4 +6,5 @@ class Flow{
     var flowCfg = ""
     var async = true
     var inputNames = arrayListOf<String>()
+    var splitCoordinates = arrayListOf<Coordinates>()
 }

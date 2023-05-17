@@ -16,6 +16,7 @@ import uk.co.strimm.experiment.Sink
 import uk.co.strimm.gui.CameraWindowPlugin
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
+import java.util.logging.Level
 
 class SinkImageJDisplayMethod() : SinkMethod {
     var cameraActor : ActorRef? = null
@@ -102,8 +103,9 @@ class SinkImageJDisplayMethod() : SinkMethod {
         return CompleteStreaming()
     }
     override fun fail(ex: Throwable) {
-        println("FAIL")
-        println(ex.message)
+        GUIMain.loggerService.log(Level.SEVERE, "Error in SinkImageJDisplayMethod. Message: ${ex.message}")
+        GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        GUIMain.loggerService.log(Level.SEVERE, ex.cause!!.stackTrace)
     }
     override fun postStop() {
 
