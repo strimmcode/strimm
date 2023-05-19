@@ -277,7 +277,7 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
 
                         val pixelType = displayInfo!!.pixelType
                         val numChannels = displayInfo!!.numChannels
-                        if ((w != im1.w || h != im1.h || im1.pixelType != pixelType || im1.numChannels != numChannels) && (sink!!.splitCoordinates.size < 1)){
+                        if ((w != im1.w || h != im1.h || im1.pixelType != pixelType || im1.numChannels != numChannels)){
                             GUIMain.loggerService.log(Level.SEVERE, "The info carried by the STRIMMBuffer is different to the Sink's configured expectations")
                             GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer width=${im1.w} sink width=$w")
                             GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer height=${im1.w} sink height=$h")
