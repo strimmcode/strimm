@@ -134,10 +134,12 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                     " Number of specified connections is $numConnectionsSpecified, number of connections made is $numConnectionsMade")
         }
     }
+
     private fun setNumberOfSpecifiedConnections(expConfig: ExperimentConfiguration){
         numConnectionsSpecified += expConfig.flowConfig.flows.map { x -> x.inputNames.size }.sum()
         numConnectionsSpecified += expConfig.sinkConfig.sinks.map { x -> x.inputNames.size }.sum()
     }
+
     private fun logInfo(){
         val sb = StringBuilder()
         sb.append("Experiment stream info:\n")
@@ -164,31 +166,35 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
 
         GUIMain.loggerService.log(Level.INFO,sb.toString())
     }
+
     private fun buildGraph(builder : GraphDSL.Builder<NotUsed>){
         buildSourceGraphParts(builder)
         buildFlowGraphParts(builder)
     }
+
     private fun buildSourceGraphParts(builder : GraphDSL.Builder<NotUsed>){
         buildImageSourceParts(builder)
     }
+
     private fun buildFlowGraphParts(builder : GraphDSL.Builder<NotUsed>){
        buildImageImageFlowParts(builder)
     }
+
     private fun buildImageSourceParts(builder : GraphDSL.Builder<NotUsed>){
         try {
             for (imageSource in experimentSources) {
                 for (outlet in imageSource.outs) {
-                        when (outlet) {
-                            is ExperimentFlow -> {
-                                builder.from(imageSource.bcastObject).viaFanIn(outlet.mergeObject)
-                                numConnectionsMade++
-                            }
-                            is ExperimentSink -> {
-                                builder.from(imageSource.bcastObject).viaFanIn(outlet.mergeObject)
-                                numConnectionsMade++
-                            }
+                    when (outlet) {
+                        is ExperimentFlow -> {
+                            builder.from(imageSource.bcastObject).viaFanIn(outlet.mergeObject)
+                            numConnectionsMade++
+                        }
+                        is ExperimentSink -> {
+                            builder.from(imageSource.bcastObject).viaFanIn(outlet.mergeObject)
+                            numConnectionsMade++
                         }
                     }
+                }
             }
         }
         catch(ex : Exception){
@@ -196,6 +202,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
+
     private fun buildImageImageFlowParts(builder : GraphDSL.Builder<NotUsed>){
         try {
             for (imgImgFlow in experimentFlows) {
@@ -221,7 +228,6 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
 
     private fun setBroadcastObjectForSources(builder : GraphDSL.Builder<NotUsed>){
         try {
-
             experimentSources.forEach { x ->
                     x.bcastObject = builder.add(Broadcast.create<STRIMMBuffer>(x.outs.size))
                     builder.from(x.source).viaFanOut(x.bcastObject)
@@ -232,6 +238,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
+
     private fun setBroadcastObjectForFlows(builder : GraphDSL.Builder<NotUsed>){
         try {
             experimentFlows.forEach { x ->
@@ -244,11 +251,10 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
+
     private fun setMergeObjectForSinks(builder : GraphDSL.Builder<NotUsed>){
         try {
             experimentSinks.forEach { x ->
-
-
                 x.mergeObject = builder.add(MergeLatest.create<STRIMMBuffer>(x.ins.size))
                 builder.from(x.mergeObject).to(x.sink)
             }
@@ -258,6 +264,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
+
     private fun setMergeObjectForFlows(builder : GraphDSL.Builder<NotUsed>){
         try {
             experimentFlows.forEach { x ->
@@ -276,6 +283,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
         populateFlows(expConfig, builder)
         populateSinks(expConfig, builder)
     }
+
     private fun populateSources(expConfig: ExperimentConfiguration, builder : GraphDSL.Builder<NotUsed>){
             try {
 
@@ -283,9 +291,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                     val expSource = ExperimentSource(source.sourceName)
                     val cl = Class.forName("uk.co.strimm.sourceMethods." + source.sourceType)
                     val sourceMethod = cl.newInstance() as SourceMethod
-                    println("Source method init")
                     sourceMethod.init(source)
-                    println("Source method post init")
                     //sourceList.add(sourceMethod)
                     sourceMethods[source.sourceName] = sourceMethod
 
@@ -293,12 +299,10 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
 
                     val akkaSource =
                         if (source.isTimeLapse) {
-
                             if (source.async) {
                                 //this option will take images at a rate determined by Tick
                                 Source.tick(Duration.ZERO, Duration.ofMillis(source.intervalMs.toLong()), Unit)
                                     //.map { sourceMethod.run() }
-
                                     //.filter{ GUIMain.experimentService.experimentStream.isRunning == true}
                                     .mapAsync(
                                         1,
@@ -312,10 +316,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                 //this option will take images at a rate determined by Tick
                                 Source.tick(Duration.ZERO, Duration.ofMillis(source.intervalMs.toLong()), Unit)
                                     //.map { sourceMethod.run() }
-
                                     //.filter{ GUIMain.experimentService.experimentStream.isRunning == true}
-                                    .mapAsync(
-                                        1, akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
+                                    .mapAsync(1,
+                                        akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
                                     )
 //                                    .filter { it.status == 1 }
                                     .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
@@ -345,15 +348,12 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                             else{
                                 Source.repeat(Unit)
                                     .filter { GUIMain.experimentService.experimentStream.isRunning == true }
-
-                                    .mapAsync(
-                                        1,
+                                    .mapAsync(1,
                                         akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
                                     )
 //                                    .filter { it.status == 1 }
                                     .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
                             }
-
                         }
                     expSource.source = builder.add(akkaSource)
                     experimentSources.add(expSource)
@@ -364,20 +364,10 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
+
     private fun populateFlows(expConfig: ExperimentConfiguration, builder : GraphDSL.Builder<NotUsed>){
         try {
             for (flow in expConfig.flowConfig.flows) {
-                val classLoader = ClassLoader.getSystemClassLoader()
-
-
-
-
-                val classpath = System.getProperty("java.class.path")
-                println("Current classpath: $classpath")
-
-
-
-
                 val expFlow = ExperimentFlow(flow.flowName)
                 val cl = Class.forName("uk.co.strimm.flowMethods." + flow.flowType)
                 val flowMethod = cl.newInstance() as FlowMethod
@@ -386,10 +376,6 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
 
                 if (flow.async) {
                     val akkaFlow = Flow.of(List::class.java)
-//                    .mapAsync(
-//                        1,
-//                        akka.japi.function.Function {t : List<*> -> flowMethod.runA(t as List<STRIMMBuffer>)   }
-//                    )
                         .mapAsync(
                             1,
                             akka.japi.function.Function { t: List<*> ->
@@ -408,10 +394,6 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                 }
                 else{
                     val akkaFlow = Flow.of(List::class.java)
-//                    .mapAsync(
-//                        1,
-//                        akka.japi.function.Function {t : List<*> -> flowMethod.runA(t as List<STRIMMBuffer>)   }
-//                    )
                         .mapAsync(
                             1,
                             akka.japi.function.Function { t: List<*> ->
@@ -421,9 +403,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                     )
                                 }) as CompletionStage<STRIMMBuffer>
                             }
-                        )
-//                        .filter { it.status == 1 }
-                        .named(flow.flowName)
+                        ).named(flow.flowName)
                     expFlow.flow = builder.add(akkaFlow) as FlowShape<List<STRIMMBuffer>, STRIMMBuffer>
                     experimentFlows.add(expFlow)
                 }
@@ -434,6 +414,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
+
     private fun populateSinks(expConfig: ExperimentConfiguration, builder : GraphDSL.Builder<NotUsed>) {
         try {
             for (sink in expConfig.sinkConfig.sinks) {
@@ -453,10 +434,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                         expSink.sink = builder.add(akkaSink)
                         experimentSinks.add(expSink)
                     }
-                else{
-                        expSink.sink = builder.add(Sink.foreach(){x : List<STRIMMBuffer> ->
+                    else{
+                        expSink.sink = builder.add(Sink.foreach{x : List<STRIMMBuffer> ->
                             sinkMethod.run(x)
-
                         })
                         experimentSinks.add(expSink)
                     }
@@ -466,6 +446,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
+
     private fun getOutlets(currentNode : ExperimentNode, expConfig: ExperimentConfiguration) : ArrayList<ExperimentNode>{
         val outlets = arrayListOf<ExperimentNode>()
         try {
@@ -498,6 +479,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
 
         return outlets
     }
+
     private fun getInlets(currentNode : ExperimentNode, expConfig: ExperimentConfiguration) : ArrayList<ExperimentNode>{
         val inlets = arrayListOf<ExperimentNode>()
         try {
@@ -526,17 +508,4 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
 
         return inlets
     }
-
 }
-
-
-//demo of how to use a Java Future
-//class SquareCalculator {
-//    private val executor = Executors.newSingleThreadExecutor()
-//    fun calculate(input: Int): Future<Int> {
-//        return executor.submit<Int> {
-//            Thread.sleep(1000)
-//            input * input
-//        }
-//    }
-//}

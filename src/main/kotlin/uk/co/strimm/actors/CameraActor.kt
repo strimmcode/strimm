@@ -179,7 +179,6 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
 
 //The CameraActor receives STRIMMImage samples from the akka graph
 class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
-
     companion object {
         fun props(plugin: CameraWindowPlugin): Props {
             return Props.create<CameraActor>(CameraActor::class.java) { CameraActor(plugin) }
@@ -203,7 +202,6 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
 
     var camThread : MonitorCameraThread? = null
     var imageSequenceIntervalMs : Long = 100 //delay between showing bursts of images in response to a software trigger
-
 
     override fun createReceive(): Receive {
         return receiveBuilder()
@@ -274,11 +272,12 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                         val imageList1 = imm as List<STRIMMPixelBuffer>
                         var im1 =  imageList1[0]
                         //println("dataID " + im1.dataID)
-                        val w = displayInfo!!.width.toInt()
-                        val h = displayInfo!!.height.toInt()
+                        var w = displayInfo!!.width.toInt()
+                        var h = displayInfo!!.height.toInt()
+
                         val pixelType = displayInfo!!.pixelType
                         val numChannels = displayInfo!!.numChannels
-                        if (w != im1.w || h != im1.h || im1.pixelType != pixelType || im1.numChannels != numChannels){
+                        if ((w != im1.w || h != im1.h || im1.pixelType != pixelType || im1.numChannels != numChannels) && (sink!!.splitCoordinates.size < 1)){
                             GUIMain.loggerService.log(Level.SEVERE, "The info carried by the STRIMMBuffer is different to the Sink's configured expectations")
                             GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer width=${im1.w} sink width=$w")
                             GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer height=${im1.w} sink height=$h")
@@ -288,17 +287,19 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
 
                         val dataset = plugin.cameraWindowController.dataset!!
                         if (im1.pixelType == "Byte"){
-                            val pix = im1.pix as ByteArray
-                            for (ch in 0..numChannels-1) {
+                            var pix = im1.pix as ByteArray
+
+                            for (ch in 0 until numChannels) {
+                                val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
                                 if (ch < numChannels-1) {
-                                    dataset.setPlaneSilently(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
+                                    dataset.setPlaneSilently(ch, imageSlice)
                                 }
                                 else {
-                                    dataset.setPlane(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
+                                    dataset.setPlane(ch, imageSlice)
                                 }
 
                                 if (bNormalise) {
-                                    val minMax = pix.fold(
+                                    val minMax = imageSlice.fold(
                                         Pair(
                                             Float.MAX_VALUE.toDouble(),
                                             Float.MIN_VALUE.toDouble()
@@ -314,14 +315,19 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                             }
                         }
                         else if (im1.pixelType == "Short"){
+                            var pix = im1.pix as ShortArray
 
-                            val pix = im1.pix as ShortArray
-                            for (ch in 0..numChannels-1) {
-                                if (ch < numChannels-1) dataset.setPlaneSilently(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
-                                else dataset.setPlane(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
+                            for (ch in 0 until numChannels) {
+                                val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
+                                if (ch < numChannels-1) {
+                                    dataset.setPlaneSilently(ch, imageSlice)
+                                }
+                                else {
+                                    dataset.setPlane(ch, imageSlice)
+                                }
 
                                 if (bNormalise) {
-                                    val minMax = pix.fold(
+                                    val minMax = imageSlice.fold(
                                         Pair(
                                             Float.MAX_VALUE.toDouble(),
                                             Float.MIN_VALUE.toDouble()
@@ -337,16 +343,17 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
 
 
                             }
-
-                            //normalisation
-
-
                         }
                         else if (im1.pixelType == "Int"){
                             val pix = im1.pix as IntArray
                             for (ch in 0..numChannels-1) {
-                                if (ch < numChannels-1) dataset.setPlaneSilently(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
-                                else dataset.setPlane(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
+                                val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
+                                if (ch < numChannels-1) {
+                                    dataset.setPlaneSilently(ch, imageSlice)
+                                }
+                                else {
+                                    dataset.setPlane(ch, imageSlice)
+                                }
 
                                 if (bNormalise) {
                                     val minMax = pix.fold(
@@ -409,7 +416,6 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                     }
                     //STRIMMSequenceCamwraDataBuffer is a group of images taken by a fast camera
                     else if (imm[0].className == "STRIMMSequenceCameraDataBuffer"){
-
                         val imageList1 = (imm[0] as STRIMMSequenceCameraDataBuffer).data
                         for (ffff in 0..imageList1.size-1){
                             var im1 =  imageList1[ffff]

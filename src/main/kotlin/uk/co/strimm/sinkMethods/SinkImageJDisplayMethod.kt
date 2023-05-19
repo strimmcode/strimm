@@ -18,14 +18,16 @@ import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
 import java.util.logging.Level
 
-class SinkImageJDisplayMethod() : SinkMethod {
+class SinkImageJDisplayMethod : SinkMethod {
     var cameraActor : ActorRef? = null
     lateinit var sink : Sink
     override lateinit var properties : HashMap<String, String>
     var bUseActor = true
+
     override fun useActor(): Boolean {
         return bUseActor
     }
+
     override fun init(sink : Sink) {
         this.sink = sink
         if (sink.sinkCfg != ""){
@@ -86,30 +88,33 @@ class SinkImageJDisplayMethod() : SinkMethod {
                 }
             }
         }
-        //
-        //
-        //
     }
-    override fun run(data : List<STRIMMBuffer>){
 
+    override fun run(data : List<STRIMMBuffer>){
     }
+
     override fun getActorRef() : ActorRef? {
         return cameraActor
     }
+
     override fun start() : StartStreaming{
         return StartStreaming()
     }
+
     override fun complete() : CompleteStreaming {
         return CompleteStreaming()
     }
+
     override fun fail(ex: Throwable) {
-        GUIMain.loggerService.log(Level.SEVERE, "Error in SinkImageJDisplayMethod. Message: ${ex.message}")
-        GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
-        GUIMain.loggerService.log(Level.SEVERE, ex.cause!!.stackTrace)
+//        GUIMain.loggerService.log(Level.SEVERE, "Error in SinkImageJDisplayMethod. Message: ${ex.message}")
+//        GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+//        GUIMain.loggerService.log(Level.SEVERE, ex.cause!!.stackTrace)
     }
+
     override fun postStop() {
 
     }
+
     override fun preStart() {
     }
 }

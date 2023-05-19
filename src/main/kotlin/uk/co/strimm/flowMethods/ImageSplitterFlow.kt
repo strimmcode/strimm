@@ -1,9 +1,9 @@
 package uk.co.strimm.flowMethods
 
 import akka.actor.ActorRef
-import mmcorej.CMMCore
 import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMPixelBuffer
+import uk.co.strimm.experiment.Coordinates
 import uk.co.strimm.experiment.Flow
 import uk.co.strimm.gui.GUIMain
 import java.util.logging.Level
@@ -11,7 +11,6 @@ import java.util.logging.Level
 class ImageSplitterFlow : FlowMethod {
     lateinit var flow: Flow
     override lateinit var properties: HashMap<String, String>
-    var core : CMMCore? = CMMCore()
 
     override var actor: ActorRef? = null
 
@@ -30,52 +29,173 @@ class ImageSplitterFlow : FlowMethod {
     }
 
     override fun run(image: List<STRIMMBuffer>): STRIMMBuffer {
-        val slicedImage = sliceImage(image[0])
-        val imageToReturn = image[0] as STRIMMPixelBuffer
-        imageToReturn.pix = slicedImage
-        imageToReturn.w = w
-        imageToReturn.h = h
+        val originalImage = image[0] as STRIMMPixelBuffer
+        val imageToReturn = STRIMMPixelBuffer(
+            numChannels = originalImage.numChannels,
+            dataID = originalImage.dataID,
+            w = w,
+            h = h,
+            status = originalImage.status,
+            pixelType = originalImage.pixelType,
+            timeAcquired = originalImage.timeAcquired,
+            pix = sliceImage(originalImage, flow.splitCoordinates[0])
+        )
         return imageToReturn
     }
 
-    fun sliceImage(image: STRIMMBuffer) : Any? {
-        if (image is STRIMMPixelBuffer) {
-            when (image.imageData) {
+    fun sliceImage(image: Any, coordinates : Coordinates) : Any{
+        if(image is STRIMMPixelBuffer) {
+            val x = coordinates.x
+            val y = coordinates.y
+            val w = coordinates.w
+            val h = coordinates.h
+
+            when (image.pix) {
                 is ByteArray -> {
                     val imageArray = image.pix as ByteArray
                     val slicedImageArray = ByteArray(w * h)
                     var pixelIndex = 0
-                    val startRowIdx = if(y>0) y-1 else 0
-                    val endRowIdx = startRowIdx + h-1
+                    var startRowIdx = y-1
+
+                    if(startRowIdx<0){
+                        startRowIdx=0
+                    }
+
+                    val endRowIdx = startRowIdx + (h - 1)
 
                     for (row in startRowIdx until endRowIdx) {
-                        val wholeSliceStartIdx = (image.w)*row
-                        val wholeSliceEndIdx = wholeSliceStartIdx + (image.w-1)
+                        val wholeSliceStartIdx = (image.w) * row
+                        val wholeSliceEndIdx = wholeSliceStartIdx + (image.w - 1)
+
                         //This wll get a whole row
-                        println("startRowIdx=$startRowIdx, endRowIdx=$endRowIdx")
-                        println("imageArray.size=${imageArray.size}, wholeSliceStartIdx=$wholeSliceStartIdx, wholeSliceEndIdx=$wholeSliceEndIdx")
-                        val wholeRow = imageArray.slice(IntRange(wholeSliceStartIdx, wholeSliceEndIdx))
+                        var wholeRow = listOf<Byte>()
+                        try {
+                            wholeRow = imageArray.slice(IntRange(wholeSliceStartIdx, wholeSliceEndIdx))
+                        }
+                        catch(ex : Exception){
+                            GUIMain.loggerService.log(Level.SEVERE, "Error taking row of image array (when slicing). Message: ${ex.message}")
+                            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                        }
 
                         val subSliceStartIdx = x
-                        val subSliceEndIdx = subSliceStartIdx + (w-1)
-                        val rowSubset = wholeRow.slice(IntRange(subSliceStartIdx, subSliceEndIdx))
+                        val subSliceEndIdx = subSliceStartIdx + (w - 1)
+                        var rowSubset = listOf<Byte>()
+                        try {
+                            rowSubset = wholeRow.slice(IntRange(subSliceStartIdx, subSliceEndIdx))
+                        }
+                        catch (ex: Exception) {
+                            GUIMain.loggerService.log(Level.SEVERE, "Error taking subset of image array row (when slicing). Message: ${ex.message}")
+                            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                        }
 
-                        for(i in 0 until rowSubset.size){
+                        for (i in 0 until rowSubset.size) {
                             slicedImageArray[pixelIndex] = rowSubset[i]
                             pixelIndex++
                         }
                     }
+
                     return slicedImageArray
-            }
-            is ShortArray -> {
-                print("Short")
-            }
-            else -> {
-                print("Float")
+                }
+                is ShortArray -> {
+                    val imageArray = image.pix as ShortArray
+                    val slicedImageArray = ShortArray(w * h)
+                    var pixelIndex = 0
+                    var startRowIdx = y-1
+
+                    if(startRowIdx<0){
+                        startRowIdx=0
+                    }
+
+                    val endRowIdx = startRowIdx + (h - 1)
+
+                    for (row in startRowIdx until endRowIdx) {
+                        val wholeSliceStartIdx = (image.w) * row
+                        val wholeSliceEndIdx = wholeSliceStartIdx + (image.w - 1)
+
+                        //This wll get a whole row
+                        var wholeRow = listOf<Short>()
+                        try {
+                            wholeRow = imageArray.slice(IntRange(wholeSliceStartIdx, wholeSliceEndIdx))
+                        }
+                        catch(ex : Exception){
+                            GUIMain.loggerService.log(Level.SEVERE, "Error taking row of image array (when slicing). Message: ${ex.message}")
+                            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                        }
+
+                        val subSliceStartIdx = x
+                        val subSliceEndIdx = subSliceStartIdx + (w - 1)
+                        var rowSubset = listOf<Short>()
+                        try {
+                            rowSubset = wholeRow.slice(IntRange(subSliceStartIdx, subSliceEndIdx))
+                        }
+                        catch (ex: Exception) {
+                            GUIMain.loggerService.log(Level.SEVERE, "Error taking subset of image array row (when slicing). Message: ${ex.message}")
+                            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                        }
+
+                        for (i in 0 until rowSubset.size) {
+                            slicedImageArray[pixelIndex] = rowSubset[i]
+                            pixelIndex++
+                        }
+                    }
+
+                    return slicedImageArray
+                }
+                is FloatArray -> {
+                    val imageArray = image.pix as FloatArray
+                    val slicedImageArray = FloatArray(w * h)
+                    var pixelIndex = 0
+                    var startRowIdx = y-1
+
+                    if(startRowIdx<0){
+                        startRowIdx=0
+                    }
+
+                    val endRowIdx = startRowIdx + (h - 1)
+
+                    for (row in startRowIdx until endRowIdx) {
+                        val wholeSliceStartIdx = (image.w) * row
+                        val wholeSliceEndIdx = wholeSliceStartIdx + (image.w - 1)
+
+                        //This wll get a whole row
+                        var wholeRow = listOf<Float>()
+                        try {
+                            wholeRow = imageArray.slice(IntRange(wholeSliceStartIdx, wholeSliceEndIdx))
+                        }
+                        catch(ex : Exception){
+                            GUIMain.loggerService.log(Level.SEVERE, "Error taking row of image array (when slicing). Message: ${ex.message}")
+                            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                        }
+
+                        val subSliceStartIdx = x
+                        val subSliceEndIdx = subSliceStartIdx + (w - 1)
+                        var rowSubset = listOf<Float>()
+                        try {
+                            rowSubset = wholeRow.slice(IntRange(subSliceStartIdx, subSliceEndIdx))
+                        }
+                        catch (ex: Exception) {
+                            GUIMain.loggerService.log(Level.SEVERE, "Error taking subset of image array row (when slicing). Message: ${ex.message}")
+                            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                        }
+
+                        for (i in 0 until rowSubset.size) {
+                            slicedImageArray[pixelIndex] = rowSubset[i]
+                            pixelIndex++
+                        }
+                    }
+
+                    return slicedImageArray
+                }
+                else -> {
+                    GUIMain.loggerService.log(Level.WARNING, "Image was not of type ByteArray, ShortArray, or FloatArray")
+                    return image
+                }
             }
         }
-    }
-        return 0
+        else{
+            GUIMain.loggerService.log(Level.WARNING, "Image object was not of type STRIMMPixelBuffer")
+            return image
+        }
     }
 
     override fun preStart() {

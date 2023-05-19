@@ -43,6 +43,7 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
             }
         }
     }
+
     override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
         //the flow function should know the
         var dataIn = data[0] as STRIMMNIDAQBuffer

@@ -39,6 +39,7 @@ open class RatioFlowMethod() : FlowMethod {
             }
         }
     }
+
     override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
         //the flow function should know the
 

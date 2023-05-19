@@ -2,10 +2,7 @@ package uk.co.strimm.sinkMethods
 
 import akka.actor.ActorRef
 import com.opencsv.CSVReader
-import uk.co.strimm.STRIMMBuffer
-import uk.co.strimm.STRIMMSaveBuffer
-import uk.co.strimm.STRIMMSignalBuffer
-import uk.co.strimm.STRIMMSignalBuffer1
+import uk.co.strimm.*
 import uk.co.strimm.actors.messages.complete.CompleteStreaming
 import uk.co.strimm.actors.messages.start.StartStreaming
 import uk.co.strimm.actors.messages.tell.TellAllStop
@@ -26,6 +23,7 @@ class SinkSaveMethod : SinkMethod {
     override fun useActor(): Boolean {
         return bUseActor
     }
+
     override fun init(sink : Sink) {
         this.sink = sink
         if (sink.sinkCfg != ""){
@@ -42,48 +40,43 @@ class SinkSaveMethod : SinkMethod {
                     }
                 }
             } catch (ex: Exception) {
-                println(ex.message)
+                GUIMain.loggerService.log(Level.SEVERE, "Error reading configuraton file ${sink.sinkCfg} for SinkSaveMethod. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             }
         }
     }
-    override fun run(data : List<STRIMMBuffer>){
-        //println("******SaveData to HDF5:" + sink!!.sinkName)
-        //send to FileManager
-//        if (data[0] is STRIMMSignalBuffer){
-//            println("save STRIMMSignalBuffer")
-//        }
-//        else if (data[0] is STRIMMSignalBuffer1){
-//            println("save STRIMMSignalBuffer1")
-//        }
-        GUIMain.actorService.fileManagerActor.tell(STRIMMSaveBuffer(data , sink!!.sinkName),null)
 
-        if(data.any{ x -> x.status == 0}) {
+    override fun run(data : List<STRIMMBuffer>){
+        GUIMain.actorService.fileManagerActor.tell(STRIMMSaveBuffer(data, sink.sinkName), null)
+
+        if (data.any { x -> x.status == 0 }) {
             GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of 0")
             GUIMain.actorService.fileManagerActor.tell(TellStopReceived(false), null)
-//            GUIMain.stopExperimentButton.doClick()
-        }
-        else if(data.any{ x -> x.status == -1}){
+        } else if (data.any { x -> x.status == -1 }) {
             GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of -1")
             GUIMain.actorService.fileManagerActor.tell(TellStopReceived(true), null)
         }
-
-
     }
+
     override fun getActorRef() : ActorRef? {
         return null
     }
+
     override fun start() : StartStreaming {
         return StartStreaming()
     }
+
     override fun complete() : CompleteStreaming {
         return CompleteStreaming()
     }
+
     override fun fail(ex: Throwable) {
         println("FAIL")
     }
-    override fun postStop() {
 
+    override fun postStop() {
     }
+
     override fun preStart() {
     }
 }

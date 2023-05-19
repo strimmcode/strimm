@@ -15,7 +15,7 @@
 			{
 				"flowName" : "ximeaSplit1",
 				"flowType" : "ImageSplitterFlow",
-				"flowCfg" : "MMCameraROIFlow.cfg",
+				"flowCfg" : "",
 				"inputNames" : [
 					"ximeaCamera"
 				],
@@ -31,7 +31,7 @@
 			{
 				"flowName" : "ximeaSplit2",
 				"flowType" : "ImageSplitterFlow",
-				"flowCfg" : "MMCameraROIFlow.cfg",
+				"flowCfg" : "",
 				"inputNames" : [
 					"ximeaCamera"
 				],

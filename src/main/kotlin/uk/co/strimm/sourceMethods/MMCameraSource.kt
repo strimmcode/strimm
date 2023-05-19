@@ -37,7 +37,6 @@ open class MMCameraSource : SourceMethod {
     var bSnapped = false
     var stop = false
 
-
     override fun init(source: Source) {
         this.source = source
         loadCfg()
@@ -109,9 +108,12 @@ open class MMCameraSource : SourceMethod {
             }
         }
 
-        //This is done so when stopping the acquisiton, each core can be shut down appropriately
-        GUIMain.loggerService.log(Level.INFO, "Adding core to cores list")
-        GUIMain.experimentService.allMMCores.add(core!!)
+
+        if(!bSnapped) {
+            //This is done so when stopping the acquisiton, each core can be shut down appropriately using stopSequenceAcquistion()
+            GUIMain.loggerService.log(Level.INFO, "Adding core to cores list")
+            GUIMain.experimentService.allMMCores.add(core!!)
+        }
     }
 
     override fun run(): STRIMMBuffer? {

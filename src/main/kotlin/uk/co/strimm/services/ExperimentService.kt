@@ -16,9 +16,12 @@ import org.scijava.service.AbstractService
 import org.scijava.service.Service
 import uk.co.strimm.HDFImageDataset
 import uk.co.strimm.RoiInfo
+import uk.co.strimm.STRIMMPixelBuffer
 import uk.co.strimm.actors.messages.stop.TerminateActor
+import uk.co.strimm.actors.messages.tell.TellStopReceived
 import uk.co.strimm.experiment.*
 import uk.co.strimm.gui.*
+import uk.co.strimm.sinkMethods.SinkSaveMethod
 import uk.co.strimm.streams.ExperimentStream
 import java.io.File
 import java.io.FileReader
@@ -117,6 +120,9 @@ class ExperimentService  : AbstractService(), ImageJService {
                 it.postStop()
             }
             experimentStream.sinkMethods.values.forEach{
+                if(it is SinkSaveMethod){
+                    GUIMain.actorService.fileManagerActor.tell(TellStopReceived(false), null)
+                }
                 it.postStop()
             }
 
