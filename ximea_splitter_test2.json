@@ -1,0 +1,34 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "ximeaCamera",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "ximeaSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 10.0
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "ximeaSaveSplit1",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ximeaCamera"
+				]
+			},
+			{
+				"sinkName" : "ximeaDisplaySplit1",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "ximeaSink2.cfg",
+				"inputNames" : [
+					"ximeaCamera"
+				]
+			}
+		]
+	}
+
+}

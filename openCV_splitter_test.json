@@ -2,9 +2,9 @@
 	"sourceConfig":{ 
 		"sources" : [
 			{
-				"sourceName" : "ximeaCamera",
+				"sourceName" : "openCVCamera",
 				"sourceType" : "MMCameraSource",
-				"sourceCfg" : "ximeaSource.cfg",
+				"sourceCfg" : "openCVSource.cfg",
 				"isTimeLapse" : False,
 				"intervalMs" : 10.0
 			}
@@ -13,71 +13,73 @@
 	"flowConfig":{ 
 		"flows" : [
 			{
-				"flowName" : "ximeaSplit1",
+				"flowName" : "openCVSplit1",
 				"flowType" : "ImageSplitterFlow",
 				"flowCfg" : "",
 				"inputNames" : [
-					"ximeaCamera"
+					"openCVCamera"
 				],
 				"splitCoordinates" : [
 					{
 						"x" : 0,
 						"y" : 0,
-						"w" : 512,
-						"h" : 512
+						"w" : 100,
+						"h" : 100
 					}
-				]
+				],
+				"splitChannel" : 1
 			},
 			{
-				"flowName" : "ximeaSplit2",
+				"flowName" : "openCVSplit2",
 				"flowType" : "ImageSplitterFlow",
 				"flowCfg" : "",
 				"inputNames" : [
-					"ximeaCamera"
+					"openCVCamera"
 				],
 				"splitCoordinates" : [
 					{
-						"x" : 500,
-						"y" : 500,
-						"w" : 512,
-						"h" : 512
+						"x" : 100,
+						"y" : 100,
+						"w" : 50,
+						"h" : 50
 					}
-				]
+				],
+				"splitChannel" : 2
 			}
 	    ]
 	},
 	"sinkConfig":{ 
 		"sinks" : [
 			{
-				"sinkName" : "ximeaSaveSplit1",
+				"sinkName" : "openCVSaveSplit1",
 				"sinkType" : "SinkSaveMethod",
 				"sinkCfg" : "Null.cfg",
 				"inputNames" : [
-					"ximeaSplit1"
+					"openCVSplit1"
 				]
 			},
 			{
-				"sinkName" : "ximeaDisplaySplit1",
+				"sinkName" : "openCVDisplaySplit1",
 				"sinkType" : "SinkImageJDisplayMethod",
-				"sinkCfg" : "ximeaSink.cfg",
+				"sinkCfg" : "openCVSink1.cfg",
 				"inputNames" : [
-					"ximeaSplit1"
+					"openCVSplit1"
 				]
 			},
 			{
-				"sinkName" : "ximeaSaveSplit2",
+				"sinkName" : "openCVSaveSplit2",
 				"sinkType" : "SinkSaveMethod",
 				"sinkCfg" : "Null.cfg",
 				"inputNames" : [
-					"ximeaSplit2"
+					"openCVSplit2"
 				]
 			},
 			{
-				"sinkName" : "ximeaDisplaySplit2",
+				"sinkName" : "openCVDisplaySplit2",
 				"sinkType" : "SinkImageJDisplayMethod",
-				"sinkCfg" : "ximeaSink.cfg",
+				"sinkCfg" : "openCVSink2.cfg",
 				"inputNames" : [
-					"ximeaSplit2"
+					"openCVSplit2"
 				]
 			}
 		]
