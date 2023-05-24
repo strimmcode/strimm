@@ -228,43 +228,46 @@ class GUIMain : Command {
 
     private fun addSaveJSONButtonListener() {
         saveJSON.addActionListener {
-            val overlays = overlayService.getOverlays()
-            for (f in 0..experimentService.expConfig.sinkConfig.sinks.size - 1) {
-                val sinkk = experimentService.expConfig.sinkConfig.sinks[f]
-                val disp = experimentService.experimentStream.cameraDisplays[sinkk.sinkName]
+            val overlays = overlayService.overlays
+            for(sink in experimentService.expConfig.sinkConfig.sinks){
+                val disp = experimentService.experimentStream.cameraDisplays[sink.sinkName]
                 if (disp != null) {
-                    val over = overlayService.getOverlays(disp) //overlays in disp but might be reapeted
-                    val filteredOverlays = overlays.filter { it in over }
-                    var combinedList = mutableListOf<ROI>()
+                    val overlayList = overlayService.getOverlays(disp) //overlays in disp but might be reapeted
+                    val filteredOverlays = overlays.filter { it in overlayList }
+                    val combinedList = mutableListOf<ROI>()
                     for (over in filteredOverlays) {
-                        var roi: ROI = ROI()
-                        if (over is RectangleOverlay) {
-                            roi.ROItype = "RECTANGLE"
-                            roi.x = over.getOrigin(0)
-                            roi.y = over.getOrigin(1)
-                            roi.w = over.getExtent(0)
-                            roi.h = over.getExtent(1)
-                            roi.ROIName = over.name
-                        } else if (over is EllipseOverlay) {
-                            roi.ROItype = "ELLIPSE"
-                            roi.x = over.getOrigin(0)
-                            roi.y = over.getOrigin(1)
-                            roi.w = over.getRadius(0)
-                            roi.h = over.getRadius(1)
-                            roi.ROIName = over.name
-                        } else {
+                        val roi = ROI()
+                        when (over) {
+                            is RectangleOverlay -> {
+                                roi.ROItype = "RECTANGLE"
+                                roi.x = over.getOrigin(0)
+                                roi.y = over.getOrigin(1)
+                                roi.w = over.getExtent(0)
+                                roi.h = over.getExtent(1)
+                                roi.ROIName = over.name
+                            }
+                            is EllipseOverlay -> {
+                                roi.ROItype = "ELLIPSE"
+                                roi.x = over.getOrigin(0)
+                                roi.y = over.getOrigin(1)
+                                roi.w = over.getRadius(0)
+                                roi.h = over.getRadius(1)
+                                roi.ROIName = over.name
+                            }
+                            else -> {
+                                GUIMain.loggerService.log(Level.WARNING, "ROI type ${roi.ROItype} not supported")
+                            }
                         }
                         combinedList.add(roi)
                     }
-                    val roiSz =
-                        experimentService.experimentStream.sinkMethods[sinkk.sinkName]!!.properties["roiSz"]
+
+                    val roiSz = experimentService.experimentStream.sinkMethods[sink.sinkName]!!.properties["roiSz"]
                     if (roiSz != null) {
                         strimmROIService.EncodeROIReference(roiSz, combinedList)
                     }
                 }
             }
         }
-
     }
 
     private fun addLoadButtonListener() {

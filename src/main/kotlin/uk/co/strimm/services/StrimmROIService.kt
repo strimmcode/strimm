@@ -8,7 +8,9 @@ import org.scijava.plugin.Plugin
 import org.scijava.service.AbstractService
 import org.scijava.service.Service
 import uk.co.strimm.experiment.ROI
+import uk.co.strimm.gui.GUIMain
 import java.io.*
+import java.util.logging.Level
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -52,17 +54,11 @@ class StrimmROIService : AbstractService(), ImageJService {
     //EncodeROIReference    enter array of ROI and will encode and save as ZIP, ROI (for 1 ROI), or CSV
     fun EncodeROIReference(refSz : String, rois : List<ROI>) : Boolean{
         val extension = refSz.substring(refSz.lastIndexOf(".") + 1).toLowerCase()
-        if (extension == "csv"){
-            return EncodeCSV(refSz, rois)
-        }
-        else if (extension == "zip"){
-            return EncodeZIP(refSz, rois)
-        }
-        else if (extension == "roi"){
-            return EncodeROI(refSz, rois)
-        }
-        else{
-            println("File extension not recognised")
+        when (extension) {
+            "csv" -> return EncodeCSV(refSz, rois)
+            "zip" -> return EncodeZIP(refSz, rois)
+            "roi" -> return EncodeROI(refSz, rois)
+            else -> GUIMain.loggerService.log(Level.SEVERE, "File extension for encoding ROI not recognised")
         }
         return false
     }
@@ -99,6 +95,7 @@ class StrimmROIService : AbstractService(), ImageJService {
         return rois
 
     }
+
     private fun DecodeROI(roiSz : String) : List<ROI>{
         var rois = mutableListOf<ROI>()
 
@@ -130,6 +127,7 @@ class StrimmROIService : AbstractService(), ImageJService {
         dis.close()
         return rois
     }
+
     private fun DecodeZIP(zipSz : String) : List<ROI> {
         var rois = mutableListOf<ROI>()
         try {
@@ -207,6 +205,7 @@ class StrimmROIService : AbstractService(), ImageJService {
         return rois
 
     }
+
     private fun EncodeZIP(zipSz : String, rois : List<ROI>) : Boolean {
         val destDir = File("_TEMP_ROI_FOLDER")
         destDir.mkdir()
@@ -257,6 +256,7 @@ class StrimmROIService : AbstractService(), ImageJService {
 
         return true
     }
+
     private fun EncodeROI(roiSz : String, rois : List<ROI>) : Boolean {
         val roi = rois[0]
         val type = if (roi.ROItype == "RECTANGLE") 1 else 2
@@ -295,22 +295,33 @@ class StrimmROIService : AbstractService(), ImageJService {
 
         return true
     }
-    private fun EncodeCSV(roiCSV : String, rois : List<ROI>) : Boolean{
-        val csvWriter = CSVWriter(FileWriter(roiCSV))
 
-        val header = arrayOf("name", "type", "x", "y" , "w" , "h")
-        csvWriter.writeNext(header, false)
-        for (f in 0..rois.size-1){
-            val type = if (rois[f].ROItype == "RECTANGLE") 1 else 2
-            val x = rois[f].x
-            val y = rois[f].y
-            val w = rois[f].w
-            val h = rois[f].h
-            val data = arrayOf(f.toString(), type.toString(), x.toString(), y.toString(), w.toString(), h.toString())
-            csvWriter.writeNext(data, false)
+    private fun EncodeCSV(roiCSV : String, rois : List<ROI>) : Boolean{
+        GUIMain.loggerService.log(Level.INFO, "Writing ROI data to CSV $roiCSV")
+        try {
+            val fileWriter = FileWriter("./$roiCSV")
+            val csvWriter = CSVWriter(fileWriter)
+            val header = arrayOf("name", "type", "x", "y", "w", "h")
+            csvWriter.writeNext(header, false)
+            for (f in 0 until rois.size) {
+                val type = if (rois[f].ROItype == "RECTANGLE") 1 else 2
+                val x = rois[f].x
+                val y = rois[f].y
+                val w = rois[f].w
+                val h = rois[f].h
+                val data =
+                    arrayOf(f.toString(), type.toString(), x.toString(), y.toString(), w.toString(), h.toString())
+                csvWriter.writeNext(data, false)
+            }
+            csvWriter.close()
+            GUIMain.loggerService.log(Level.INFO, "Finished writing ROI data to CSV $roiCSV")
+            return true
         }
-        csvWriter.close()
-        return true
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Error writing ROI data to CSV. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+            return false
+        }
     }
 
     private fun ROIDecoder_newFile(destinationDir: File, zipEntry: ZipEntry): File? {
