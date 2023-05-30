@@ -37,6 +37,10 @@ open class MMCameraSource : SourceMethod {
     var bSnapped = false
     var stop = false
 
+    //Number of frames that should be in the buffer before we start reading and sending
+    //This is to prevent the acquisition stopping as soon as it's begun
+    val initialBufferAmount = 5
+
     override fun init(source: Source) {
         this.source = source
         loadCfg()
@@ -211,6 +215,18 @@ open class MMCameraSource : SourceMethod {
                             1)
                     }
                 }
+                else if (numChannels == 2) {
+                    dataID++
+                    return STRIMMPixelBuffer(
+                        pix,
+                        w,
+                        h,
+                        pixelType,
+                        numChannels,
+                        GUIMain.softwareTimerService.getTime(),
+                        dataID,
+                        1)
+                }
                 else if (numChannels == 4) {
                     if (coreBytesPerPixel != 8) {
                         GUIMain.loggerService.log(Level.WARNING,"Core format clashes with cfg")
@@ -282,7 +298,7 @@ open class MMCameraSource : SourceMethod {
 
 //        x1 = core!!.remainingImageCount
 //        GUIMain.loggerService.log(Level.INFO, "Remaining image count is $x1")
-        while (core!!.remainingImageCount == 0 && !stop) { //Spin waiting for images at the beginning
+        while ((core!!.remainingImageCount < initialBufferAmount && !stop) || core!!.deviceBusy(label)) { //Spin waiting for images at the beginning
         }
 
         /**
@@ -382,6 +398,18 @@ open class MMCameraSource : SourceMethod {
                             dataID,
                             1)
                     }
+                }
+                else if(numChannels == 2){
+                    dataID++
+                    return STRIMMPixelBuffer(
+                        pix,
+                        w,
+                        h,
+                        pixelType,
+                        numChannels,
+                        time,
+                        dataID,
+                        1)
                 }
                 else if (numChannels == 4) {
                     if (coreBytesPerPixel != 8) {

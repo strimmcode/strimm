@@ -50,7 +50,7 @@ class SinkSaveMethod : SinkMethod {
         GUIMain.actorService.fileManagerActor.tell(STRIMMSaveBuffer(data, sink.sinkName), null)
 
         if (data.any { x -> x.status == 0 }) {
-            GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of 0")
+//            GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of 0")
             GUIMain.actorService.fileManagerActor.tell(TellStopReceived(false), null)
         } else if (data.any { x -> x.status == -1 }) {
             GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of -1")

@@ -1,13 +1,10 @@
 package uk.co.strimm.actors
 
-
-
 import akka.actor.AbstractActor
 import akka.actor.Kill
 import akka.actor.Props
 import uk.co.strimm.Acknowledgement
 import uk.co.strimm.STRIMMBuffer
-import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.actors.messages.Message
 import uk.co.strimm.actors.messages.complete.CompleteStreaming
 import uk.co.strimm.actors.messages.fail.FailStreaming
@@ -50,6 +47,4 @@ class TraceActor(val plugin: TraceWindowPlugin) : AbstractActor(){
                 GUIMain.loggerService.log(Level.SEVERE, "Trace actor does not recognise incoming message")
             }.build()
     }
-
-
 }

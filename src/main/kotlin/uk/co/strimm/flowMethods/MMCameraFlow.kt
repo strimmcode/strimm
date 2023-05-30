@@ -10,6 +10,7 @@ import uk.co.strimm.STRIMMPixelBuffer
 import uk.co.strimm.experiment.Flow
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
+import java.util.logging.Level
 
 //takes an image in response to a STRIMMBuffer and sends the resulting
 //image through the akka graph
@@ -44,16 +45,17 @@ class MMCameraFlow() : FlowMethod {
         val st = StrVector()
         st.add("./DeviceAdapters/")
         try{
-            println("load camera ******************")
+            GUIMain.loggerService.log(Level.INFO, "Loading camera config in MMCameraFlow")
             core!!.setDeviceAdapterSearchPaths(st)
             core!!.loadSystemConfiguration("./DeviceAdapters/CameraMMConfigs/" + properties["MMDeviceConfig"]) // MMDeviceConfig, Ximea.cfg#
             label = core!!.getCameraDevice()
             name = core!!.getDeviceName(label)
             library = core!!.getDeviceLibrary(label)
             coreBytesPerPixel = core!!.bytesPerPixel.toInt()
-            println("success loaded camera ****************")
-        } catch(ex : Exception){
-            println("Exception: !" + ex.message)
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Exception loading config ${properties["MMDeviceConfig"]}. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
 
         pixelType = properties["pixelType"]!!

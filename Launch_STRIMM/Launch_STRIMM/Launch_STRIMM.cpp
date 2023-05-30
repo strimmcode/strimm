@@ -10,7 +10,7 @@ int main()
     cout << "Starting STRIMM Launcher" << endl;
     PROCESS_INFORMATION pi{};
     STARTUPINFOA si{};
-
+    cout << "here 1" << endl;
     si.cb = sizeof(si);
 
     char szDir[1024] = { 0 };
@@ -18,8 +18,10 @@ int main()
     GetCurrentDirectoryA(sizeof(szDir), szDir);
     ss << szDir;
     ss << "\\STRIMM_settings.txt";
+    cout << "here 2" << endl;
     cout << ss.str() << endl;
     ifstream ifs(ss.str().c_str());
+    cout << "here 3" << endl;
     if (ifs) {
         string startMemorySz;
         string startMemSize;
@@ -29,6 +31,8 @@ int main()
         ifs >> maxMemorySz >> maxMemorySize;
         ifs.close();
 
+        cout << "Start mem size is: " + startMemSize << endl;
+        cout << "Max mem size is: " + maxMemorySize << endl;
         stringstream ss;
         ss << "javaw  -Xms" << startMemSize << " -Xmx" << maxMemorySize << " -splash:splash.png  -cp ./jars/* Main";
         

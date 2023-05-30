@@ -61,6 +61,11 @@ class CameraScrollWindowPlugin : AbstractDockableWindow() {
     }
 }
 
+/**
+ * The CameraScrollWindow is used exclusively when reloading an already acquired experiment. Data from the H5 file
+ * will be sent to the controller that interacts with this class.
+ * @param windowPanel The JPanel component that the data is added to
+ */
 class CameraScrollWindow(val windowPanel: JPanel){
     lateinit var data : MutableMap.MutableEntry<String, ArrayList<HDFImageDataset>>
 

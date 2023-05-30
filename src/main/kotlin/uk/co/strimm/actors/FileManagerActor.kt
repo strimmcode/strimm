@@ -15,7 +15,6 @@ import java.util.logging.Level
 import hdf.hdf5lib.H5
 import hdf.hdf5lib.HDF5Constants
 import uk.co.strimm.actors.messages.ask.*
-import uk.co.strimm.actors.messages.tell.TellAllStop
 import uk.co.strimm.actors.messages.tell.TellIsSaving
 import uk.co.strimm.actors.messages.tell.TellStopReceived
 
@@ -23,7 +22,7 @@ import uk.co.strimm.actors.messages.tell.TellStopReceived
 class FileManagerActor : AbstractActor() {
     var file: Int = 0 //handle to the hdf5 file
     var buffers = hashMapOf<String, List<List<STRIMMBuffer>>>()  //each datasource that has send SaveBuffers to the FileManager will have its name added to this dictionary and will save a list of its buffers
-    var flush_cnt = 5000 //number of SaveBuffers received before a flush, done per datasource
+    var flushCount = 50//number of SaveBuffers received before a flush, done per datasource
     var imageDataNumberMap = hashMapOf<String, Long>() //imageDataNumberMap is used to ensure that each datasource has the correct frame number for each buffer saved ie 0,1,2 etc
     var traceDataNumberMap = hashMapOf<String, LongArray>() //traceDataNumberMap keeps a record of the length of each STRIMMBuffer's trace data in each frame which is a List<STRIMMBuffer>
     var isCapturingBuffers = false
@@ -79,7 +78,7 @@ class FileManagerActor : AbstractActor() {
             .match<TellStopReceived>(TellStopReceived::class.java) {
                 stopSignalCount++
                 GUIMain.loggerService.log(Level.INFO, "One stop signal received. StopSignalCount=${stopSignalCount}, Number of buffers=${buffers.size}")
-                if(stopSignalCount == buffers.size) {
+                if(stopSignalCount == buffers.size || it.isFromNIDAQ) {
                     GUIMain.loggerService.log(Level.INFO, "Stopping all cores")
                     GUIMain.experimentService.allMMCores.forEach { x -> x.stopSequenceAcquisition() }
                     GUIMain.loggerService.log(Level.INFO, "Setting UI state to IDLE and saving datasets")
@@ -149,7 +148,8 @@ class FileManagerActor : AbstractActor() {
                                                 HDF5Constants.H5P_DEFAULT,
                                                 HDF5Constants.H5P_DEFAULT
                                             )
-                                        } else if (type_frm == 1) { //SHORT
+                                        }
+                                        else if (type_frm == 1) { //SHORT
                                             type_frm = HDF5Constants.H5T_NATIVE_INT16
                                             datasetId = H5.H5Dcreate(
                                                 hand,
@@ -160,7 +160,8 @@ class FileManagerActor : AbstractActor() {
                                                 HDF5Constants.H5P_DEFAULT,
                                                 HDF5Constants.H5P_DEFAULT
                                             )
-                                        } else if (type_frm == 2) { //INT
+                                        }
+                                        else if (type_frm == 2) { //INT
                                             type_frm = HDF5Constants.H5T_NATIVE_INT32
                                             datasetId = H5.H5Dcreate(
                                                 hand,
@@ -171,7 +172,8 @@ class FileManagerActor : AbstractActor() {
                                                 HDF5Constants.H5P_DEFAULT,
                                                 HDF5Constants.H5P_DEFAULT
                                             )
-                                        } else if (type_frm == 3) { //LONG
+                                        }
+                                        else if (type_frm == 3) { //LONG
                                             type_frm = HDF5Constants.H5T_NATIVE_INT64
                                             datasetId = H5.H5Dcreate(
                                                 hand,
@@ -182,7 +184,8 @@ class FileManagerActor : AbstractActor() {
                                                 HDF5Constants.H5P_DEFAULT,
                                                 HDF5Constants.H5P_DEFAULT
                                             )
-                                        } else if (type_frm == 4) { //FLOAT
+                                        }
+                                        else if (type_frm == 4) { //FLOAT
                                             type_frm = HDF5Constants.H5T_NATIVE_FLOAT
                                             datasetId = H5.H5Dcreate(
                                                 hand,
@@ -193,7 +196,8 @@ class FileManagerActor : AbstractActor() {
                                                 HDF5Constants.H5P_DEFAULT,
                                                 HDF5Constants.H5P_DEFAULT
                                             )
-                                        } else if (type_frm == 5) { //DOUBLE
+                                        }
+                                        else if (type_frm == 5) { //DOUBLE
                                             type_frm = HDF5Constants.H5T_NATIVE_DOUBLE
                                             datasetId = H5.H5Dcreate(
                                                 hand,
@@ -205,6 +209,7 @@ class FileManagerActor : AbstractActor() {
                                                 HDF5Constants.H5P_DEFAULT
                                             )
                                         }
+
                                         H5.H5Dwrite(
                                             datasetId, type_frm,
                                             HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
@@ -281,7 +286,7 @@ class FileManagerActor : AbstractActor() {
 
                     //explicitely clean up
                     handles = hashMapOf<String, Int>()
-//                    vec_size_map[keySz] = vec_size_map[keySz]!! + flush_cnt
+//                    vec_size_map[keySz] = vec_size_map[keySz]!! + flushCount
 //                    buffers[keySz] = ArrayList<List<STRIMMBuffer>>()
 //                }
                 GUIMain.experimentService.isFileSaving = false
@@ -314,11 +319,8 @@ class FileManagerActor : AbstractActor() {
 
                                 //
                                 //
-                                //is a flush needed when the number of frames == flush_cnt
-                                if (data.size == flush_cnt) {
-                                    println("*******flush to HDF5******")
-                                    //
-                                    //
+                                //is a flush needed when the number of frames == flushCount
+                                if (data.size == flushCount) {
                                     //save matrix data//
                                     for (frame in 0..data.size - 1) {
                                         for (f in 0..data[frame].size - 1) {
@@ -344,7 +346,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 1) { //SHORT
+                                                }
+                                                else if (type_frm == 1) { //SHORT
                                                     type_frm = HDF5Constants.H5T_NATIVE_INT16
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -355,7 +358,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 2) { //INT
+                                                }
+                                                else if (type_frm == 2) { //INT
                                                     type_frm = HDF5Constants.H5T_NATIVE_INT32
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -366,7 +370,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 3) { //LONG
+                                                }
+                                                else if (type_frm == 3) { //LONG
                                                     type_frm = HDF5Constants.H5T_NATIVE_INT64
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -377,7 +382,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 4) { //FLOAT
+                                                }
+                                                else if (type_frm == 4) { //FLOAT
                                                     type_frm = HDF5Constants.H5T_NATIVE_FLOAT
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -388,7 +394,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 5) { //DOUBLE
+                                                }
+                                                else if (type_frm == 5) { //DOUBLE
                                                     type_frm = HDF5Constants.H5T_NATIVE_DOUBLE
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -400,8 +407,7 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
                                                 }
-                                                //
-                                                //
+
                                                 H5.H5Dwrite(
                                                     datasetId,
                                                     type_frm,
@@ -415,28 +421,28 @@ class FileManagerActor : AbstractActor() {
                                                 H5.H5Sclose(dataspaceMatrixData)
                                                 H5.H5Dclose(datasetId)
                                             }
-                                            /////////////////////////////////////
-                                            /////////////////////////////////////
+
                                             //directly append the trace matrix in data[frame][f]
                                             //f indexes each STRIMMBuffer within a frame (which is a List<STRIMMBuffer>)
                                             val dims = data[frame][f].getTraceDataDims()
-                                            //it is possible that the different STRIMMBuffers in each frame have different lengths of traceData
-                                            //each frame will always contain size(List<STRIMMBuffer>) but they might have come from different sources
-                                            //and have different lenghts eg the source might be a car and each STRIMMBuffer traceData could be a particular sensor
-                                            //might might have recorded a different number of measurements.
-                                            //traceDataNumberMap keeps a record of the length of each STRIMMBuffer's trace data
-                                            //
-                                            //traceDataNumberMap is necessary in order to append in h5
-                                            //in order to append new data in h5
+                                            /**
+                                             * It is possible that the different STRIMMBuffers in each frame have different lengths of traceData
+                                             * each frame will always contain size(List<STRIMMBuffer>) but they might have come from different sources
+                                             * and have different lenghts eg the source might be a car and each STRIMMBuffer traceData could be a particular sensor
+                                             * might might have recorded a different number of measurements.
+                                             * traceDataNumberMap keeps a record of the length of each STRIMMBuffer's trace data
+                                             *
+                                             * traceDataNumberMap is necessary in order to append in h5 in order to append new data in h5
+                                             */
                                             val curLength = traceDataNumberMap[it.name]!![f]
-                                            val newLength: Long = (curLength + dims[0]).toLong()
+                                            val newLength: Long = (curLength + dims[0])
                                             val dataset_append =
                                                 handles["dataset_" + it.name + "_traceData_" + f.toString()]!!
 
                                             H5.H5Dset_extent(dataset_append, longArrayOf(newLength, dims[1]))
 
-                                            val newOffset: Long = curLength.toLong()
-                                            val extLength: Long = dims[0].toLong()
+                                            val newOffset: Long = curLength
+                                            val extLength: Long = dims[0]
                                             var filespace = H5.H5Dget_space(dataset_append)
 
 
@@ -468,7 +474,8 @@ class FileManagerActor : AbstractActor() {
                                         buffers[it.name] = ArrayList<List<STRIMMBuffer>>()
                                     }
                                 }
-                            } else {
+                            }
+                            else {
                                 //NEW DATA SOURCE this is where all of the new groups etc are defined.
                                 //
                                 //
@@ -568,7 +575,7 @@ class FileManagerActor : AbstractActor() {
                                         val maxdims =
                                             longArrayOf(HDF5Constants.H5S_UNLIMITED.toLong(), traceDataDims[1])
                                         val dims = longArrayOf(0, traceDataDims[1])
-                                        val chunk_dims = longArrayOf(flush_cnt.toLong(), traceDataDims[1])
+                                        val chunk_dims = longArrayOf(flushCount.toLong(), traceDataDims[1])
                                         val dataspace = H5.H5Screate_simple(2, dims, maxdims) // the 2 is the rank
                                         //create handle to a creation property list
                                         val prop = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE)
@@ -588,12 +595,8 @@ class FileManagerActor : AbstractActor() {
 
                                         H5.H5Sclose(dataspace)
                                         H5.H5Pclose(prop)
-
-
                                     }
-
                                 }
-
                             }
                         }
                         else {
@@ -605,17 +608,12 @@ class FileManagerActor : AbstractActor() {
                                 //retrieve the List<List<STRIMMBuffer>>
                                 data = data as ArrayList<List<STRIMMBuffer>>
                                 data.add(it.data)
-                                //
-                                //
-                                //is a flush needed when the number of frames == flush_cnt
-                                if (data.size == flush_cnt) {
-                                    println("*******flush to HDF5******")
-                                    //
-                                    //
-                                    //save matrix data//
-                                    for (frame in 0..data.size - 1) {
-                                        for (f in 0..data[frame].size - 1) {
-                                            //println("******* write dataset")
+
+                                //is a flush needed when the number of frames == flushCount
+                                if (data.size == flushCount) {
+                                    //save matrix data
+                                    for (frame in 0 until data.size) {
+                                        for (f in 0 until data[frame].size) {
                                             //the subimages in each frame could have different dims and pixel type
                                             val dims_frm = data[frame][f].getImageDataDims()
                                             if (data[frame][f].imageData != null) {
@@ -637,7 +635,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 1) { //SHORT
+                                                }
+                                                else if (type_frm == 1) { //SHORT
                                                     type_frm = HDF5Constants.H5T_NATIVE_INT16
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -648,7 +647,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 2) { //INT
+                                                }
+                                                else if (type_frm == 2) { //INT
                                                     type_frm = HDF5Constants.H5T_NATIVE_INT32
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -659,7 +659,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 3) { //LONG
+                                                }
+                                                else if (type_frm == 3) { //LONG
                                                     type_frm = HDF5Constants.H5T_NATIVE_INT64
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -670,7 +671,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 4) { //FLOAT
+                                                }
+                                                else if (type_frm == 4) { //FLOAT
                                                     type_frm = HDF5Constants.H5T_NATIVE_FLOAT
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -681,7 +683,8 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT,
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
-                                                } else if (type_frm == 5) { //DOUBLE
+                                                }
+                                                else if (type_frm == 5) { //DOUBLE
                                                     type_frm = HDF5Constants.H5T_NATIVE_DOUBLE
                                                     datasetId = H5.H5Dcreate(
                                                         hand,
@@ -693,8 +696,7 @@ class FileManagerActor : AbstractActor() {
                                                         HDF5Constants.H5P_DEFAULT
                                                     )
                                                 }
-                                                //
-                                                //
+
                                                 H5.H5Dwrite(
                                                     datasetId,
                                                     type_frm,
@@ -708,30 +710,33 @@ class FileManagerActor : AbstractActor() {
                                                 H5.H5Sclose(dataspaceMatrixData)
                                                 H5.H5Dclose(datasetId)
                                             }
-                                            /////////////////////////////////////
-                                            /////////////////////////////////////
+
                                             //directly append the trace matrix in data[frame][f]
                                             //f indexes each STRIMMBuffer within a frame (which is a List<STRIMMBuffer>)
                                             val dims = data[frame][f].getTraceDataDims()
-                                            //it is possible that the different STRIMMBuffers in each frame have different lengths of traceData
-                                            //each frame will always contain size(List<STRIMMBuffer>) but they might have come from different sources
-                                            //and have different lenghts eg the source might be a car and each STRIMMBuffer traceData could be a particular sensor
-                                            //might might have recorded a different number of measurements.
-                                            //traceDataNumberMap keeps a record of the length of each STRIMMBuffer's trace data
-                                            //
-                                            //traceDataNumberMap is necessary in order to append in h5
-                                            //in order to append new data in h5
+                                            /**
+                                             * It is possible that the different STRIMMBuffers in each frame have different lengths of traceData
+                                             * each frame will always contain size(List<STRIMMBuffer>) but they might have come from different sources
+                                             * and have different lenghts eg the source might be a car and each STRIMMBuffer traceData could be a particular sensor
+                                             * might might have recorded a different number of measurements.
+                                             * traceDataNumberMap keeps a record of the length of each STRIMMBuffer's trace data
+                                             *
+                                             * traceDataNumberMap is necessary in order to append in h5 in order to append new data in h5
+                                             */
                                             val curLength = traceDataNumberMap[it.name]!![f]
-                                            val newLength: Long = (curLength + dims[0]).toLong()
+                                            val newLength: Long = (curLength + dims[0])
+                                            GUIMain.loggerService.log(Level.INFO, "H5 Dastaset name handle dataset_${it.name}_traceData_$f")
                                             val dataset_append =
                                                 handles["dataset_" + it.name + "_traceData_" + f.toString()]!!
 
+//                                            GUIMain.loggerService.log(Level.INFO,"Dataset append: $dataset_append")
+//                                            GUIMain.loggerService.log(Level.INFO,"New length $newLength")
+//                                            GUIMain.loggerService.log(Level.INFO,"Dims: ${dims[0]}, ${dims[1]}")
                                             H5.H5Dset_extent(dataset_append, longArrayOf(newLength, dims[1]))
 
-                                            val newOffset: Long = curLength.toLong()
-                                            val extLength: Long = dims[0].toLong()
+                                            val newOffset: Long = curLength
+                                            val extLength: Long = dims[0]
                                             var filespace = H5.H5Dget_space(dataset_append)
-
 
                                             H5.H5Sselect_hyperslab(
                                                 filespace,
@@ -746,6 +751,7 @@ class FileManagerActor : AbstractActor() {
                                                 longArrayOf(extLength, dims[1]),
                                                 null
                                             ) //TODO is the rank = 2
+
                                             H5.H5Dwrite(
                                                 dataset_append,
                                                 HDF5Constants.H5T_NATIVE_DOUBLE,
@@ -754,14 +760,17 @@ class FileManagerActor : AbstractActor() {
                                                 HDF5Constants.H5P_DEFAULT,
                                                 data[frame][f].traceData
                                             )
+
                                             H5.H5Sclose(memspace)
                                             H5.H5Sclose(filespace)
+
                                             traceDataNumberMap[it.name]!![f] += dims[0] //update traceDataNumberMap to allow for the appended data
                                         }
                                         buffers[it.name] = ArrayList<List<STRIMMBuffer>>()
                                     }
                                 }
-                            } else {
+                            }
+                            else {
                                 //NEW DATA SOURCE this is where all of the new groups etc are defined.
                                 if (file > 0) { //make sure have true h5 file handle
                                     //println("***new data source " + it.name)
@@ -857,7 +866,7 @@ class FileManagerActor : AbstractActor() {
                                         val maxdims =
                                             longArrayOf(HDF5Constants.H5S_UNLIMITED.toLong(), traceDataDims[1])
                                         val dims = longArrayOf(0, traceDataDims[1])
-                                        val chunk_dims = longArrayOf(flush_cnt.toLong(), traceDataDims[1])
+                                        val chunk_dims = longArrayOf(flushCount.toLong(), traceDataDims[1])
                                         val dataspace = H5.H5Screate_simple(2, dims, maxdims) // the 2 is the rank
                                         //create handle to a creation property list
                                         val prop = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE)
@@ -920,7 +929,6 @@ class FileManagerActor : AbstractActor() {
                     //println("*******flush******")
                     //save matrix data
                     //the 'outer' list is the frame
-                    println("FAM: data size is: ${data.size}")
                     for (frame in 0..data.size - 1) { //for each frame
                         for (f in 0..data[frame].size - 1) {//go through each image source in List<STRIMMBuffer>
                             if (data[frame][f].imageData != null) {
@@ -930,7 +938,6 @@ class FileManagerActor : AbstractActor() {
                                 //retrieve the handle for this group
                                 val hand =
                                     handles["group_node_ix_" + keySz + "_" + f.toString() + "_imageData"]!!
-                                println(hand.toString() + "*******************")
                                 //create a dataset
                                 var datasetId = 0
                                 if (type_frm == 0) { //BYTE
@@ -944,7 +951,8 @@ class FileManagerActor : AbstractActor() {
                                         HDF5Constants.H5P_DEFAULT,
                                         HDF5Constants.H5P_DEFAULT
                                     )
-                                } else if (type_frm == 1) { //SHORT
+                                }
+                                else if (type_frm == 1) { //SHORT
                                     type_frm = HDF5Constants.H5T_NATIVE_INT16
                                     datasetId = H5.H5Dcreate(
                                         hand,
@@ -955,7 +963,8 @@ class FileManagerActor : AbstractActor() {
                                         HDF5Constants.H5P_DEFAULT,
                                         HDF5Constants.H5P_DEFAULT
                                     )
-                                } else if (type_frm == 2) { //INT
+                                }
+                                else if (type_frm == 2) { //INT
                                     type_frm = HDF5Constants.H5T_NATIVE_INT32
                                     datasetId = H5.H5Dcreate(
                                         hand,
@@ -966,7 +975,8 @@ class FileManagerActor : AbstractActor() {
                                         HDF5Constants.H5P_DEFAULT,
                                         HDF5Constants.H5P_DEFAULT
                                     )
-                                } else if (type_frm == 3) { //LONG
+                                }
+                                else if (type_frm == 3) { //LONG
                                     type_frm = HDF5Constants.H5T_NATIVE_INT64
                                     datasetId = H5.H5Dcreate(
                                         hand,
@@ -977,7 +987,8 @@ class FileManagerActor : AbstractActor() {
                                         HDF5Constants.H5P_DEFAULT,
                                         HDF5Constants.H5P_DEFAULT
                                     )
-                                } else if (type_frm == 4) { //FLOAT
+                                }
+                                else if (type_frm == 4) { //FLOAT
                                     type_frm = HDF5Constants.H5T_NATIVE_FLOAT
                                     datasetId = H5.H5Dcreate(
                                         hand,
@@ -988,7 +999,8 @@ class FileManagerActor : AbstractActor() {
                                         HDF5Constants.H5P_DEFAULT,
                                         HDF5Constants.H5P_DEFAULT
                                     )
-                                } else if (type_frm == 5) { //DOUBLE
+                                }
+                                else if (type_frm == 5) { //DOUBLE
                                     type_frm = HDF5Constants.H5T_NATIVE_DOUBLE
                                     datasetId = H5.H5Dcreate(
                                         hand,
@@ -1000,6 +1012,7 @@ class FileManagerActor : AbstractActor() {
                                         HDF5Constants.H5P_DEFAULT
                                     )
                                 }
+
                                 H5.H5Dwrite(
                                     datasetId, type_frm,
                                     HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
@@ -1074,7 +1087,7 @@ class FileManagerActor : AbstractActor() {
 
             //explicitely clean up
             handles = hashMapOf<String, Int>()
-//                    vec_size_map[keySz] = vec_size_map[keySz]!! + flush_cnt
+//                    vec_size_map[keySz] = vec_size_map[keySz]!! + flushCount
 //                    buffers[keySz] = ArrayList<List<STRIMMBuffer>>()
 //                }
             GUIMain.experimentService.isFileSaving = false

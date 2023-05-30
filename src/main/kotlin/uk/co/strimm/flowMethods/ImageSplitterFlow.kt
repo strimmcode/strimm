@@ -33,11 +33,11 @@ class ImageSplitterFlow : FlowMethod {
 
         /**
          * Note - you have to create a new STRIMMBuffer to then send on to the sinks. This is because the incoming
-         * STRIMMBuffer is shared with all flows connected from that particular source. So modifying it here would
-         * modify it for all nodes connected to that particular source
+         * STRIMMBuffer object is shared with all flows connected from that particular source. So modifying it here
+         * would modify it for all nodes connected to that particular source.
          */
         val imageToReturn = STRIMMPixelBuffer(
-            numChannels = originalImage.numChannels,
+            numChannels = 1,
             dataID = originalImage.dataID,
             w = w,
             h = h,
@@ -49,6 +49,13 @@ class ImageSplitterFlow : FlowMethod {
         return imageToReturn
     }
 
+    /**
+     * Takes an image (as an Any type but only works on STRIMMPixelBuffer) and coordinates and returns a slice of
+     * the original image based on the coordinates specified.
+     * @param image The STRIMMPixelBuffer object as Any type
+     * @param coordinates The coordinates by which to slice the image
+     * @return The sliced image object
+     */
     fun sliceImage(image: Any, coordinates : Coordinates) : Any{
         if(image is STRIMMPixelBuffer) {
             val x = coordinates.x

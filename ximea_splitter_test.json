@@ -2,6 +2,12 @@
 	"sourceConfig":{ 
 		"sources" : [
 			{
+				"sourceName" : "NIDAQSource",
+				"sourceType" : "NIDAQSourceMethod",
+				"sourceCfg" : "episodicSource.cfg",
+				"isTimeLapse" : False
+			},
+			{
 				"sourceName" : "ximeaCamera",
 				"sourceType" : "MMCameraSource",
 				"sourceCfg" : "ximeaSource.cfg",
@@ -13,6 +19,13 @@
 	"flowConfig":{ 
 		"flows" : [
 			{
+				"flowName" : "NIDAQFlow",
+				"flowType" : "NIDAQBuffer_to_SignalBufferFlow",
+				"inputNames" : [
+					"NIDAQSource"
+				]
+			},
+			{
 				"flowName" : "ximeaSplit1",
 				"flowType" : "ImageSplitterFlow",
 				"flowCfg" : "",
@@ -23,8 +36,8 @@
 					{
 						"x" : 0,
 						"y" : 0,
-						"w" : 512,
-						"h" : 512
+						"w" : 60,
+						"h" : 120
 					}
 				]
 			},
@@ -37,17 +50,65 @@
 				],
 				"splitCoordinates" : [
 					{
-						"x" : 500,
-						"y" : 500,
-						"w" : 512,
-						"h" : 512
+						"x" : 59,
+						"y" : 0,
+						"w" : 60,
+						"h" : 120
 					}
+				]
+			},
+			{
+				"flowName" : "ROIFlowSplit1",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "ximeaROIFlowSplit1.cfg",
+				"inputNames" : [
+					"ximeaSplit1"
+				]
+			},
+			{
+				"flowName" : "ROIFlowSplit2",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "ximeaROIFlowSplit2.cfg",
+				"inputNames" : [
+					"ximeaSplit2"
 				]
 			}
 	    ]
 	},
 	"sinkConfig":{ 
 		"sinks" : [
+			{
+				"sinkName" : "Split1ROIDisplaySink",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "ximea_ROI_sink_preview.cfg",
+				"inputNames" : [
+					"ROIFlowSplit1"
+				]
+			},
+			{
+				"sinkName" : "Split1ROISave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ROIFlowSplit1"
+				]
+			},
+			{
+				"sinkName" : "Split2ROIDisplaySink",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "ximea_ROI_sink_preview.cfg",
+				"inputNames" : [
+					"ROIFlowSplit2"
+				]
+			},
+			{
+				"sinkName" : "Split2ROISave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ROIFlowSplit2"
+				]
+			},
 			{
 				"sinkName" : "ximeaSaveSplit1",
 				"sinkType" : "SinkSaveMethod",
@@ -75,12 +136,19 @@
 			{
 				"sinkName" : "ximeaDisplaySplit2",
 				"sinkType" : "SinkImageJDisplayMethod",
-				"sinkCfg" : "ximeaSink.cfg",
+				"sinkCfg" : "ximeaSink2.cfg",
 				"inputNames" : [
 					"ximeaSplit2"
+				]
+			},
+			{
+				"sinkName" : "NIDAQSaveSink",				
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"NIDAQFlow"
 				]
 			}
 		]
 	}
-
 }

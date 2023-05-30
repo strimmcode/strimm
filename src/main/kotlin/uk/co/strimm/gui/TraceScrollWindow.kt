@@ -27,6 +27,7 @@ import java.util.logging.Level
 import javax.swing.JDialog
 import javax.swing.JOptionPane
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.round
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Trace Scroll Feed")
@@ -67,6 +68,10 @@ class TraceScrollWindowPlugin : AbstractDockableWindow() {
     }
 }
 
+/**
+ * The TraceScrollWindow is used exclusively when reloading an already acquired experiment. Data from the H5 file
+ * will be sent to the controller that interacts with this class.
+ */
 class TraceScrollWindow{
     lateinit var data : HashMap<String, FloatArray>
 
@@ -193,13 +198,11 @@ class TraceScrollWindow{
                     val series = XYChart.Series<Number, Number>()
                     series.name = trace.key
 
-
                     var initialPlotLimit = maxInitialDataPoints
                     if(trace.value.size < maxInitialDataPoints){
                         initialPlotLimit = trace.value.size
                     }
 
-//                    val initialPlotLimit = trace.value.size
                     GUIMain.loggerService.log(Level.INFO, "Adding trace ${trace.key} to chart...")
                     for(i in 0 until initialPlotLimit){
                         val dataPoint = trace.value[i]
@@ -234,23 +237,50 @@ class TraceScrollWindow{
             dialog.title = "Show/Hide traces"
             val checkVBox = VBox()
             checkVBox.spacing = 5.0
-            checkVBox.minWidth = 100.0
-            checkVBox.minHeight = 500.0
+            val checkBoxHeight = 20.0
+            val checkBoxesPerColumn = 8
+            val checkBoxColumnWidth = 60.0
 
             var checkBoxCount = 0
+            var traceCount = 0
+            var translateX = 0.0
             for(trace in data){
                 val traceName = trace.key
                 if(traceName != "times"){
+                    if(checkBoxCount % checkBoxesPerColumn == 0 && (checkBoxCount > 0)){
+                        translateX += checkBoxColumnWidth
+                    }
                     val chk = CheckBox(traceName)
                     chk.minWidth = 50.0
-                    chk.minHeight = 20.0
+                    chk.minHeight = checkBoxHeight
+                    println("translateX is ${translateX}")
+                    val translateY = (traceCount%checkBoxesPerColumn)*checkVBox.spacing
+                    println("translateY is ${translateY}")
+                    chk.translateX = translateX
+                    chk.translateY = -translateY
                     checkVBox.children.add(chk)
                     checkBoxCount++
+                    traceCount++
                 }
             }
+
             dialog.dialogPane.children.add(checkVBox)
-            dialog.dialogPane.minWidth = 100.0
-            dialog.dialogPane.minHeight = (checkBoxCount*25) + 25.toDouble()
+
+            val minWidth = checkBoxColumnWidth*ceil((checkBoxCount/checkBoxesPerColumn).toDouble())
+            val minHeight = (checkBoxesPerColumn*checkVBox.spacing)+(checkBoxesPerColumn*checkBoxHeight)
+            checkVBox.minWidth = minWidth
+            checkVBox.minHeight = minHeight
+
+            dialog.dialogPane.minWidth = minWidth
+            dialog.dialogPane.minHeight = minHeight
+
+//            checkBoxes.forEach {chk ->
+//                chk.minWidth = 50.0
+//                chk.minHeight = checkBoxHeight
+//                checkVBox.children.add(chk)
+//            }
+
+//            checkVBox.children.forEach { x -> x.translateX += 25 }
 
             val okButton = Button("OK")
             dialog.dialogPane.children.add(okButton)

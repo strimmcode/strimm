@@ -427,7 +427,14 @@ class ExperimentService  : AbstractService(), ImageJService {
     fun createTracePlugins(traceDataFolderIDs : HashMap<String, Int>){
         for(traceDataset in traceHDFDatasets){ //Each entry represents all the trace data from one sink
             val parentFolderPath = traceDataset.key.replace("/$datasetString", "")
-            val sortedData = sortTraces(traceDataFolderIDs[parentFolderPath]!!, traceDataset)
+
+            var sortedData: HashMap<String, FloatArray>
+            sortedData = if(isROIDataset(traceDataFolderIDs[parentFolderPath]!!)){
+                sortROITraces(traceDataset)
+            }
+            else {
+                sortTraces(traceDataFolderIDs[parentFolderPath]!!, traceDataset)
+            }
             val plugin = GUIMain.dockableWindowPluginService.createPlugin(TraceScrollWindowPlugin::class.java, sortedData, false, "TraceScrollWindow")
             plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
             Platform.runLater {
@@ -477,9 +484,32 @@ class ExperimentService  : AbstractService(), ImageJService {
                 dataForIndex[j] = valueForIndex
             }
             sortedTraces[name] = dataForIndex
+
             H5.H5Aclose(attributeID)
         }
         return sortedTraces
+    }
+
+    fun sortROITraces(traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>): HashMap<String, FloatArray>{
+        val roiTraces = hashMapOf<String, FloatArray>()
+        var roiTraceString: String
+        for(i in 0 until traceDataset.value.size){
+            val row = traceDataset.value[i]
+            for(j in 0 until row.size){
+                roiTraceString = if (j == 0) {
+                    "times"
+                } else {
+                    "ROI$j"
+                }
+
+                if(i == 0){
+                    roiTraces[roiTraceString] = FloatArray(traceDataset.value.size)
+                }
+
+                roiTraces[roiTraceString]!![i] = row[j]
+            }
+        }
+        return roiTraces
     }
 
     /**
@@ -534,5 +564,26 @@ class ExperimentService  : AbstractService(), ImageJService {
             isImageDataset = isImageDataset(groupNodePath + "/" + childNames.first(), fileAsGroupID)
         }
         return isImageDataset
+    }
+
+    fun isROIDataset(traceDataParentID : Int) : Boolean{
+        val folderInfo = H5.H5Oget_info(traceDataParentID)
+        val numAttributes = folderInfo.num_attrs
+        var hasDataIDAttribute = false
+        var hasStatusAttribute = false
+        for(i in 0 until numAttributes){
+            val attributeID = H5.H5Aopen_by_idx(traceDataParentID, ".", HDF5Constants.H5_INDEX_CRT_ORDER,
+                HDF5Constants.H5_ITER_NATIVE, i, HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT)
+            val attributeName = H5.H5Aget_name(attributeID)
+            if(attributeName.toLowerCase() == "dataID".toLowerCase()){
+                hasDataIDAttribute = true
+            }
+
+            if(attributeName.toLowerCase() == "status".toLowerCase()){
+                hasStatusAttribute = true
+            }
+        }
+
+        return hasDataIDAttribute && hasStatusAttribute
     }
 }
