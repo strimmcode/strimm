@@ -624,77 +624,79 @@ class FileManagerActor : AbstractActor() {
                                                 val hand =
                                                     handles["group_node_ix_" + it.name + "_" + f.toString() + "_imageData"]!!
                                                 var datasetId = 0
-                                                if (type_frm == 0) { //BYTE
-                                                    type_frm = HDF5Constants.H5T_NATIVE_INT8
-                                                    datasetId = H5.H5Dcreate(
-                                                        hand,
-                                                        imageDataNumberMap[it.name]!!.toString(),
-                                                        HDF5Constants.H5T_NATIVE_INT8,
-                                                        dataspaceMatrixData,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT
-                                                    )
-                                                }
-                                                else if (type_frm == 1) { //SHORT
-                                                    type_frm = HDF5Constants.H5T_NATIVE_INT16
-                                                    datasetId = H5.H5Dcreate(
-                                                        hand,
-                                                        imageDataNumberMap[it.name]!!.toString(),
-                                                        HDF5Constants.H5T_NATIVE_INT16, //TODO
-                                                        dataspaceMatrixData,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT
-                                                    )
-                                                }
-                                                else if (type_frm == 2) { //INT
-                                                    type_frm = HDF5Constants.H5T_NATIVE_INT32
-                                                    datasetId = H5.H5Dcreate(
-                                                        hand,
-                                                        imageDataNumberMap[it.name]!!.toString(),
-                                                        HDF5Constants.H5T_NATIVE_INT32, //TODO
-                                                        dataspaceMatrixData,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT
-                                                    )
-                                                }
-                                                else if (type_frm == 3) { //LONG
-                                                    type_frm = HDF5Constants.H5T_NATIVE_INT64
-                                                    datasetId = H5.H5Dcreate(
-                                                        hand,
-                                                        imageDataNumberMap[it.name]!!.toString(),
-                                                        HDF5Constants.H5T_NATIVE_INT64, //TODO
-                                                        dataspaceMatrixData,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT
-                                                    )
-                                                }
-                                                else if (type_frm == 4) { //FLOAT
-                                                    type_frm = HDF5Constants.H5T_NATIVE_FLOAT
-                                                    datasetId = H5.H5Dcreate(
-                                                        hand,
-                                                        imageDataNumberMap[it.name]!!.toString(),
-                                                        HDF5Constants.H5T_NATIVE_FLOAT, //TODO
-                                                        dataspaceMatrixData,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT
-                                                    )
-                                                }
-                                                else if (type_frm == 5) { //DOUBLE
-                                                    type_frm = HDF5Constants.H5T_NATIVE_DOUBLE
-                                                    datasetId = H5.H5Dcreate(
-                                                        hand,
-                                                        imageDataNumberMap[it.name]!!.toString(),
-                                                        HDF5Constants.H5T_NATIVE_DOUBLE, //TODO
-                                                        dataspaceMatrixData,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT,
-                                                        HDF5Constants.H5P_DEFAULT
-                                                    )
+                                                when (type_frm) {
+                                                    0 -> { //BYTE
+                                                        type_frm = HDF5Constants.H5T_NATIVE_INT8
+                                                        datasetId = H5.H5Dcreate(
+                                                            hand,
+                                                            imageDataNumberMap[it.name]!!.toString(),
+                                                            HDF5Constants.H5T_NATIVE_INT8,
+                                                            dataspaceMatrixData,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT
+                                                        )
+                                                    }
+                                                    1 -> { //SHORT
+                                                        type_frm = HDF5Constants.H5T_NATIVE_INT16
+                                                        datasetId = H5.H5Dcreate(
+                                                            hand,
+                                                            imageDataNumberMap[it.name]!!.toString(),
+                                                            HDF5Constants.H5T_NATIVE_INT16, //TODO
+                                                            dataspaceMatrixData,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT
+                                                        )
+                                                    }
+                                                    2 -> { //INT
+                                                        type_frm = HDF5Constants.H5T_NATIVE_INT32
+                                                        datasetId = H5.H5Dcreate(
+                                                            hand,
+                                                            imageDataNumberMap[it.name]!!.toString(),
+                                                            HDF5Constants.H5T_NATIVE_INT32, //TODO
+                                                            dataspaceMatrixData,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT
+                                                        )
+                                                    }
+                                                    3 -> { //LONG
+                                                        type_frm = HDF5Constants.H5T_NATIVE_INT64
+                                                        datasetId = H5.H5Dcreate(
+                                                            hand,
+                                                            imageDataNumberMap[it.name]!!.toString(),
+                                                            HDF5Constants.H5T_NATIVE_INT64, //TODO
+                                                            dataspaceMatrixData,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT
+                                                        )
+                                                    }
+                                                    4 -> { //FLOAT
+                                                        type_frm = HDF5Constants.H5T_NATIVE_FLOAT
+                                                        datasetId = H5.H5Dcreate(
+                                                            hand,
+                                                            imageDataNumberMap[it.name]!!.toString(),
+                                                            HDF5Constants.H5T_NATIVE_FLOAT, //TODO
+                                                            dataspaceMatrixData,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT
+                                                        )
+                                                    }
+                                                    5 -> { //DOUBLE
+                                                        type_frm = HDF5Constants.H5T_NATIVE_DOUBLE
+                                                        datasetId = H5.H5Dcreate(
+                                                            hand,
+                                                            imageDataNumberMap[it.name]!!.toString(),
+                                                            HDF5Constants.H5T_NATIVE_DOUBLE, //TODO
+                                                            dataspaceMatrixData,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT,
+                                                            HDF5Constants.H5P_DEFAULT
+                                                        )
+                                                    }
                                                 }
 
                                                 H5.H5Dwrite(
@@ -725,7 +727,7 @@ class FileManagerActor : AbstractActor() {
                                              */
                                             val curLength = traceDataNumberMap[it.name]!![f]
                                             val newLength: Long = (curLength + dims[0])
-                                            GUIMain.loggerService.log(Level.INFO, "H5 Dastaset name handle dataset_${it.name}_traceData_$f")
+//                                            GUIMain.loggerService.log(Level.INFO, "H5 Dastaset name handle dataset_${it.name}_traceData_$f")
                                             val dataset_append =
                                                 handles["dataset_" + it.name + "_traceData_" + f.toString()]!!
 
