@@ -80,6 +80,7 @@ class SinkImageJDisplayMethod : SinkMethod {
             GUIMain.experimentService.runtimeRoiList[sink.sinkName] = mutableListOf<RoiInfo>()
             val rois: List<ROI> = GUIMain.strimmROIService.DecodeROIReference(roiSz as String)
             for (f in 0..rois.size - 1) {
+                GUIMain.loggerService.log(Level.INFO, "Creating ROI from $roiSz")
                 val overlay = ROIManager.createOverlayFromROIObject(rois[f])
                 if (overlay != null) {
                     overlay.name = f.toString()

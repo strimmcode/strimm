@@ -4,7 +4,6 @@ import akka.actor.ActorRef
 import com.opencsv.CSVReader
 import net.imagej.overlay.EllipseOverlay
 import net.imagej.overlay.Overlay
-import net.imagej.overlay.PolygonOverlay
 import net.imagej.overlay.RectangleOverlay
 import net.imglib2.Cursor
 import net.imglib2.img.array.ArrayImg
@@ -19,7 +18,6 @@ import net.imglib2.type.numeric.real.FloatType
 import net.imglib2.util.Intervals
 import net.imglib2.view.Views
 import uk.co.strimm.STRIMMBuffer
-import uk.co.strimm.STRIMMImage
 import uk.co.strimm.STRIMMPixelBuffer
 import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.experiment.Flow
@@ -31,9 +29,7 @@ import java.util.logging.Level
 //The cfg has the name of the sink with the reference to the roi file
 //this roi file can be in either csv or roiManager format from MicroManager
 //
-class ROIFlowMethod() : FlowMethod {
-
-
+class ROIFlowMethod : FlowMethod {
     var sinkName = ""
     open lateinit var flow: Flow
     override lateinit var properties: HashMap<String, String>
@@ -48,50 +44,41 @@ class ROIFlowMethod() : FlowMethod {
 
     override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
         //the flow function should know the
-
         //get the overlays
-
-
         //cant seem to get a list of overlays
-        val overlays = GUIMain.overlayService.getOverlays()
+        val overlays = GUIMain.overlayService.overlays
         val disp = GUIMain.experimentService.experimentStream.cameraDisplays[sinkName]
+
         if (disp != null && overlays.size > 0) {
             val over = GUIMain.overlayService.getOverlays(disp) //overlays in disp but might be reapeted
             val filteredOverlays = overlays.filter { it in over }.filter{ it.name != null }
-//            for (fff in 0..filteredOverlays.size - 1){
-//                println(fff.toString() + "   " + filteredOverlays[fff].name)
-//            }
-
             //apply each overlay to the pixels and calculate the mean(?)
-
             //assemble into a row of data, along with the SINK:IDs as names
 
             val image = data[0] as STRIMMPixelBuffer
-            val roi_info = averageROI(filteredOverlays, image)
+            val roiInfo = averageROI(filteredOverlays, image)
 
-//            for (f in 0..roi_info.size-1){
-//                val p = roi_info[f]
-//                println(f.toString() + " " + p.first + " " + p.second)
-//            }
-            val data = DoubleArray(roi_info.size)
-            for (f in 0..data.size - 1) {
-                data[f] = roi_info[f].second  //Pair(string, val)
+            val dataToSend = DoubleArray(roiInfo.size)
+            for (f in 0 until dataToSend.size) {
+                dataToSend[f] = roiInfo[f].second  //Pair(string, val)
             }
+
             val times = DoubleArray(1)
             times[0] = image.timeAcquired
             val numSamples = 1
             val channelNames = mutableListOf<String>()
-            for (f in 0..data.size - 1) {
-                channelNames.add(roi_info[f].first)
+            for (f in 0 until dataToSend.size) {
+                channelNames.add(roiInfo[f].first)
             }
-            //println(channelNames.toString())
-            return STRIMMSignalBuffer(data, times, numSamples, channelNames, image.dataID, image.status)
+
+            val buffer = STRIMMSignalBuffer(dataToSend, times, numSamples, channelNames, image.dataID, image.status)
+            return buffer
         }
         else {
             return STRIMMBuffer(0,2)
         }
-
     }
+
     private fun averageROI(roiList: List<Overlay>, image: STRIMMPixelBuffer): List< Pair<String, Double> > {
 
         val results = arrayListOf<Pair<String, Double> >()
@@ -331,6 +318,7 @@ class ROIFlowMethod() : FlowMethod {
 
         return average
     }
+
     fun loadCfg() {
         properties = hashMapOf<String, String>()
         if (flow.flowCfg != "") {
@@ -346,18 +334,18 @@ class ROIFlowMethod() : FlowMethod {
                     }
                 }
             } catch (ex: Exception) {
-                println(ex.message)
+                GUIMain.loggerService.log(Level.SEVERE, "Error loading cfg file for ROIFlowMethod. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             }
         }
         else{
 
         }
-
     }
+
     override fun preStart(){
-
     }
-    override fun postStop(){
 
+    override fun postStop(){
     }
 }

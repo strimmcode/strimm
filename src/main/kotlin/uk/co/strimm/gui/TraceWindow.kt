@@ -1,6 +1,5 @@
 package uk.co.strimm.gui
 
-
 import bibliothek.gui.dock.common.DefaultMultipleCDockable
 import com.sun.javafx.charts.Legend
 import javafx.application.Platform
@@ -28,7 +27,6 @@ import javax.swing.JLabel
 import javax.swing.JLayeredPane
 import javax.swing.SwingConstants
 
-
 var debugTW = false
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Trace Feed")
@@ -44,7 +42,6 @@ class TraceWindowPlugin : AbstractDockableWindow() {
         this.createDock(title).apply {
             val fxPanel = JFXPanel()
             add(fxPanel)
-
 
             try {
                 val URL = this.javaClass.getResource("/fxml/TraceChart.fxml")

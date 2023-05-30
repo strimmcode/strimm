@@ -1,6 +1,5 @@
 package uk.co.strimm.experiment
 
-import akka.actor.ActorRef
 import net.imagej.overlay.*
 import uk.co.strimm.gui.GUIMain
 import java.util.logging.Level
@@ -57,10 +56,7 @@ class ROIManager{
             when {
                 roi.ROItype == "RECTANGLE" -> {
                     //make and fill in an Overlay
-
                     val rectangleOverlay = RectangleOverlay(GUIMain.imageJService.context)
-
-
                     rectangleOverlay.setOrigin(roi.x, 0)
                     rectangleOverlay.setOrigin(roi.y, 1)
                     rectangleOverlay.setExtent(roi.w, 0)
@@ -71,7 +67,6 @@ class ROIManager{
                     rectangleOverlay.lineColor = ds.lineColor
                     rectangleOverlay.lineStyle = ds.lineStyle
                     rectangleOverlay.lineWidth = ds.lineWidth
-
 
                     //The roi name at this point should already be unique from earlier specification (see TraceFromROIContext)
                     rectangleOverlay.name = roi.ROIName
@@ -104,7 +99,5 @@ class ROIManager{
                 }
             }
         }
-
-
     }
 }

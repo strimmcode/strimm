@@ -53,12 +53,16 @@ data class DockableWindowPosition(val x : Double, val y: Double, val width: Doub
 open class STRIMMBuffer(var dataID : Int, val status : Int, val className : String? = "STRIMMBuffer"){
     open var imageData : Any? = null
     open var traceData = arrayOf<Double>(dataID.toDouble(),status.toDouble())
+    private var xDim = 1.toLong()
+    private var yDim = 2.toLong()
+
     open fun getImageDataDims() : LongArray {
         return longArrayOf(0)
     }
     open fun getTraceDataDims() : LongArray{
-        return longArrayOf(1,2)
+        return longArrayOf(xDim,yDim)
     }
+
     open fun getImageDataType() : Int {
         return -1 //Long
     }
@@ -73,6 +77,7 @@ open class STRIMMBuffer(var dataID : Int, val status : Int, val className : Stri
 }
 open class STRIMMSaveBuffer(val data : List<STRIMMBuffer>, val name : String){
 }
+
 open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Double, dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status, "STRIMMPixelBuffer"){
     override var imageData = pix
@@ -135,9 +140,6 @@ open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixel
 
 }
 
-
-
-
 open class STRIMMImageBuffer(var pix : Any?, val w : Int, val h : Int, val bitDepth : Int, val timeAcquired : Number, dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status, "STRIMMImageBuffer"){ //keep STRIMMBuffer like this - but make sure they are not saved
     //override var imageData = pix as List<Any>
@@ -179,12 +181,13 @@ open class STRIMMArduinoControlBuffer(
                                       dataID:Int, status : Int) :
     STRIMMBuffer(dataID, status, "STRIMMArduinoControlBuffer"){
 }
+
 open class STRIMMNIDAQControlBuffer(
     var pTimes : DoubleArray,
     var pDataAO : DoubleArray, var AOChannels : List<String>, var pDataDO : IntArray, var DOport : Int, var DOChannels : List<String>,
     dataID : Int, status : Int) : STRIMMBuffer(dataID, status, "STRIMMNIDAQControlBuffer") {
-
 }
+
 open class STRIMMNIDAQBuffer(
     var numSamples : Int,
     var sampleFreqMS : Double,
@@ -194,7 +197,6 @@ open class STRIMMNIDAQBuffer(
     var pDataDO : IntArray?, var DOChannels : IntArray?, var DOport : Int,
     var pDataDI : IntArray?, var DIChannels : IntArray?, var DIport : Int,
     dataID : Int, status : Int) : STRIMMBuffer(dataID, status, "STRIMMNIDAQBuffer") {
-
 }
 
 open class STRIMMSignalBuffer1(var data : Any?, val numChannels : Int, val channelNames : List<String>,  dataID : Int, status : Int) :
@@ -213,19 +215,16 @@ open class STRIMMSignalBuffer1(var data : Any?, val numChannels : Int, val chann
     }
     }
 
-
 open class STRIMMSignalBuffer(var data : DoubleArray?, var times : DoubleArray?,  val numSamples : Int,  val channelNames : List<String>?,  dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status, "STRIMMSignalBuffer"){
         override var traceData = arrayOf<Double>()
         init{
-            val cnt = 0
             val ret = mutableListOf<Double>()
-            for (f in 0..numSamples-1){
-                ret.add(times!![f])
-                for (ff in 0..channelNames!!.size-1){
-                    ret.add(data!![f*channelNames!!.size + ff])
+            for (sampleNumber in 0 until numSamples){
+                ret.add(times!![sampleNumber])
+                for (channelNumber in 0 until channelNames!!.size){
+                    ret.add(data!![sampleNumber*channelNames.size + channelNumber])
                 }
-
             }
             traceData = ret.toTypedArray()
         }
@@ -276,19 +275,11 @@ open class STRIMM_MMCommandBuffer(
     dataID : Int,
     status : Int
 ) : STRIMMBuffer(dataID, status, "STRIMMXYStageBuffer"){
-
 }
-
-
-
-
-
-
 
 class ImageData(var pix : Any?, val w : Int, val h : Int, val bitDepth : Int, val timeAcquired : Number, val imageCount : Int){
-
 }
-//
+
 open class STRIMMImage(val images : List<ImageData>, dataID : Int, var messageSz :String , status : Int ) :
     STRIMMBuffer( dataID, status, "STRIMMImage"){
 }
