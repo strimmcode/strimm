@@ -321,8 +321,9 @@ class TraceScrollWindow{
 
     fun addShiftYUpButtonListener(){
         shiftYUpButton.setOnAction {
-            yAxis.lowerBound += shiftYAmount
-            yAxis.upperBound += shiftYAmount
+            val range = yAxis.upperBound-yAxis.lowerBound
+            yAxis.lowerBound += range*changeFactor
+            yAxis.upperBound += range*changeFactor
         }
     }
 
@@ -330,26 +331,33 @@ class TraceScrollWindow{
         shiftYDownButton.setOnAction {
             //Unlike shifting the x axis, we don't have to guard against going into the negative because data on
             //the y axis could be negative
-            yAxis.lowerBound -= shiftYAmount
-            yAxis.upperBound -= shiftYAmount
+            val range = yAxis.upperBound-yAxis.lowerBound
+            yAxis.lowerBound -= range*changeFactor
+            yAxis.upperBound -= range*changeFactor
         }
     }
 
     fun addZoomInYButtonListener(){
         zoomInYButton.setOnAction {
-            yAxis.lowerBound += yAxis.lowerBound*changeFactor
-            yAxis.upperBound -= yAxis.upperBound*changeFactor
+            val range = yAxis.upperBound-yAxis.lowerBound
+            yAxis.lowerBound += range*changeFactor
+            yAxis.upperBound -= range*changeFactor
 
-            shiftYAmount -= (shiftYAmount*changeFactor).toInt()
+            val newRange = yAxis.upperBound-yAxis.lowerBound
+            shiftYAmount = newRange/2
+            yAxis.tickUnit = newRange/5
         }
     }
 
     fun addZoomOutYButtonListener(){
         zoomOutYButton.setOnAction {
-            yAxis.lowerBound -= yAxis.lowerBound*changeFactor
-            yAxis.upperBound += yAxis.upperBound*changeFactor
+            val range = yAxis.upperBound-yAxis.lowerBound
+            yAxis.lowerBound -= range*changeFactor
+            yAxis.upperBound += range*changeFactor
 
-            shiftYAmount += (shiftYAmount*changeFactor).toInt()
+            val newRange = yAxis.upperBound-yAxis.lowerBound
+            shiftYAmount = newRange/2
+            yAxis.tickUnit = newRange/5
         }
     }
 
@@ -359,9 +367,9 @@ class TraceScrollWindow{
             xAxis.lowerBound = xAxis.lowerBound + (range*changeFactor)
             xAxis.upperBound = xAxis.upperBound -(range*changeFactor)
 
-            shiftXAmount = range/2
-
-            xAxis.tickUnit = range/5
+            val newRange = xAxis.upperBound-xAxis.lowerBound
+            shiftXAmount = newRange/2
+            xAxis.tickUnit = newRange/5
 
             redrawChart()
         }
@@ -386,9 +394,9 @@ class TraceScrollWindow{
                 xAxis.upperBound  = newVal
             }
 
-            shiftXAmount = range/2
-
-            xAxis.tickUnit = range/5
+            val newRange = xAxis.upperBound-xAxis.lowerBound
+            shiftXAmount = newRange/2
+            xAxis.tickUnit = newRange/5
 
             redrawChart()
         }
