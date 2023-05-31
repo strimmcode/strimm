@@ -321,7 +321,7 @@ class ExperimentService  : AbstractService(), ImageJService {
 
                 var dataTypeConstant = HDF5Constants.H5T_NATIVE_B8
                 when(bitDepth){
-                    8 -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_B8}
+                    8 -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_INT8}
                     16 -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_SHORT}
                     32 -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_FLOAT}
                     else -> {GUIMain.loggerService.log(Level.WARNING, "Bit depth of $bitDepth not recognised. Trying with bitDepth=8")}
@@ -339,20 +339,48 @@ class ExperimentService  : AbstractService(), ImageJService {
                     H5.H5Sget_simple_extent_dims(datasetSpace, dims, maxDims) //Populates dims and maxDims
 
                     /**
-                     * Image data is actually 3D in the file (1 x w x h) but reading into a 3D array is too slow
+                     * Image data is actually 3D in the file (1 x h x w) but reading into a 3D array is too slow
                      * Reading into a 1D array instead is much faster. We can then process the data into 2D arrays
                      * for images later
                      */
-                    val dataRead = ShortArray(dims[0].toInt()*dims[1].toInt()*dims[2].toInt())
-                    H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
-
-                    val image = HDFImageDataset()
-                    image.bitDepth = bitDepth
-                    image.shortData = dataRead
-                    image.frameNumber = i
-                    image.width = dims[1].toInt()
-                    image.height = dims[2].toInt()
-                    allImages.add(image)
+                    when(bitDepth){
+                        8 -> {
+                            val dataRead = ByteArray(dims[0].toInt()*dims[1].toInt()*dims[2].toInt())
+                            H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
+                            val image = HDFImageDataset()
+                            image.bitDepth = bitDepth
+                            image.byteData = dataRead
+                            image.frameNumber = i
+                            image.width = dims[1].toInt()
+                            image.height = dims[2].toInt()
+                            allImages.add(image)
+                        }
+                        16 -> {
+                            val dataRead = ShortArray(dims[0].toInt()*dims[1].toInt()*dims[2].toInt())
+                            H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
+                            val image = HDFImageDataset()
+                            image.bitDepth = bitDepth
+                            image.shortData = dataRead
+                            image.frameNumber = i
+                            image.width = dims[1].toInt()
+                            image.height = dims[2].toInt()
+                            allImages.add(image)
+                        }
+                        32 -> {
+                            val dataRead = FloatArray(dims[0].toInt()*dims[1].toInt()*dims[2].toInt())
+                            H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
+                            val image = HDFImageDataset()
+                            image.bitDepth = bitDepth
+                            image.floatData = dataRead
+                            image.frameNumber = i
+                            image.width = dims[1].toInt()
+                            image.height = dims[2].toInt()
+                            allImages.add(image)
+                        }
+                        else -> {
+                            GUIMain.loggerService.log(Level.SEVERE, "Bit depth not supported (8, 16, 32 supported)")
+                        }
+                    }
 
                     H5.H5Dclose(datasetID)
                 }
@@ -409,7 +437,8 @@ class ExperimentService  : AbstractService(), ImageJService {
      */
     fun createImagePlugins(){
         for(imageDataset in imageHDFDatasets){
-            val plugin = GUIMain.dockableWindowPluginService.createPlugin(CameraScrollWindowPlugin::class.java, imageDataset, false, "ImageScrollWindow")
+            val pluginName = imageDataset.key.split("/")[1]
+            val plugin = GUIMain.dockableWindowPluginService.createPlugin(CameraScrollWindowPlugin::class.java, imageDataset, false, pluginName)
             plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
             plugin.cameraScrollWindowController.populateImages()
             GUIMain.strimmUIService.windowsLoaded += 1
@@ -435,7 +464,8 @@ class ExperimentService  : AbstractService(), ImageJService {
             else {
                 sortTraces(traceDataFolderIDs[parentFolderPath]!!, traceDataset)
             }
-            val plugin = GUIMain.dockableWindowPluginService.createPlugin(TraceScrollWindowPlugin::class.java, sortedData, false, "TraceScrollWindow")
+            val pluginName = traceDataset.key.split("/")[1]
+            val plugin = GUIMain.dockableWindowPluginService.createPlugin(TraceScrollWindowPlugin::class.java, sortedData, false, pluginName)
             plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
             Platform.runLater {
                 plugin.traceWindowController.populateChart() //Has to be done here because plugin initialisation needs to happen before the graph is populated
