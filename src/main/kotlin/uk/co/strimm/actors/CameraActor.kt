@@ -5,15 +5,11 @@ import akka.actor.Kill
 import akka.actor.Props
 import net.imagej.display.ImageDisplay
 import net.imagej.overlay.EllipseOverlay
-import net.imagej.overlay.Overlay
 import net.imagej.overlay.RectangleOverlay
 import org.scijava.util.ColorRGB
-import org.scijava.util.IntCoords
 import org.scijava.util.RealCoords
-import scala.Byte
 import uk.co.strimm.*
 import uk.co.strimm.actors.messages.Message
-import uk.co.strimm.actors.messages.ask.AskMessageTest
 import uk.co.strimm.gui.CameraWindowPlugin
 import uk.co.strimm.gui.GUIMain
 import uk.co.strimm.actors.messages.complete.CompleteStreaming
@@ -25,8 +21,6 @@ import uk.co.strimm.experiment.Sink
 import uk.co.strimm.gui.CameraWindow
 import java.util.logging.Level
 import javax.swing.JLabel
-import javax.swing.JLayeredPane
-import kotlin.math.max
 
 class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : ImageDisplay) : Thread(name) {
     //keeps track of when the numOverlays for this display changes
@@ -43,19 +37,16 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
 
     override fun run() {
         while (!bExit) {
-            val can = display.canvas
-
-           // println("camera thread " + can.zoomFactor)
-            val overlays = GUIMain.overlayService.getOverlays() //total number of overlays
-
-            val over = GUIMain.overlayService.getOverlays(display) //overlays in disp but might be reapeted
-            val filteredOverlays = overlays.filter{it in over}
+            val canvas = display.canvas
+            val overlays = GUIMain.overlayService.overlays //total number of overlays
+            val overlaysForDisplay = GUIMain.overlayService.getOverlays(display) //overlays in disp but might be reapeted
+            val filteredOverlays = overlays.filter{it in overlaysForDisplay}
 
             if (overlays.size != numOverlays){
                 numOverlays = overlays.size
                 bNumOverlaysChanged = true
 
-                println("number of overlays in " + display + " " + filteredOverlays.size)
+                GUIMain.loggerService.log(Level.INFO, "Number of overlays for " + display + " is now " + filteredOverlays.size)
                 var max_val = -1
                 filteredOverlays.forEach{
                     if (it.name != null){
@@ -64,34 +55,30 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
                         }
                     }
                 }
+
                 filteredOverlays.forEach{
                     if (it.name == null){
                         max_val++
                         it.name = max_val.toString()
                     }
                 }
-                println("****")
 
                 filteredOverlays.forEach{
-                    println(it.name)
                     if (bColoured){
-
                         val col = GUIMain.roiColours[it.name.toInt() % GUIMain.roiColours.size]
                         it.fillColor = ColorRGB((255.0 * 0.0).toInt(), (255.0 * 0.0).toInt(), (255.0 * 0.0).toInt())
                         it.alpha = 0
                         it.lineColor = ColorRGB((255.0 * col.red).toInt(), (255.0 * col.green).toInt(), (255.0 * col.blue).toInt())
                     }
                 }
-                println("**")
                 GUIMain.zoomService.zoomOriginalScale(display)
             }
             else{
                 bNumOverlaysChanged = false
-
             }
 
             if (cam.layer != null) {
-                val ic = can.dataToPanelCoords(RealCoords(3000.0, 3000.0))
+                val ic = canvas.dataToPanelCoords(RealCoords(3000.0, 3000.0))
                 for (f in 0..filteredOverlays.size - 1) {
                     val com = cam.layer!!.getComponent(f) as JLabel
                     com.setBounds(ic.x, ic.y, 40, 20)
@@ -99,7 +86,7 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
 
                 //number code using labels - buggy but mostly works
                 //221224
-                if (  cam.numChannels > 1) {
+                if (cam.numChannels > 1) {
                     val channelIx = cam.view!!.planePosition.getLongPosition(0)
                     for (f in 0..filteredOverlays.size - 1) {
                         var x_rc = 3000.0
@@ -124,9 +111,9 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
 
                         }
 
-                        var zoom_level = can.zoomFactor
+                        var zoom_level = canvas.zoomFactor
 
-                        val ic = can.dataToPanelCoords(RealCoords(x_rc, y_rc))
+                        val ic = canvas.dataToPanelCoords(RealCoords(x_rc, y_rc))
 
                         if (zoom_level < 1.0) {
 
@@ -134,9 +121,6 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
                             ic.y = (y_rc.toDouble() * zoom_level).toInt()
                         }
 
-//                        println("*****AAAA")
-//                        println("zoom " + zoom_level)
-//                        println(ic.x.toString() + " " + ic.y.toString())
                         val com = cam.layer!!.getComponent(f) as JLabel
                         com.text = txt
                         com.setBounds(ic.x, ic.y, 40, 20)
@@ -165,14 +149,14 @@ class MonitorCameraThread(name: String?, var cam : CameraWindow, var display : I
 
                         }
 
-                        val ic = can.dataToPanelCoords(RealCoords(x_rc, y_rc))
+                        val ic = canvas.dataToPanelCoords(RealCoords(x_rc, y_rc))
                         val com = cam.layer!!.getComponent(f) as JLabel
                         com.text = txt
                         com.setBounds(ic.x, ic.y, 40, 20)
                     }
                 }
             }
-            Thread.sleep(50)
+            sleep(50)
         }
     }
 }
@@ -224,6 +208,7 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                 plugin.cameraWindowController.initialiseDisplay()
                 camThread = MonitorCameraThread(sink!!.sinkName, plugin.cameraWindowController,  plugin.cameraWindowController.display as ImageDisplay)
                 if (camThread != null){
+                    GUIMain.loggerService.log(Level.INFO, "Starting camera monitor thread for ${sink!!.sinkName}")
                     camThread!!.start()
                 }
                 sender().tell(Acknowledgement.INSTANCE, self())
