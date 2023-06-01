@@ -218,13 +218,19 @@ class TraceScrollWindow{
                     }
 
                     xAxis.lowerBound = 0.0
-                    xAxis.upperBound = initialPlotLimit.toDouble()
+                    xAxis.upperBound = times[initialPlotLimit-1].toDouble()
                     lineChart.data.add(series)
                 }
             }
 
             yAxis.lowerBound = yMin.toDouble() - (yMin.toDouble()*0.1)
             yAxis.upperBound = yMax.toDouble() + (yMin.toDouble()*0.1)
+
+            val xRange = xAxis.upperBound-xAxis.lowerBound
+            xAxis.tickUnit = xRange/5
+
+            val yRange = yAxis.upperBound-yAxis.lowerBound
+            yAxis.tickUnit = yRange/5
         }
         else{
             GUIMain.loggerService.log(Level.WARNING, "No trace data found in TraceScrollWindow")
@@ -291,12 +297,13 @@ class TraceScrollWindow{
     fun addShiftXRightButtonListener(){
         shiftXRightButton.setOnAction {
             val maxTime = times.max()!!
-            if((xAxis.upperBound + shiftXAmount) <= maxTime) {
-                xAxis.lowerBound += shiftXAmount
-                xAxis.upperBound += shiftXAmount
+            val range = xAxis.upperBound-xAxis.lowerBound
+            if((xAxis.upperBound + (range*changeFactor)) <= maxTime) {
+                xAxis.lowerBound += (range*changeFactor)
+                xAxis.upperBound += (range*changeFactor)
             }
             else{
-                xAxis.lowerBound = maxTime.toDouble()-shiftXAmount
+                xAxis.lowerBound = maxTime.toDouble()-range
                 xAxis.upperBound = maxTime.toDouble()
             }
 
@@ -306,13 +313,14 @@ class TraceScrollWindow{
 
     fun addShiftXLeftButtonListener(){
         shiftXLeftButton.setOnAction {
-            if((xAxis.lowerBound - shiftXAmount) >= 0) {
-                xAxis.lowerBound -= shiftXAmount
-                xAxis.upperBound -= shiftXAmount
+            val range = xAxis.upperBound-xAxis.lowerBound
+            if((xAxis.lowerBound - (range*changeFactor)) >= 0) {
+                xAxis.lowerBound -= (range*changeFactor)
+                xAxis.upperBound -= (range*changeFactor)
             }
             else{
                 xAxis.lowerBound = 0.0
-                xAxis.upperBound = shiftXAmount
+                xAxis.upperBound = range
             }
 
             redrawChart()
