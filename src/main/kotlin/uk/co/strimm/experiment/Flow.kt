@@ -8,4 +8,5 @@ class Flow{
     var inputNames = arrayListOf<String>()
     var splitCoordinates = arrayListOf<Coordinates>()
     var splitChannel = 1
+    var eventKeys = arrayListOf<String>()
 }

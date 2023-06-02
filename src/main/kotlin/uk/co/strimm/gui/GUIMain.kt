@@ -330,8 +330,6 @@ class GUIMain : Command {
     //Both of the following functions will run the stream, they define different STRIMM modes and also activate and grey out different buttons on the toolbar
     private fun addStartPreviewButtonListener() {
         startPreviewExperimentButton.addActionListener {
-
-
             saveJSON.isEnabled = true
             startPreviewExperimentButton.isEnabled = false
             startAcquisitionExperimentButton.isEnabled = false
@@ -341,13 +339,11 @@ class GUIMain : Command {
             strimmUIService.state = UIstate.PREVIEW
             //run the stream
             experimentService.runStream()
-
         }
     }
 
     private fun addStartAcquisitionButtonListener() {
         startAcquisitionExperimentButton.addActionListener {
-
             actorService.fileManagerActor.tell(AskInitHDF5File(), null)
             startAcquisitionExperimentButton.isEnabled = false
             startPreviewExperimentButton.isEnabled = false
@@ -358,7 +354,6 @@ class GUIMain : Command {
             strimmUIService.state = UIstate.ACQUISITION
             //run the stream
             experimentService.runStream()
-
         }
     }
 
@@ -375,10 +370,8 @@ class GUIMain : Command {
         }
     }
 
-
     private fun addStopButtonListener() {
         stopExperimentButton.addActionListener {
-
             stopExperimentButton.isEnabled = false
             pauseExperimentButton.isEnabled = false
             startAcquisitionExperimentButton.isEnabled = true
@@ -397,12 +390,10 @@ class GUIMain : Command {
                 //turn the JSON into a runnable graph.
                 createStreamGraph()
             }
-
         }
     }
 
     //TODO might not work due to specific windows closing required
-
     //LEGACY  This is the response to pressing the close button
     //if in Acquisition mode it should save the data that has been acquired before closing
     //it also is set to shut down the NIDAQ and other special things from ProtocolService

@@ -75,13 +75,13 @@ open class STRIMMBuffer(var dataID : Int, val status : Int, val className : Stri
         return hashMapOf("dataID" to 9999.0 , "status" to 9999.0)
     }
 }
-open class STRIMMSaveBuffer(val data : List<STRIMMBuffer>, val name : String){
-}
+open class STRIMMSaveBuffer(val data : List<STRIMMBuffer>, val name : String)
 
 open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Double, dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status, "STRIMMPixelBuffer"){
     override var imageData = pix
     override open var traceData = arrayOf<Double>(dataID.toDouble(), timeAcquired.toDouble())
+
     override open fun getImageDataDims() : LongArray {
         //h,w,ch originally
         return longArrayOf(numChannels.toLong(), h.toLong(), w.toLong())
@@ -89,6 +89,7 @@ open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixel
     override open fun getTraceDataDims() : LongArray{
         return longArrayOf(1,2)
     }
+
     override open fun getImageDataType() : Int {
         if (pixelType == "Byte"){
             return 0
@@ -137,7 +138,6 @@ open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixel
     override open fun getTraceDataMap(): HashMap<String , Double>{
         return hashMapOf("0 'dataID'" to 9999.0 , "1 'timeAcquired'" to 9999.0)
     }
-
 }
 
 open class STRIMMImageBuffer(var pix : Any?, val w : Int, val h : Int, val bitDepth : Int, val timeAcquired : Number, dataID : Int, status : Int) :
@@ -231,21 +231,13 @@ open class STRIMMSignalBuffer(var data : DoubleArray?, var times : DoubleArray?,
         override fun getTraceDataDims() : LongArray{
             return longArrayOf(numSamples.toLong(),(1 + channelNames!!.size).toLong())
         }
-//        override fun getTraceDataMap(): HashMap<String , Double> {
-//
-//            val ret = hashMapOf<String, Double>()
-//            ret["times"] = 0.0
-//            for (ch in 0..channelNames!!.size-1){
-//                ret[channelNames!![ch]] = 0.0
-//            }
-//            return ret
-//        }
+
         override fun getTraceDataMap(): HashMap<String , Double> {
         //these are the names that will be used in the h5 attributes in form  1   'times'   done this way else h5 puts them into alpha order
             val ret = hashMapOf<String, Double>()
             var cnt = 0
-            ret[cnt.toString() + " 'times'"] = 0.0
-            for (ch in 0..channelNames!!.size-1){
+            ret["$cnt 'times'"] = 0.0
+            for (ch in 0 until channelNames!!.size){
                 cnt++
                 ret[cnt.toString() + " '" + channelNames!![ch] + "'"] = 0.0
             }

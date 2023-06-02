@@ -142,7 +142,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;TEST_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\National Instruments\Shared\ExternalCompilerSupport\C\include; C:\Program Files\Java\jdk-11.0.10\include;C:\Program Files\Java\jdk-11.0.10\include\win32; C:\Program Files\Java\jdk-11.0.10\include\win32\bridge;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\National Instruments\Shared\ExternalCompilerSupport\C\include;C:\Program Files\Java\jdk-11.0.17\include;C:\Program Files\Java\jdk-11.0.17\include\win32;C:\Program Files\Java\jdk-11.0.17\include\win32\bridge</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

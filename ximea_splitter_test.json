@@ -2,12 +2,6 @@
 	"sourceConfig":{ 
 		"sources" : [
 			{
-				"sourceName" : "NIDAQSource",
-				"sourceType" : "NIDAQSourceMethod",
-				"sourceCfg" : "episodicSource.cfg",
-				"isTimeLapse" : False
-			},
-			{
 				"sourceName" : "ximeaCamera",
 				"sourceType" : "MMCameraSource",
 				"sourceCfg" : "ximeaSource.cfg",
@@ -18,13 +12,6 @@
 	},
 	"flowConfig":{ 
 		"flows" : [
-			{
-				"flowName" : "NIDAQFlow",
-				"flowType" : "NIDAQBuffer_to_SignalBufferFlow",
-				"inputNames" : [
-					"NIDAQSource"
-				]
-			},
 			{
 				"flowName" : "ximeaSplit1",
 				"flowType" : "ImageSplitterFlow",
@@ -58,6 +45,18 @@
 				]
 			},
 			{
+				"flowName" : "split1MarkerFlow",
+				"flowType" : "EventMarkerFlow",
+				"inputNames" : [
+					"ximeaSplit1"
+				],
+				"eventKeys" : [
+					"1",
+					"2",
+					"3"
+				]
+			},
+			{
 				"flowName" : "ROIFlowSplit1",
 				"flowType" : "ROIFlowMethod",
 				"flowCfg" : "ximeaROIFlowSplit1.cfg",
@@ -77,6 +76,14 @@
 	},
 	"sinkConfig":{ 
 		"sinks" : [
+			{
+				"sinkName" : "ximeaSplit1MarkerSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"split1MarkerFlow"
+				]
+			},
 			{
 				"sinkName" : "Split1ROIDisplaySink",
 				"sinkType" : "SinkTraceMethod",
@@ -139,14 +146,6 @@
 				"sinkCfg" : "ximeaSink2.cfg",
 				"inputNames" : [
 					"ximeaSplit2"
-				]
-			},
-			{
-				"sinkName" : "NIDAQSaveSink",				
-				"sinkType" : "SinkSaveMethod",
-				"sinkCfg" : "Null.cfg",
-				"inputNames" : [
-					"NIDAQFlow"
 				]
 			}
 		]

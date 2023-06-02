@@ -15,6 +15,7 @@ import uk.co.strimm.CAMERA_FEED_BACKGROUND_COLOUR
 import uk.co.strimm.DockableWindowPosition
 import uk.co.strimm.actors.messages.stop.DetatchController
 import uk.co.strimm.gui.GUIMain
+import uk.co.strimm.services.StrimmUIService
 import java.awt.BorderLayout
 import java.awt.Graphics
 import java.awt.GridLayout
@@ -194,7 +195,7 @@ abstract class AbstractDockableWindow : DockableWindowPlugin {
             }
         }
 
-        GUIMain.strimmUIService.strimmFrame = frame!!
+        GUIMain.strimmUIService.strimmFrame = frame!! as StrimmUIService.CustomFrame
 
         GUIMain.loggerService.log(Level.INFO, "docked multiple dockable window")
 

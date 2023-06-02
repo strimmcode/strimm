@@ -1,6 +1,6 @@
 ﻿  TestTest.cpp
   Generating code
-  Previous IPDB not found, fall back to full compilation.
+  Previous IPDB was built with incompatible compiler, fall back to full compilation.
   All 2 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
-  TestTest.vcxproj -> C:\Users\twrig\source\repos\Test__16_11_22__multipleNIDAQ__allNIDAQs\x64\Release\TestTest.exe
+  TestTest.vcxproj -> C:\strimm\strimm\strimm\NIDAQ\x64\Release\TestTest.exe
