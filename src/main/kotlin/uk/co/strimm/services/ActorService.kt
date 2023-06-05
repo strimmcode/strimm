@@ -29,28 +29,30 @@ import java.util.logging.Level
 
 @Plugin(type = Service::class)
 class ActorService : AbstractService(), ImageJService {
-    //
     var mailboxConfig = com.typesafe.config.ConfigFactory.parseString("control-aware-dispatcher { mailbox-type = \"akka.dispatch.UnboundedControlAwareMailbox\" }")
     var actorSystem : ActorSystem? = ActorSystem.create("STRIMMAkkaSystem", mailboxConfig)
     var materializer = ActorMaterializer.create(ActorMaterializerSettings.create(actorSystem).withInputBuffer(1, 1), actorSystem)
-    //
+
     val actorCreateMessages = hashMapOf<Class<out Any>,Class<out ActorMessage>>()
     var allActors = hashMapOf<ActorRef,Pair<String,Class<out Actor>>>()
     val cameraActorDisplays = hashMapOf<String, ActorRef>()//dataset name, actor ref
-    //
+
     lateinit var mainActor : ActorRef
     lateinit var fileManagerActor : ActorRef
-    //
+
     var deadActors = arrayListOf<ActorRef>()
 
     init {
         createActorMessageMap()
     }
+
     fun createActor(props : Props, name : String, actorClass : Class<out Actor>) : ActorRef {
         GUIMain.loggerService.log(Level.INFO,"Registering actor: $name")
-        //Create every actor with a control aware dispatcher. This functions like default settings but will give
-        //priority to any message that implements akka.dispatch.ControlMessage. This will mostly be used to send
-        //high priority stop or kill messages
+        /**
+         * Create every actor with a control aware dispatcher. This functions like default settings but will give
+         * priority to any message that implements akka.dispatch.ControlMessage. This will mostly be used to send
+         * high priority stop or kill messages
+         */
         val actorRef = actorSystem!!.actorOf(props.withDispatcher("control-aware-dispatcher"),name)
 
         if(name != ActorConstants.MAIN_ACTOR_NAME) {
@@ -61,9 +63,11 @@ class ActorService : AbstractService(), ImageJService {
         allActors[actorRef] = Pair(name,actorClass)
         return actorRef
     }
+
     fun removeActor(actorToRemove : ActorRef){
         allActors.remove(actorToRemove)
     }
+
     fun getActorByName(actorName : String) : ActorRef?{
         var ref : ActorRef? = null
         for(actor in allActors){
@@ -79,6 +83,7 @@ class ActorService : AbstractService(), ImageJService {
         }
         return ref
     }
+
     fun <P : Actor?>getActorsOfType(actorClass : Class<P>) : ArrayList<ActorRef> {
         val actorsOfType = arrayListOf<ActorRef>()
         for(actor in allActors){
@@ -88,7 +93,7 @@ class ActorService : AbstractService(), ImageJService {
         }
         return actorsOfType
     }
-    //
+
     fun initStrimmAndFileManagerActors() {
         allActors = hashMapOf<ActorRef,Pair<String,Class<out Actor>>>()
         deadActors = arrayListOf<ActorRef>()
@@ -100,9 +105,8 @@ class ActorService : AbstractService(), ImageJService {
         callable = Callable { createActor(FileManagerActor.props(), fileManagerActorName, FileManagerActor::class.java) }
         future = exServ.submit(callable)
         fileManagerActor = future.get()
-
-
     }
+
     private fun createActorMessageMap(){
         actorCreateMessages[CameraWindowPlugin::class.java] = CreateCameraActor::class.java
         actorCreateMessages[TraceWindowPlugin::class.java] = CreateTraceActor::class.java
@@ -110,15 +114,15 @@ class ActorService : AbstractService(), ImageJService {
         actorCreateMessages[SourceTestActor::class.java] = CreateSourceTestActor::class.java
         actorCreateMessages[FlowTestActor::class.java] = CreateFlowTestActor::class.java
     }
+
     fun makeActorName(baseActorName : String) : String{
         val uniqueID = UUID.randomUUID().toString()
         val sanitizedName = GUIMain.utilsService.sanitiseNameForPlugin(baseActorName)
         return "$sanitizedName-ID-$uniqueID"
     }
+
     fun getActorPrettyName(fullActorName : String) : String{
         val split = fullActorName.split("-")
         return split.first()
     }
-
-
 }

@@ -20,6 +20,7 @@ class TraceActor(val plugin: TraceWindowPlugin) : AbstractActor(){
             return Props.create<TraceActor>(TraceActor::class.java) { TraceActor(plugin) }
         }
     }
+
     override fun createReceive(): Receive {
         return receiveBuilder()
             .match<Message>(Message::class.java) { message ->

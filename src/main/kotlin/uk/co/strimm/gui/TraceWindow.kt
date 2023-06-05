@@ -6,10 +6,15 @@ import javafx.application.Platform
 import javafx.embed.swing.JFXPanel
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
+import javafx.scene.control.ContentDisplay
+import javafx.scene.control.Label
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import org.apache.commons.lang3.StringUtils.isNumeric
@@ -18,6 +23,7 @@ import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.STRIMMSignalBuffer1
 import uk.co.strimm.experiment.Sink
+import uk.co.strimm.gui.GUIMain.Companion.markerEventLabel
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
 import java.awt.Color
@@ -26,8 +32,6 @@ import java.util.logging.Level
 import javax.swing.JLabel
 import javax.swing.JLayeredPane
 import javax.swing.SwingConstants
-
-var debugTW = false
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Trace Feed")
 class TraceWindowPlugin : AbstractDockableWindow() {
@@ -67,7 +71,6 @@ class TraceWindowPlugin : AbstractDockableWindow() {
         }
     }
 }
-
 
 class TraceWindow {
     var sink: Sink? = null

@@ -65,6 +65,18 @@
 				]
 			},
 			{
+				"flowName" : "split2MarkerFlow",
+				"flowType" : "EventMarkerFlow",
+				"inputNames" : [
+					"ROIFlowSplit1"
+				],
+				"eventKeys" : [
+					"4",
+					"5",
+					"6"
+				]
+			},
+			{
 				"flowName" : "ROIFlowSplit2",
 				"flowType" : "ROIFlowMethod",
 				"flowCfg" : "ximeaROIFlowSplit2.cfg",
@@ -82,6 +94,14 @@
 				"sinkCfg" : "Null.cfg",
 				"inputNames" : [
 					"split1MarkerFlow"
+				]
+			},
+			{
+				"sinkName" : "Split1ROIMarkerSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"split2MarkerFlow"
 				]
 			},
 			{

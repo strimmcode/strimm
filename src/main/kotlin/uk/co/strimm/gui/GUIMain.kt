@@ -9,6 +9,10 @@ import bibliothek.gui.dock.common.CGrid
 import hdf.hdf5lib.H5
 import io.scif.services.DatasetIOService
 import javafx.application.Platform
+import javafx.geometry.Insets
+import javafx.geometry.Pos
+import javafx.scene.control.Label
+import javafx.scene.layout.HBox
 import javafx.scene.paint.Color
 import net.imagej.DatasetService
 import net.imagej.ImageJService
@@ -184,6 +188,18 @@ class GUIMain : Command {
         imageJButtonBar.addSeparator()
         imageJButtonBar.add(closeAllWindowsExistingExpButton)
         addCloseAllWindowsExistinExpButtonListener()
+
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        imageJButtonBar.addSeparator()
+        markerEventLabel = JLabel("")
+        markerEventLabel.isVisible = false
+        imageJButtonBar.add(markerEventLabel)
         strimmUIService.state = UIstate.IDLE
     }
 
@@ -330,6 +346,10 @@ class GUIMain : Command {
     //Both of the following functions will run the stream, they define different STRIMM modes and also activate and grey out different buttons on the toolbar
     private fun addStartPreviewButtonListener() {
         startPreviewExperimentButton.addActionListener {
+            strimmUIService.eventMarkerLabelThread.start()
+            strimmUIService.eventMarkerLabelThread.updateEventMarkerLabel("")
+            //Zero the pressed key events as they should only be listened to when in preview or live
+            strimmUIService.pressedEventKeys = arrayListOf<Pair<Int, String>>()
             saveJSON.isEnabled = true
             startPreviewExperimentButton.isEnabled = false
             startAcquisitionExperimentButton.isEnabled = false
@@ -344,6 +364,10 @@ class GUIMain : Command {
 
     private fun addStartAcquisitionButtonListener() {
         startAcquisitionExperimentButton.addActionListener {
+            strimmUIService.eventMarkerLabelThread.start()
+            strimmUIService.eventMarkerLabelThread.updateEventMarkerLabel("")
+            //Zero the pressed key events as they should only be listened to when in preview or live
+            strimmUIService.pressedEventKeys = arrayListOf<Pair<Int, String>>()
             actorService.fileManagerActor.tell(AskInitHDF5File(), null)
             startAcquisitionExperimentButton.isEnabled = false
             startPreviewExperimentButton.isEnabled = false
@@ -357,7 +381,11 @@ class GUIMain : Command {
         }
     }
 
-    //This function controls the logic of going to ACQUISITION_PAUSED state and manages relevant button states,  unless STRIMM is in ACQUISITION mode then it cannot save data, so by going into ACQUISITION_PAUSED mode the saving is suspended for the duration of the pause.
+    /**
+     * This function controls the logic of going to ACQUISITION_PAUSED state and manages relevant button states,
+     * unless STRIMM is in ACQUISITION mode then it cannot save data, so by going into ACQUISITION_PAUSED mode the
+     * saving is suspended for the duration of the pause.
+     */
     private fun addPauseButtonListener() {
         pauseExperimentButton.addActionListener {
             if (strimmUIService.state == UIstate.ACQUISITION) {
@@ -377,6 +405,9 @@ class GUIMain : Command {
             startAcquisitionExperimentButton.isEnabled = true
             startPreviewExperimentButton.isEnabled = true
             loadExperimentConfigButton.isEnabled = true
+
+            strimmUIService.eventMarkerLabelThread.terminate()
+            strimmUIService.eventMarkerLabelThread.join()
 
             experimentService.stopStream()
             //selectedFile will be null if STRIMM is in an IDLE state so check for this
@@ -515,17 +546,13 @@ class GUIMain : Command {
         var selectedFile: File? = null // the currently loaded JSON
         val loadExistingExperimentButton = JButton() // loads a h5 file containing an existing experiment. Will display all data for quick viewing
         val closeAllWindowsExistingExpButton = JButton() // Button for specifically closing windows opened from loadExistingExperimentButton functionality
-
         val loadExperimentConfigButton = JButton() // loads the JSON, brings STRIMM to a WAITING state
-        val startPreviewExperimentButton =
-            JButton() // runs the JSON, but does not store any frames, STRIMM is in a PREVIEW state
+        val startPreviewExperimentButton = JButton() // runs the JSON, but does not store any frames, STRIMM is in a PREVIEW state
         val startAcquisitionExperimentButton = JButton() // runs the JSON, stores data, STRIMM is in an ACQUISITION mode
-        val stopExperimentButton =
-            JButton() // stops the JSON, destroys existing resources and then reloads the experiment and moves back to a WAITING mode
-        val pauseExperimentButton =
-            JButton() // will prevent an acquisition from saving data as long as paused, puts STRIMM into the ACQUISITION_PAUSED mode
-        val saveJSON =
-            JButton() //legacy - this will be changed to a ROISave button - allowing the user to select ROIs and then  save them into an ImageJ format - which is then reference in the JSON, it also means that ROIs could be made directly in ImageJ and imported to STRIMM
+        val stopExperimentButton = JButton() // stops the JSON, destroys existing resources and then reloads the experiment and moves back to a WAITING mode
+        val pauseExperimentButton = JButton() // will prevent an acquisition from saving data as long as paused, puts STRIMM into the ACQUISITION_PAUSED mode
+        val saveJSON = JButton() //legacy - this will be changed to a ROISave button - allowing the user to select ROIs and then  save them into an ImageJ format - which is then reference in the JSON, it also means that ROIs could be made directly in ImageJ and imported to STRIMM
+        var markerEventLabel = JLabel("")
         var mainWindowIcon: ImageIcon? = null
 
         fun createStreamGraph() {
@@ -585,7 +612,6 @@ class GUIMain : Command {
         @Parameter
         lateinit var loggerService: LoggerService
 
-
         @Parameter
         lateinit var commandService: CommandService
 
@@ -598,17 +624,14 @@ class GUIMain : Command {
         @Parameter
         lateinit var threadService: ThreadService
 
-
         @Parameter
         lateinit var overlayService: OverlayService
 
         @Parameter
         lateinit var opService: OpService
 
-
         @Parameter
         lateinit var datasetIOService: DatasetIOService
-
 
         @Parameter
         lateinit var experimentService: ExperimentService
@@ -630,9 +653,8 @@ class GUIMain : Command {
         lateinit var zoomService: ZoomService
 
 
-//there are only 8 different coloured legend symbols allowed in JavaFX bedore
+        //there are only 8 different coloured legend symbols allowed in JavaFX bedore
         //it recycles, so do it all this way
-
         //this introduced some bugs
 
         //endregion

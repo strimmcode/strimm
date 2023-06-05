@@ -30,6 +30,8 @@ class EventMarkerFlow : FlowMethod {
             if(orderedKeyPresses.isNotEmpty()) {
                 val press = orderedKeyPresses.first()
                 GUIMain.loggerService.log(Level.INFO, "EventMarkerFlow ${flow.flowName} noting event key ${press.second} pressed")
+                GUIMain.strimmUIService.eventMarkerLabelThread.updateEventMarkerLabel(press.second)
+                //Remove the key press from the list so it isn't processed again next time this method is run
                 GUIMain.strimmUIService.pressedEventKeys.remove(press)
                 val newBuffer = makeNewBuffer(image.first(), true, press.second)
                 return newBuffer
@@ -45,7 +47,7 @@ class EventMarkerFlow : FlowMethod {
      * the key being pressed. Event keys are currently only supported as single numbers 0-9. If no event key has been
      * pressed then still create a new STRIMMSignalBuffer but with data=0.0
      * @param oldBuffer The buffer with the incoming data
-     * @param keyMarkerPressed Flag to say if a key press has been found
+     * @param keyMarkerPressed Flag to say if a corresponding key press has been found
      * @param keyPressString The string of the key that has been pressed
      * @return A new STRIMMSignalBuffer containing the time of the oldBuffer but with new data based on a key being
      * pressed or not
@@ -64,12 +66,13 @@ class EventMarkerFlow : FlowMethod {
 
         /**
          * Purpose of the when statement below is to convert the incoming data into a STRIMMSignalBuffer. This
-         * STRIMMSignalBuffer will not contain the incomming data, but takes the incomming time. It adds new data
+         * STRIMMSignalBuffer will not contain the incomming data, but takes the incomming data's time. It adds new data
          * which corresponds to what event marker keys have been specified and pressed (or not pressed).
          *
-         * Note - Event markers for data coming from a NIDAQ board (using NIDAQBuffer to SignalBufferFlow) are not
+         * Note - Event markers for data coming from a NIDAQ board (using NIDAQBuffer_to_SignalBufferFlow) are not
          * supported. This is because in episodic mode (the only mode currently supported) all data arrives at the
-         * end of each episode, so placing event markers for this doesn't make much sense
+         * end of each episode, so placing event markers for this doesn't make much sense as you don't see the data
+         * until the end
          */
         when(oldBuffer){
             is STRIMMPixelBuffer ->{
