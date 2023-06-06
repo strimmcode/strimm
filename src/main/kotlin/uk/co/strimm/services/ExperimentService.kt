@@ -3,7 +3,6 @@ package uk.co.strimm.services
 import akka.NotUsed
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
-import akka.pattern.PatternsCS
 import akka.stream.javadsl.RunnableGraph
 import com.google.gson.GsonBuilder
 import hdf.hdf5lib.H5
@@ -16,7 +15,6 @@ import org.scijava.service.AbstractService
 import org.scijava.service.Service
 import uk.co.strimm.HDFImageDataset
 import uk.co.strimm.RoiInfo
-import uk.co.strimm.STRIMMPixelBuffer
 import uk.co.strimm.actors.messages.stop.TerminateActor
 import uk.co.strimm.actors.messages.tell.TellStopReceived
 import uk.co.strimm.experiment.*
@@ -68,10 +66,12 @@ class ExperimentService  : AbstractService(), ImageJService {
             false
         }
     }
+
     //createExperimentStream()     create the experimentStream - which contols akka components, also init protocolService
     fun createExperimentStream() {
         experimentStream = ExperimentStream(expConfig)
     }
+
     //createStreamGraph()    use experimentStream to createStream from expConfig, flags to show stream is loaded, and that data needs to be stored
     fun createStreamGraph(): Boolean {
         //Shutdown Arduino ports which may have been left open when a previous graph automatically loaded - but was not run
@@ -93,11 +93,13 @@ class ExperimentService  : AbstractService(), ImageJService {
             false
         }
     }
+
     //runStream()   set the AQM::bCamerasAcquire so all sources start, then runStream in experimentStream()
     fun runStream() {
        // GUIMain.acquisitionMethodService.bCamerasAcquire = true
         experimentStream.runStream()
     }
+    
     //stopStream()   set AQM::bCamerasAquire to false to stop sources. Switch the killswitch, set experimentStream::isRunning to false
     //stop the acquisition of each camera and destroyStream() - which will destroy all of the actors and docking windows.
     fun stopStream(): Boolean {
@@ -134,6 +136,7 @@ class ExperimentService  : AbstractService(), ImageJService {
             false
         }
     }
+
     //destroyStream()    if isStreamLoaded, destroy camera, trace, histogram etc actors along with datastoe actors.
     //destroy fileWriter and main actor, close all docking windows, and then close the actorSystem.
     //Closing the actorSystem will also shutdown any akka-stream components. The flag isStreamLoaded is then set to false.
@@ -483,7 +486,7 @@ class ExperimentService  : AbstractService(), ImageJService {
      * in any particular order
      * @param traceDataParentID The parent folder (group) of the trace data
      * @param traceDataset The trace data as a hashmap entry. Key is path of the trace dataset, value is an array of all trace data
-     * @return The trace data and associated names as a HashMaCore format clashes with cfgp<name, data>
+     * @return The trace data and associated names as a HashMap
      */
     fun sortTraces(traceDataParentID : Int, traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>) : HashMap<String, FloatArray>{
         val folderInfo = H5.H5Oget_info(traceDataParentID)
@@ -520,6 +523,12 @@ class ExperimentService  : AbstractService(), ImageJService {
         return sortedTraces
     }
 
+    /**
+     * Similar to sortTraces but differs in that this is processing ROI traces. This method uses the attributes
+     * of the "traceData" folder in ROI datasets to sort the ROI traces with their names
+     * @param traceDataset The trace data as a hashmap entry. Key is path of the trace dataset, value is an array of all trace data
+     * @return The trace data and associated names as a HashMap
+     */
     fun sortROITraces(traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>): HashMap<String, FloatArray>{
         val roiTraces = hashMapOf<String, FloatArray>()
         var roiTraceString: String
@@ -596,6 +605,14 @@ class ExperimentService  : AbstractService(), ImageJService {
         return isImageDataset
     }
 
+    /**
+     * Method to check if a dataset is an ROI dataset. There are two types of trace dataset - an ROI dataset and a
+     * NIDAQ trace dataset (this is not explicitly definted, but implicit). The way to differentiate them currently
+     * is to check if the "traceData" node within the dataset has certain attributes. Ideally there would be a more
+     * robust way to determining this but this will do for now.
+     * @param traceDataParentID The H5 ID of the "traceData" node
+     * @return Boolean that is true if the node has certain attributes for an ROI dataset, false if not
+     */
     fun isROIDataset(traceDataParentID : Int) : Boolean{
         val folderInfo = H5.H5Oget_info(traceDataParentID)
         val numAttributes = folderInfo.num_attrs
