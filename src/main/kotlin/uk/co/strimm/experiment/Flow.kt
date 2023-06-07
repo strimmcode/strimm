@@ -9,4 +9,5 @@ class Flow{
     var splitCoordinates = arrayListOf<Coordinates>()
     var splitChannel = 1
     var eventKeys = arrayListOf<String>()
+    var associatedSaveSink = ""
 }

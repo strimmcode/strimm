@@ -229,3 +229,9 @@ class ExperimentConstants{
         }
     }
 }
+
+class FileConstants{
+    companion object{
+        const val associatedMarkerSinkAttrText = "AMS"
+    }
+}

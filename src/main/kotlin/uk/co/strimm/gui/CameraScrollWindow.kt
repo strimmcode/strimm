@@ -12,6 +12,7 @@ import net.imglib2.type.numeric.real.FloatType
 import net.imglib2.view.Views
 import org.scijava.display.Display
 import org.scijava.plugin.Plugin
+import org.scijava.ui.swing.viewer.SwingDisplayPanel
 import org.scijava.ui.swing.viewer.SwingDisplayWindow
 import org.scijava.ui.viewer.DisplayWindow
 import uk.co.strimm.DisplayInfo
@@ -22,6 +23,7 @@ import java.awt.Robot
 import java.awt.event.InputEvent
 import java.util.*
 import java.util.logging.Level
+import javax.swing.JLayeredPane
 import javax.swing.JPanel
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Camera Scroll Window")
@@ -80,7 +82,6 @@ class CameraScrollWindow(val windowPanel: JPanel){
         GUIMain.loggerService.log(Level.INFO, "Processing image data into stack")
 
         dataset = createDataset(bitDepth)
-
         display = GUIMain.displayService.createDisplayQuietly(dataset)
         view = (display as ImageDisplay).activeView as DatasetView
         displayWindow = GUIMain.uiService.defaultUI.createDisplayWindow(display)
@@ -96,6 +97,15 @@ class CameraScrollWindow(val windowPanel: JPanel){
                         it.view(this, display)
                         pack()
                         val rootPane = this.rootPane
+
+                        //Test code, will remove soon
+//                        val test = this.rootPane.components
+//                        test.forEach { x -> println(x.name) }
+//                        val layeredPane = test[1]
+//                        val test2 = (layeredPane as JLayeredPane).components
+//                        val test3 = (test2[0] as SwingDisplayPanel).components
+//                        val test4 = test3.filter { x -> x.name == "sliderPanel" }
+//                        test4.forEach{ x -> println(x.name)}
                         windowPanel.add(rootPane)
 
                         /**
@@ -104,6 +114,7 @@ class CameraScrollWindow(val windowPanel: JPanel){
                         * Mentioned here (the last sentence):
                         * https://imagej.net/2012-08-01_-_Loading_and_displaying_a_dataset_with_the_ImageJ2_API
                         */
+                        //TODO click is not happening at the correct x and y at the moment
                         val robot = Robot()
                         robot.mouseMove(windowPanel.width/2, windowPanel.height/2)
                         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK)

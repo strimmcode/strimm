@@ -14,8 +14,10 @@ import java.time.format.DateTimeFormatter
 import java.util.logging.Level
 import hdf.hdf5lib.H5
 import hdf.hdf5lib.HDF5Constants
+import uk.co.strimm.FileConstants.Companion.associatedMarkerSinkAttrText
 import uk.co.strimm.actors.messages.ask.*
 import uk.co.strimm.actors.messages.tell.TellIsSaving
+import uk.co.strimm.actors.messages.tell.TellMarkerFlowMap
 import uk.co.strimm.actors.messages.tell.TellStopReceived
 
 
@@ -30,6 +32,7 @@ class FileManagerActor : AbstractActor() {
     var isSaving = false
     var stopSignalCount = 0
     val maxTraces = 100.toLong() //Fairly arbitrary, can change if needed
+    val markerSinkMap = hashMapOf<String, String>()
 
     companion object {
         fun props(): Props {
@@ -75,6 +78,11 @@ class FileManagerActor : AbstractActor() {
             .match<TerminateActor>(TerminateActor::class.java) {
                 GUIMain.loggerService.log(Level.INFO, "FileManagerActor actor ${self.path().name()} terminating")
                 self.tell(Kill.getInstance(), self)
+            }
+            .match<TellMarkerFlowMap>(TellMarkerFlowMap::class.java) {
+                GUIMain.loggerService.log(Level.INFO, "FileManagerActor received marker flow map: from${it.markerFlowAssociation.first} to ${it.markerFlowAssociation.second}")
+                markerSinkMap[it.markerFlowAssociation.first] = it.markerFlowAssociation.second
+                sender().tell(Acknowledgement.INSTANCE, self())
             }
             .match<TellStopReceived>(TellStopReceived::class.java) {
                 stopSignalCount++
@@ -1002,17 +1010,19 @@ class FileManagerActor : AbstractActor() {
             val data = buffers[saveBuffer.name] as ArrayList<List<STRIMMBuffer>>
             data.add(saveBuffer.data)
 
-            val group_node = H5.H5Gcreate(
+            val groupNode = H5.H5Gcreate(
                 file, saveBuffer.name, HDF5Constants.H5P_DEFAULT,
                 HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT)
 
-            handles["group_" + saveBuffer.name + "_node"] = group_node
+            writeAssociatedMarkerSinkAttribute(groupNode, saveBuffer)
+
+            handles["group_" + saveBuffer.name + "_node"] = groupNode
             traceDataNumberMap[saveBuffer.name] = LongArray(data[0].size) //data[0].size is the number of sub images
 
             for (f in 0 until saveBuffer.data.size) {//go through the sub images
                 traceDataNumberMap[saveBuffer.name]!![f] = 0
                 val group_node_ix = H5.H5Gcreate(
-                    group_node, f.toString(), HDF5Constants.H5P_DEFAULT,
+                    groupNode, f.toString(), HDF5Constants.H5P_DEFAULT,
                     HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
                 ) //default
                 handles["group_node_ix_" + saveBuffer.name + "_" + f.toString()] = group_node_ix
@@ -1099,6 +1109,42 @@ class FileManagerActor : AbstractActor() {
 
                 H5.H5Sclose(dataspace)
                 H5.H5Pclose(prop)
+            }
+        }
+    }
+
+    /**
+     * Method to write an "Associated Marker Sink" (AMS) attribute to the group node. This is so it can be corroborated
+     * when using load previous experiment functionality. This method will only run when a new dataset is created and
+     * is entirely optonal.
+     * @param nodeID The ID of the top level node containing all the dataset's data
+     * @param saveBuffer The data to be saved. We don't need all the data, just the saveBuffer's name (the folder's
+     * name)
+     */
+    private fun writeAssociatedMarkerSinkAttribute(nodeID : Int, saveBuffer : STRIMMSaveBuffer){
+        for(markerSinkPair in markerSinkMap){
+            if(markerSinkPair.value == saveBuffer.name){
+                val dims = longArrayOf(1)
+                val dataspaceID = H5.H5Screate_simple(1, dims, null)
+                val attribute = H5.H5Acreate(
+                    nodeID,
+                    "$associatedMarkerSinkAttrText ${markerSinkPair.key}",
+                    HDF5Constants.H5T_STD_I32BE,
+                    dataspaceID,
+                    HDF5Constants.H5P_DEFAULT,
+                    HDF5Constants.H5P_DEFAULT)
+
+                /**
+                 * Frustratingly, the H5 API doesn't support string attributes so we have to stuff the string into the
+                 * attribute name and give it a dummy numerical value.
+                 */
+                H5.H5Awrite(
+                    attribute,
+                    HDF5Constants.H5T_NATIVE_DOUBLE,
+                    doubleArrayOf(0.0)
+                )
+                H5.H5Aclose(attribute)
+                H5.H5Sclose(dataspaceID)
             }
         }
     }

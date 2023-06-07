@@ -99,7 +99,7 @@ class ExperimentService  : AbstractService(), ImageJService {
        // GUIMain.acquisitionMethodService.bCamerasAcquire = true
         experimentStream.runStream()
     }
-    
+
     //stopStream()   set AQM::bCamerasAquire to false to stop sources. Switch the killswitch, set experimentStream::isRunning to false
     //stop the acquisition of each camera and destroyStream() - which will destroy all of the actors and docking windows.
     fun stopStream(): Boolean {
@@ -247,6 +247,22 @@ class ExperimentService  : AbstractService(), ImageJService {
             GUIMain.loggerService.log(Level.SEVERE, ex.message!!)
             GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
+    }
+
+    /**
+     * Utility method that will get the names of all the save sinks that are downstream from a flow
+     * @param flowName The flow upstream of the save sinks
+     * @return A list of save sinks downstream of the flow. This will likely always be of size 1
+     */
+    fun getDownstreamSaveSinksFromFlow(flowName : String) : ArrayList<String>{
+        val sinks = ArrayList<String>()
+        val sinkConfig = expConfig.sinkConfig
+        for(sink in sinkConfig.sinks){
+            if(sink.inputNames.contains(flowName) && sink.sinkType == "SinkSaveMethod") {
+                sinks.add(sink.sinkName)
+            }
+        }
+        return sinks
     }
 
     /**
