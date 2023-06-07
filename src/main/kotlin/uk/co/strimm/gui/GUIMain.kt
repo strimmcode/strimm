@@ -9,10 +9,6 @@ import bibliothek.gui.dock.common.CGrid
 import hdf.hdf5lib.H5
 import io.scif.services.DatasetIOService
 import javafx.application.Platform
-import javafx.geometry.Insets
-import javafx.geometry.Pos
-import javafx.scene.control.Label
-import javafx.scene.layout.HBox
 import javafx.scene.paint.Color
 import net.imagej.DatasetService
 import net.imagej.ImageJService
@@ -35,13 +31,11 @@ import org.scijava.ui.UIService
 import org.scijava.ui.swing.SwingToolBar
 import org.scijava.ui.swing.sdi.SwingSDIUI
 import uk.co.strimm.ComponentTexts
-import uk.co.strimm.HDFImageDataset
 import uk.co.strimm.actors.messages.ask.AskInitHDF5File
 import uk.co.strimm.experiment.ROI
 import uk.co.strimm.services.*
 import uk.co.strimm.setIcon
 import java.awt.BorderLayout
-import java.awt.Dialog
 //import java.awt.Color
 //import java.awt.Color
 import java.awt.Dimension
@@ -156,7 +150,7 @@ class GUIMain : Command {
         if (mainWindowIcon != null) strimmUIService.strimmFrame.iconImage = mainWindowIcon!!.image
 
         imageJButtonBar.add(loadExistingExperimentButton)
-        addExistingExperimentButtonListener()
+        addLoadExistingExperimentButtonListener()
 
         imageJButtonBar.add(saveJSON)
         addSaveJSONButtonListener()
@@ -187,7 +181,7 @@ class GUIMain : Command {
         imageJButtonBar.addSeparator()
         imageJButtonBar.addSeparator()
         imageJButtonBar.add(closeAllWindowsExistingExpButton)
-        addCloseAllWindowsExistinExpButtonListener()
+        addCloseAllWindowsExistingExpButtonListener()
 
         imageJButtonBar.addSeparator()
         imageJButtonBar.addSeparator()
@@ -203,7 +197,7 @@ class GUIMain : Command {
         strimmUIService.state = UIstate.IDLE
     }
 
-    private fun addCloseAllWindowsExistinExpButtonListener(){
+    private fun addCloseAllWindowsExistingExpButtonListener(){
         closeAllWindowsExistingExpButton.addActionListener {
             loggerService.log(Level.INFO, "Closing all open windows")
             val cameraScrollWindowPlugins =
@@ -220,7 +214,7 @@ class GUIMain : Command {
         }
     }
 
-    private fun addExistingExperimentButtonListener(){
+    private fun addLoadExistingExperimentButtonListener(){
         loadExistingExperimentButton.addActionListener {
             val path = "."
             val folder = File(path)

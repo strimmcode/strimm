@@ -268,7 +268,7 @@ class ExperimentService  : AbstractService(), ImageJService {
     /**
      * Close all open windows. This is called before the h5 file is read and window plugins created
      */
-    private fun closeOpenWindows(){
+    fun closeOpenWindows(){
         GUIMain.loggerService.log(Level.INFO, "Closing all open windows")
         val cameraWindowPlugins =
             GUIMain.dockableWindowPluginService.getPluginsOfType(CameraWindowPlugin::class.java)
@@ -276,6 +276,12 @@ class ExperimentService  : AbstractService(), ImageJService {
         val traceWindowPlugins =
             GUIMain.dockableWindowPluginService.getPluginsOfType(TraceWindowPlugin::class.java)
         traceWindowPlugins.forEach { x -> x.value.close() }
+        val cameraScrollWindowPlugins =
+            GUIMain.dockableWindowPluginService.getPluginsOfType(CameraScrollWindowPlugin::class.java)
+        cameraScrollWindowPlugins.forEach { x -> x.value.close() }
+        val traceScrollWindowPlugins =
+            GUIMain.dockableWindowPluginService.getPluginsOfType(TraceScrollWindowPlugin::class.java)
+        traceScrollWindowPlugins.forEach { x -> x.value.close() }
     }
 
     /**
@@ -285,7 +291,7 @@ class ExperimentService  : AbstractService(), ImageJService {
      * @param fileAsGroupID The ID of the top level node but read as a group
      * @return A pair containing the paths to the group IDs for the datasets, first is image group IDs, second is trace group IDs
      */
-    fun getGroupIDs(childNames : Array<String?>, rootPath : String, fileAsGroupID: Int) : Pair<ArrayList<String>, ArrayList<String>>{
+    private fun getGroupIDs(childNames : Array<String?>, rootPath : String, fileAsGroupID: Int) : Pair<ArrayList<String>, ArrayList<String>>{
         val imageGroupIDs = arrayListOf<String>()
         val traceGroupIDs = arrayListOf<String>()
         //Determine if children contain image data or trace data
@@ -309,12 +315,12 @@ class ExperimentService  : AbstractService(), ImageJService {
      * @param datasetIDs A hashmap of the dataset IDs, key is the path, value is the ID of the node at the path
      * @param fileAsGroupID The ID of the top level node but read as a group
      */
-    fun readImageDatasets(datasetIDs : HashMap<String, Int>, fileAsGroupID: Int){
+    private fun readImageDatasets(datasetIDs : HashMap<String, Int>, fileAsGroupID: Int){
         val bitDepthAttrString = "bitDepth"
 
-        val allImages = ArrayList<HDFImageDataset>()
         for(datasetName in datasetIDs.keys){
             try{
+                val allImages = ArrayList<HDFImageDataset>()
                 val folderID = datasetIDs[datasetName]!!
                 val folderInfo = H5.H5Oget_info(folderID)
                 val numAttributes = folderInfo.num_attrs
@@ -338,6 +344,7 @@ class ExperimentService  : AbstractService(), ImageJService {
                     H5.H5Aclose(attributeID)
                 }
 
+                //Set the appropriate constant for bit depth
                 var dataTypeConstant = HDF5Constants.H5T_NATIVE_B8
                 when(bitDepth){
                     8 -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_INT8}
@@ -346,6 +353,7 @@ class ExperimentService  : AbstractService(), ImageJService {
                     else -> {GUIMain.loggerService.log(Level.WARNING, "Bit depth of $bitDepth not recognised. Trying with bitDepth=8")}
                 }
 
+                //Read the data
                 val numMembers = H5.H5Gn_members(fileAsGroupID, datasetName)
                 for(i in 0 until numMembers){
                     if(i % 100 == 0){
@@ -419,7 +427,7 @@ class ExperimentService  : AbstractService(), ImageJService {
      * @param datasetIDs A hashmap of the dataset IDs, key is the path, value is the ID of the node at the path
      * @param fileAsGroupID The ID of the top level node but read as a group
      */
-    fun readTraceDatasets(fileAsGroupID : Int, datasetIDs : HashMap<String, Int>){
+    private fun readTraceDatasets(fileAsGroupID : Int, datasetIDs : HashMap<String, Int>){
         for(parentFolderPath in datasetIDs.keys){
             GUIMain.loggerService.log(Level.INFO, "Reading trace dataset $parentFolderPath/$datasetString")
             try{
@@ -454,7 +462,7 @@ class ExperimentService  : AbstractService(), ImageJService {
      * Create dockable window plugins for each image dataset. The plugins for image dataset use CameraScrollWindowPlugin
      * class and are similar to the standard CameraWindowPlugin
      */
-    fun createImagePlugins(){
+    private fun createImagePlugins(){
         for(imageDataset in imageHDFDatasets){
             val pluginName = imageDataset.key.split("/")[1]
             val plugin = GUIMain.dockableWindowPluginService.createPlugin(CameraScrollWindowPlugin::class.java, imageDataset, false, pluginName)
@@ -472,7 +480,7 @@ class ExperimentService  : AbstractService(), ImageJService {
      * Create dockable window plugins for each trace dataset. The plugins for trace dataset use TraceScrollWindowPlugin
      * class and are similar to the standard TraceWindowPlugin
      */
-    fun createTracePlugins(traceDataFolderIDs : HashMap<String, Int>){
+    private fun createTracePlugins(traceDataFolderIDs : HashMap<String, Int>){
         for(traceDataset in traceHDFDatasets){ //Each entry represents all the trace data from one sink
             val parentFolderPath = traceDataset.key.replace("/$datasetString", "")
 
@@ -504,7 +512,7 @@ class ExperimentService  : AbstractService(), ImageJService {
      * @param traceDataset The trace data as a hashmap entry. Key is path of the trace dataset, value is an array of all trace data
      * @return The trace data and associated names as a HashMap
      */
-    fun sortTraces(traceDataParentID : Int, traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>) : HashMap<String, FloatArray>{
+    private fun sortTraces(traceDataParentID : Int, traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>) : HashMap<String, FloatArray>{
         val folderInfo = H5.H5Oget_info(traceDataParentID)
         val numAttributes = folderInfo.num_attrs
 
@@ -545,7 +553,7 @@ class ExperimentService  : AbstractService(), ImageJService {
      * @param traceDataset The trace data as a hashmap entry. Key is path of the trace dataset, value is an array of all trace data
      * @return The trace data and associated names as a HashMap
      */
-    fun sortROITraces(traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>): HashMap<String, FloatArray>{
+    private fun sortROITraces(traceDataset: MutableMap.MutableEntry<String, Array<FloatArray>>): HashMap<String, FloatArray>{
         val roiTraces = hashMapOf<String, FloatArray>()
         var roiTraceString: String
         for(i in 0 until traceDataset.value.size){
