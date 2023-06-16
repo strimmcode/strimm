@@ -610,9 +610,6 @@ class GUIMain : Command {
         lateinit var commandService: CommandService
 
         @Parameter
-        lateinit var strimmUIService: StrimmUIService
-
-        @Parameter
         lateinit var pluginService: PluginService
 
         @Parameter
@@ -639,18 +636,18 @@ class GUIMain : Command {
         @Parameter
         lateinit var protocolService: ProtocolService
 
-
         @Parameter
         lateinit var strimmROIService: StrimmROIService
 
         @Parameter
         lateinit var zoomService: ZoomService
 
+        @Parameter
+        lateinit var strimmUIService: StrimmUIService
 
         //there are only 8 different coloured legend symbols allowed in JavaFX bedore
         //it recycles, so do it all this way
         //this introduced some bugs
-
         //endregion
         val roiColours = arrayListOf<Color>(
             Color.color(1.0, 0.0, 0.0), //blue

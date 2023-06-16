@@ -2,7 +2,6 @@ package uk.co.strimm.services
 
 import bibliothek.gui.dock.common.CControl
 import bibliothek.gui.dock.common.CGrid
-import javafx.application.Platform
 import net.imagej.ImageJService
 import org.scijava.plugin.Plugin
 import org.scijava.service.AbstractService
@@ -11,7 +10,6 @@ import uk.co.strimm.gui.GUIMain
 import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
 import java.awt.event.KeyEvent
-import java.lang.Thread.sleep
 import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JOptionPane

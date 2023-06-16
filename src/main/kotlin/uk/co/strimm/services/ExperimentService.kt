@@ -13,6 +13,7 @@ import net.imagej.ImageJService
 import org.scijava.plugin.Plugin
 import org.scijava.service.AbstractService
 import org.scijava.service.Service
+import uk.co.strimm.FileConstants
 import uk.co.strimm.HDFImageDataset
 import uk.co.strimm.RoiInfo
 import uk.co.strimm.actors.messages.stop.TerminateActor
@@ -41,6 +42,7 @@ class ExperimentService  : AbstractService(), ImageJService {
 
     var imageHDFDatasets = hashMapOf<String, ArrayList<HDFImageDataset>>()
     var traceHDFDatasets = hashMapOf<String, Array<FloatArray>>() //<name as path, data>
+    var eventMarkerHDFDatasets = hashMapOf<String, Pair<String, Array<FloatArray>>>() //<main dataset path, Pair(marker dataset path, data)>
 
     val imageDataGroupName = "imageData"
     val traceDataGroupName = "traceData"
@@ -432,22 +434,40 @@ class ExperimentService  : AbstractService(), ImageJService {
             GUIMain.loggerService.log(Level.INFO, "Reading trace dataset $parentFolderPath/$datasetString")
             try{
                 //Assumption that a traceData group will only have one child that is a dataset called "data"
-                val datasetID = H5.H5Dopen(fileAsGroupID, "$parentFolderPath/$datasetString", HDF5Constants.H5P_DEFAULT)
+                val datasetID =
+                    H5.H5Dopen(fileAsGroupID, "$parentFolderPath/$datasetString", HDF5Constants.H5P_DEFAULT)
                 val datasetSpace = H5.H5Dget_space(datasetID)
 
                 var dataTypeConstant = H5.H5Sget_simple_extent_type(datasetSpace)
                 //Add to the when statement below if the datatype is expected to be something other than float
-                when(dataTypeConstant){
-                    HDF5Constants.H5T_FLOAT -> { dataTypeConstant = HDF5Constants.H5T_NATIVE_FLOAT}
+                when (dataTypeConstant) {
+                    HDF5Constants.H5T_FLOAT -> {
+                        dataTypeConstant = HDF5Constants.H5T_NATIVE_FLOAT
+                    }
                 }
 
                 val dims = LongArray(2) //Assumption that this will only ever be 2D (reasonable)
                 val maxDims = LongArray(2) //Don't see a need to use this but needed for method call
                 H5.H5Sget_simple_extent_dims(datasetSpace, dims, maxDims) //Populates dims and maxDims
-                val dataRead : Array<FloatArray> = Array(dims[0].toInt()) { FloatArray(dims[1].toInt())} //Column, then row
-                H5.H5Dread(datasetID, dataTypeConstant, HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, dataRead)
+                val dataRead: Array<FloatArray> =
+                    Array(dims[0].toInt()) { FloatArray(dims[1].toInt()) } //Column, then row
+                H5.H5Dread(
+                    datasetID,
+                    dataTypeConstant,
+                    HDF5Constants.H5S_ALL,
+                    HDF5Constants.H5S_ALL,
+                    HDF5Constants.H5P_DEFAULT,
+                    dataRead
+                )
+
+                //Event marker datasets will always be in addition to the trace dataset
+                val markerDataset = getAssociatedMarkerSink(fileAsGroupID, parentFolderPath)
+                if(markerDataset != ""){
+                    readEventMarkerDatasets(fileAsGroupID, markerDataset, "$parentFolderPath/$datasetString")
+                }
 
                 traceHDFDatasets["$parentFolderPath/$datasetString"] = dataRead
+
 
                 H5.H5Dclose(datasetID)
             }
@@ -455,6 +475,57 @@ class ExperimentService  : AbstractService(), ImageJService {
                 GUIMain.loggerService.log(Level.SEVERE, "Failed to read trace dataset $parentFolderPath/$datasetString. Message: ${ex.message}")
                 GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             }
+        }
+    }
+
+    /**
+     * Method to read certain trace datasets as event marker datasets. Functionally, these are still trace datasets
+     * but are separated as they represent event markers and event marker data is attached to an existing trace scroll
+     * window rather than having it's own window
+     * @param fileAsGroupID The ID of the top level node but read as a group
+     * @param markerDatasetName The name of the marker trace dataset in the HDF5 file taken from the associated
+     * marker sink attribute.
+     * @param traceDatasetPath The path of the correspondng trace dataset in the HDF file
+     * @see getAssociatedMarkerSink
+     */
+    private fun readEventMarkerDatasets(fileAsGroupID: Int, markerDatasetName: String, traceDatasetPath: String){
+        try {
+            GUIMain.loggerService.log(Level.INFO, "Reading event marker dataset ./$markerDatasetName/$datasetString")
+            //TODO this is hardcoded. Probably okay for now but may need upating
+            val path = "/$markerDatasetName/0/traceData/$datasetString"
+            val markerNodeID = H5.H5Dopen(fileAsGroupID, path, HDF5Constants.H5P_DEFAULT)
+            if(markerNodeID > 0) {
+                val datasetSpace = H5.H5Dget_space(markerNodeID)
+
+                var dataTypeConstant = H5.H5Sget_simple_extent_type(datasetSpace)
+                //Add to the when statement below if the datatype is expected to be something other than float
+                when (dataTypeConstant) {
+                    HDF5Constants.H5T_FLOAT -> {
+                        dataTypeConstant = HDF5Constants.H5T_NATIVE_FLOAT
+                    }
+                }
+
+                val dims = LongArray(2) //Assumption that this will only ever be 2D (reasonable)
+                val maxDims = LongArray(2) //Don't see a need to use this but needed for method call
+                H5.H5Sget_simple_extent_dims(datasetSpace, dims, maxDims) //Populates dims and maxDims
+                val dataRead: Array<FloatArray> =
+                    Array(dims[0].toInt()) { FloatArray(dims[1].toInt()) } //Column, then row
+                H5.H5Dread(
+                    markerNodeID,
+                    dataTypeConstant,
+                    HDF5Constants.H5S_ALL,
+                    HDF5Constants.H5S_ALL,
+                    HDF5Constants.H5P_DEFAULT,
+                    dataRead
+                )
+
+                eventMarkerHDFDatasets[traceDatasetPath] = Pair(path, dataRead)
+                H5.H5Dclose(markerNodeID)
+            }
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Error reading event marker dataset $markerDatasetName. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
     }
 
@@ -491,15 +562,45 @@ class ExperimentService  : AbstractService(), ImageJService {
             else {
                 sortTraces(traceDataFolderIDs[parentFolderPath]!!, traceDataset)
             }
-            val pluginName = traceDataset.key.split("/")[1]
-            val plugin = GUIMain.dockableWindowPluginService.createPlugin(TraceScrollWindowPlugin::class.java, sortedData, false, pluginName)
-            plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
-            Platform.runLater {
-                plugin.traceWindowController.populateChart() //Has to be done here because plugin initialisation needs to happen before the graph is populated
-                GUIMain.strimmUIService.windowsLoaded += 1
-                if(GUIMain.strimmUIService.windowsLoaded == (traceHDFDatasets.size + imageHDFDatasets.size)){
-                    GUIMain.closeAllWindowsExistingExpButton.isEnabled = true
-                    GUIMain.strimmUIService.hideLoadingDataDialog()
+
+            val hasMarkerFlow = traceDataset.key in eventMarkerHDFDatasets.map{ x -> x.key}
+            val isMarkerFlow = traceDataset.key in eventMarkerHDFDatasets.map{x -> x.value.first}
+
+            if(!isMarkerFlow) {
+                val pluginName = traceDataset.key.split("/")[1]
+                val plugin = GUIMain.dockableWindowPluginService.createPlugin(
+                    TraceScrollWindowPlugin::class.java,
+                    sortedData,
+                    false,
+                    pluginName
+                )
+                plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
+
+                if(!hasMarkerFlow) {
+                    Platform.runLater {
+                        plugin.traceWindowController.populateChart() //Has to be done here because plugin initialisation needs to happen before the graph is populated
+                        GUIMain.strimmUIService.windowsLoaded += 1
+                        if (GUIMain.strimmUIService.windowsLoaded == (traceHDFDatasets.size + imageHDFDatasets.size)-eventMarkerHDFDatasets.size) {
+                            GUIMain.closeAllWindowsExistingExpButton.isEnabled = true
+                            GUIMain.strimmUIService.hideLoadingDataDialog()
+                        }
+                    }
+                }
+                else{
+                    GUIMain.loggerService.log(Level.INFO, "Creating dataset ${traceDataset.key} with marker flow")
+                    Platform.runLater {
+                        plugin.traceWindowController.populateChart() //Has to be done here because plugin initialisation needs to happen before the graph is populated
+                        val markerData = eventMarkerHDFDatasets.filter { x -> x.key == traceDataset.key }.toList()
+                        if(markerData.isNotEmpty()){
+                            plugin.traceWindowController.populateEventMarkers(markerData.first().second.second)
+                        }
+
+                        GUIMain.strimmUIService.windowsLoaded += 1
+                        if (GUIMain.strimmUIService.windowsLoaded == (traceHDFDatasets.size + imageHDFDatasets.size)-eventMarkerHDFDatasets.size) {
+                            GUIMain.closeAllWindowsExistingExpButton.isEnabled = true
+                            GUIMain.strimmUIService.hideLoadingDataDialog()
+                        }
+                    }
                 }
             }
         }
@@ -656,5 +757,31 @@ class ExperimentService  : AbstractService(), ImageJService {
         }
 
         return hasDataIDAttribute && hasStatusAttribute
+    }
+
+    /**
+     * Sinks in the HDF file can have an attribute for a an associated marker sink. This method will return the value
+     * of that attribute if that exists.
+     * @param fileAsGroupID The ID of the top level node but read as a group
+     * @param dataFullPath The full path of the sink dataset in the HDF file
+     * @return The value of the associated marker sink attribute or an empty string if attribute doesn't exist
+     */
+    fun getAssociatedMarkerSink(fileAsGroupID: Int, dataFullPath: String) : String{
+        val nodePath = dataFullPath.split("/")[1]
+        val groupNodeID = H5.H5Gopen(fileAsGroupID, nodePath, HDF5Constants.H5P_DEFAULT)
+        val folderInfo = H5.H5Oget_info(groupNodeID)
+        val numAttributes = folderInfo.num_attrs
+        for(i in 0 until numAttributes){
+            val attributeID = H5.H5Aopen_by_idx(
+                groupNodeID, ".", HDF5Constants.H5_INDEX_CRT_ORDER,
+                HDF5Constants.H5_ITER_NATIVE, i, HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT)
+            val attributeFullName = H5.H5Aget_name(attributeID)
+            if(attributeFullName.contains(FileConstants.associatedMarkerSinkAttrText)){
+                val split = attributeFullName.split(" ")
+                val associatedMarkerSink = split[1]
+                return associatedMarkerSink
+            }
+        }
+        return ""
     }
 }

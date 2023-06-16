@@ -8,15 +8,14 @@ import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
 import javafx.scene.Scene
-import javafx.scene.chart.LineChart
-import javafx.scene.chart.NumberAxis
-import javafx.scene.chart.XYChart
+import javafx.scene.chart.*
 import javafx.scene.control.*
 import javafx.scene.image.ImageView
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
+import javafx.scene.text.Text
 import org.scijava.plugin.Plugin
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
@@ -84,6 +83,10 @@ class TraceScrollWindow{
     var yAxis = NumberAxis()
     var lineChart = LineChart<Number, Number>(xAxis, yAxis)
 
+    val markerXAxis = NumberAxis()
+    var catYAxis = CategoryAxis()
+    var markerChart = ScatterChart<Number, String>(markerXAxis, catYAxis)
+
     var shiftXAmount = 500.0 //When a shift button is clicked, how much will it shift by (unit is the time unit). This is the initial value and will change if the x axis range is changed
     var shiftYAmount = 500.0
     var xTickUnit = 100.0
@@ -106,10 +109,15 @@ class TraceScrollWindow{
 
     var showHideButton = Button()
 
+    var chartPane = VBox()
+
+    var hasMarkers = false
+
     @FXML
     fun initialize(){
         tracePane.children.add(borderPane)
-        borderPane.center = lineChart
+        borderPane.center = chartPane
+        chartPane.children.add(lineChart)
 
         val yAxisButtonBox = VBox()
         yAxisButtonBox.children.addAll(shiftYUpButton, shiftYDownButton, zoomInYButton, zoomOutYButton)
@@ -184,7 +192,9 @@ class TraceScrollWindow{
         yAxis.isMinorTickVisible = false
         yAxis.isTickMarkVisible = true
         yAxis.tickUnit = yTickUnit
-        yAxis.label = "Value" //TODO get from file eventually
+//        yAxis.label = "Value" //TODO get from file eventually
+        yAxis.tickLabelRotation = 270.0
+        catYAxis.tickLabelRotation = 270.0
     }
 
     fun populateChart(){
@@ -235,6 +245,50 @@ class TraceScrollWindow{
         else{
             GUIMain.loggerService.log(Level.WARNING, "No trace data found in TraceScrollWindow")
         }
+    }
+
+    fun populateEventMarkers(markerData: Array<FloatArray>){
+        //Set a bunch of properties for appearance and functonality
+        markerChart.maxWidth = lineChart.maxWidth
+        markerChart.prefWidth = lineChart.prefWidth
+        markerChart.maxHeight = 50.0
+        markerChart.prefWidthProperty().bind(tracePane.widthProperty())
+        markerChart.animated = false
+        markerChart.isLegendVisible = false
+        markerChart.isHorizontalZeroLineVisible = false
+        markerXAxis.isMinorTickVisible = false
+        markerXAxis.isTickMarkVisible = true
+        markerXAxis.isTickLabelsVisible = false
+        markerXAxis.isAutoRanging = false
+        markerXAxis.tickUnit = xAxis.tickUnit
+        markerChart.prefWidthProperty().bind(tracePane.widthProperty())
+
+        hasMarkers = true
+        //Populate the chart with event markers (an event marker will be anything greater than 0)
+        for(i in 1 until markerData[0].size) {
+            val series = XYChart.Series<Number, String>()
+            val markerChannel = markerData.map { x ->
+                var dataPoint = ""
+                if(x[i] > 0.0){
+                    dataPoint = x[i].toString()
+                }
+
+                Pair(x[0], dataPoint)
+            }
+
+            markerChannel.forEach { x ->
+                if(x.second != ""){
+                    series.data.add(XYChart.Data<Number, String>(x.first, x.second))
+                }
+            }
+
+            markerChart.data.add(series)
+        }
+
+        chartPane.children.add(0, markerChart)
+
+        markerXAxis.lowerBound = xAxis.lowerBound
+        markerXAxis.upperBound = xAxis.upperBound
     }
 
     fun addShowHideButtonListener(){
@@ -301,10 +355,18 @@ class TraceScrollWindow{
             if((xAxis.upperBound + (range*changeFactor)) <= maxTime) {
                 xAxis.lowerBound += (range*changeFactor)
                 xAxis.upperBound += (range*changeFactor)
+                if(hasMarkers){
+                    markerXAxis.lowerBound = xAxis.lowerBound
+                    markerXAxis.upperBound = xAxis.upperBound
+                }
             }
             else{
                 xAxis.lowerBound = maxTime.toDouble()-range
                 xAxis.upperBound = maxTime.toDouble()
+                if(hasMarkers){
+                    markerXAxis.lowerBound = xAxis.lowerBound
+                    markerXAxis.upperBound = xAxis.upperBound
+                }
             }
 
             redrawChart()
@@ -317,10 +379,18 @@ class TraceScrollWindow{
             if((xAxis.lowerBound - (range*changeFactor)) >= 0) {
                 xAxis.lowerBound -= (range*changeFactor)
                 xAxis.upperBound -= (range*changeFactor)
+                if(hasMarkers){
+                    markerXAxis.lowerBound = xAxis.lowerBound
+                    markerXAxis.upperBound = xAxis.upperBound
+                }
             }
             else{
                 xAxis.lowerBound = 0.0
                 xAxis.upperBound = range
+                if(hasMarkers){
+                    markerXAxis.lowerBound = xAxis.lowerBound
+                    markerXAxis.upperBound = xAxis.upperBound
+                }
             }
 
             redrawChart()
@@ -374,10 +444,17 @@ class TraceScrollWindow{
             val range = xAxis.upperBound-xAxis.lowerBound
             xAxis.lowerBound = xAxis.lowerBound + (range*changeFactor)
             xAxis.upperBound = xAxis.upperBound -(range*changeFactor)
+            if(hasMarkers){
+                markerXAxis.lowerBound = xAxis.lowerBound
+                markerXAxis.upperBound = xAxis.upperBound
+            }
 
             val newRange = xAxis.upperBound-xAxis.lowerBound
             shiftXAmount = newRange/2
             xAxis.tickUnit = newRange/5
+            if(hasMarkers){
+                markerXAxis.tickUnit = xAxis.tickUnit
+            }
 
             redrawChart()
         }
@@ -394,6 +471,10 @@ class TraceScrollWindow{
                 xAxis.lowerBound -= range*changeFactor
             }
 
+            if(hasMarkers){
+                markerXAxis.lowerBound = xAxis.lowerBound
+            }
+
             val newVal = xAxis.upperBound + (range * changeFactor)
             if(newVal > times.max()!!){
                 xAxis.upperBound = times.max()!!.toDouble()
@@ -402,9 +483,16 @@ class TraceScrollWindow{
                 xAxis.upperBound  = newVal
             }
 
+            if(hasMarkers){
+                markerXAxis.upperBound = xAxis.upperBound
+            }
+
             val newRange = xAxis.upperBound-xAxis.lowerBound
             shiftXAmount = newRange/2
             xAxis.tickUnit = newRange/5
+            if(hasMarkers){
+                markerXAxis.tickUnit = xAxis.tickUnit
+            }
 
             redrawChart()
         }

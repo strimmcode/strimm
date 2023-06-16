@@ -12,7 +12,6 @@ import net.imglib2.type.numeric.real.FloatType
 import net.imglib2.view.Views
 import org.scijava.display.Display
 import org.scijava.plugin.Plugin
-import org.scijava.ui.swing.viewer.SwingDisplayPanel
 import org.scijava.ui.swing.viewer.SwingDisplayWindow
 import org.scijava.ui.viewer.DisplayWindow
 import uk.co.strimm.DisplayInfo
@@ -23,7 +22,6 @@ import java.awt.Robot
 import java.awt.event.InputEvent
 import java.util.*
 import java.util.logging.Level
-import javax.swing.JLayeredPane
 import javax.swing.JPanel
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Camera Scroll Window")
@@ -97,15 +95,6 @@ class CameraScrollWindow(val windowPanel: JPanel){
                         it.view(this, display)
                         pack()
                         val rootPane = this.rootPane
-
-                        //Test code, will remove soon
-//                        val test = this.rootPane.components
-//                        test.forEach { x -> println(x.name) }
-//                        val layeredPane = test[1]
-//                        val test2 = (layeredPane as JLayeredPane).components
-//                        val test3 = (test2[0] as SwingDisplayPanel).components
-//                        val test4 = test3.filter { x -> x.name == "sliderPanel" }
-//                        test4.forEach{ x -> println(x.name)}
                         windowPanel.add(rootPane)
 
                         /**
