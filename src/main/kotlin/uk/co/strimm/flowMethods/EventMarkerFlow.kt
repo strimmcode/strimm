@@ -70,8 +70,7 @@ class EventMarkerFlow : FlowMethod {
      */
     private fun makeNewBuffer(oldBuffer : STRIMMBuffer, keyMarkerPressed : Boolean, keyPressString : String): STRIMMBuffer{
         val newBuffer: STRIMMBuffer
-
-        //TEST COMMENT
+        
         var keyPressNumber = 0.0
         if(keyMarkerPressed) {
             try {
