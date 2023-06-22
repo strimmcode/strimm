@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\strimm\strimm\strimm\Launch_STRIMM\x64\Release\Launch_STRIMM.exe</FullPath>
+      <FullPath>C:\STRIMM\strimm\Launch_STRIMM\x64\Release\Launch_STRIMM.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

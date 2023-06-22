@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\strimm\strimm\strimm\NIDAQ\x64\Debug\TestTest.exe</FullPath>
+      <FullPath>C:\STRIMM\strimm\NIDAQ\x64\Debug\TestTest.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

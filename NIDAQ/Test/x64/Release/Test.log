@@ -1,1 +1,14 @@
-﻿  Test.vcxproj -> C:\strimm\strimm\strimm\NIDAQ\x64\Release\Test.dll
+﻿  CompoundProtocol.cpp
+  dllmain.cpp
+  ProtocolBase.cpp
+  SimpleDataProtocol.cpp
+  SimpleProtocol.cpp
+  SimpleProtocolContinuous.cpp
+  SimpleProtocolSoftwareTiming.cpp
+  Test.cpp
+     Creating library C:\STRIMM\strimm\NIDAQ\x64\Release\Test.lib and object C:\STRIMM\strimm\NIDAQ\x64\Release\Test.exp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 877 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Test.vcxproj -> C:\STRIMM\strimm\NIDAQ\x64\Release\Test.dll

@@ -52,7 +52,7 @@ open class RatioFlowMethod() : FlowMethod {
 
 
             for (j in 0..im.w*im.h - 1) {
-                pix[j] = (pix1[j].toDouble() / pix0[j].toDouble()).toShort()
+                pix[j] = (pix1[j].toDouble() / pix0[j].toDouble()).toInt().toShort()
             }
             statusID = 1
         }

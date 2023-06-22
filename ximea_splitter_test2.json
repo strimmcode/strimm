@@ -10,8 +10,28 @@
 			}
 		]
 	},
+	"flowConfig":{
+		"flows" : [
+			{
+				"flowName" : "ROIFlow1",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "ximeaROIFlowSplit1.cfg",
+				"inputNames" : [
+					"ximeaCamera"
+				]
+			}
+		]
+	},
 	"sinkConfig":{ 
 		"sinks" : [
+			{
+				"sinkName" : "Split1ROIDisplaySink",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "ximea_ROI_sink_preview.cfg",
+				"inputNames" : [
+					"ROIFlow1"
+				]
+			},
 			{
 				"sinkName" : "ximeaSaveSplit1",
 				"sinkType" : "SinkSaveMethod",

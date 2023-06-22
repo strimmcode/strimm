@@ -123,7 +123,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;TEST_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\National Instruments\Shared\ExternalCompilerSupport\C\include;C:\Program Files\Java\jdk-11.0.17\include;C:\Program Files\Java\jdk-11.0.17\include\win32;C:\Program Files\Java\jdk-11.0.17\include\win32\bridge</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Java\jdk-20\include\win32\bridge;C:\Program Files\Java\jdk-20\include\win32;C:\Program Files\Java\jdk-20\include;C:\Program Files (x86)\National Instruments\Shared\ExternalCompilerSupport\C\include;C:\Program Files\Java\jdk-11.0.17\include;C:\Program Files\Java\jdk-11.0.17\include\win32;C:\Program Files\Java\jdk-11.0.17\include\win32\bridge</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zc:strictStrings- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -142,7 +142,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;TEST_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\National Instruments\Shared\ExternalCompilerSupport\C\include;C:\Program Files\Java\jdk-11.0.17\include;C:\Program Files\Java\jdk-11.0.17\include\win32;C:\Program Files\Java\jdk-11.0.17\include\win32\bridge</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Java\jdk-20\include\win32\bridge;C:\Program Files\Java\jdk-20\include\win32;C:\Program Files\Java\jdk-20\include;C:\Program Files (x86)\National Instruments\Shared\ExternalCompilerSupport\C\include;C:\Program Files\Java\jdk-11.0.17\include;C:\Program Files\Java\jdk-11.0.17\include\win32;C:\Program Files\Java\jdk-11.0.17\include\win32\bridge</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

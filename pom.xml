@@ -5,21 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mainModule</artifactId>
-    <groupId>me.twrig</groupId>
-    <version>1.0.5-SNAPSHOT</version>
+    <groupId>strimm</groupId>
+    <version>1.0.6-SNAPSHOT</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>org.scijava</groupId>
         <artifactId>pom-scijava</artifactId>
         <version>23.1.1</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <name>mainModule</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
-        <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
+        <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
+        <kotlin.version>1.8.22</kotlin.version>
     </properties>
 
     <repositories>
@@ -29,7 +30,7 @@
         </repository>
         <repository>
             <id>imagej.public</id>
-            <url>http://maven.imagej.net/content/groups/public</url>
+            <url>https://maven.imagej.net/content/groups/public</url>
         </repository>
         <repository>
             <id>MMCore</id>
@@ -38,146 +39,148 @@
     </repositories>
 
     <build>
-            <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-            <pluginManagement>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jetbrains.dokka</groupId>
-                        <artifactId>dokka-maven-plugin</artifactId>
-                        <version>${dokka.version}</version>
-                        <executions>
-                            <execution>
-                                <phase>pre-site</phase>
-                                <goals>
-                                    <goal>dokka</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <includes>
-                                <file>README.md</file>
-                            </includes>
-                            <sourceDirectories>
-                                <dir>src/main/kotlin</dir>
-                            </sourceDirectories>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </pluginManagement>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.jetbrains.kotlin</groupId>
-                    <artifactId>kotlin-maven-plugin</artifactId>
-                    <version>1.5.10</version>
+                    <groupId>org.jetbrains.dokka</groupId>
+                    <artifactId>dokka-maven-plugin</artifactId>
+                    <version>${dokka.version}</version>
                     <executions>
                         <execution>
-                            <id>compile</id>
-                            <phase>compile</phase>
+                            <phase>pre-site</phase>
                             <goals>
-                                <goal>compile</goal>
-                            </goals>
-                            <configuration>
-                                <sourceDirs>
-                                    <source>src/main/kotlin</source>
-                                    <source>target/generated-sources/kapt</source>
-                                    <source>target/generated-sources/kaptKotlin</source>
-                                </sourceDirs>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>test-compile</id>
-                            <phase>test-compile</phase>
-                            <goals>
-                                <goal>test-compile</goal>
+                                <goal>dokka</goal>
                             </goals>
                         </execution>
                     </executions>
                     <configuration>
-                        <jvmTarget>1.8</jvmTarget>
+                        <includes>
+                            <file>README.md</file>
+                        </includes>
+                        <sourceDirectories>
+                            <dir>src/main/kotlin</dir>
+                        </sourceDirectories>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.0</version>
-                    <configuration>
-                        <workingDirectory>${basedir}\..\</workingDirectory>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.4</version>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <mainClass>Main</mainClass>
-                            </manifest>
-                        </archive>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-maven-plugin</artifactId>
-                    <version>0.0.8</version>
-                    <configuration>
-                        <mainClass>Main</mainClass>
-                    </configuration>
-                </plugin>
-                <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-enforcer-plugin</artifactId>-->
-                <!--<version>3.0.0-M2</version>-->
-                <!--<executions>-->
-                <!--<execution>-->
-                <!--<id>enforce-banned-dependencies</id>-->
-                <!--<goals>-->
-                <!--<goal>enforce</goal>-->
-                <!--</goals>-->
-                <!--<configuration>-->
-                <!--<rules>-->
-                <!--&lt;!&ndash;<bannedDependencies>&ndash;&gt;-->
-                <!--&lt;!&ndash;<includes>&ndash;&gt;-->
-                <!--&lt;!&ndash;<exclude></exclude>&ndash;&gt;-->
-                <!--&lt;!&ndash;</includes>&ndash;&gt;-->
-                <!--&lt;!&ndash;</bannedDependencies>&ndash;&gt;-->
-                <!--<bannedDependencies>-->
-                <!--<excludes>-->
-                <!--<exclude>com.typesafe.akka:*</exclude>-->
-                <!--</excludes>-->
-                <!--</bannedDependencies>-->
-                <!--<searchTransitive>false</searchTransitive>-->
-                <!--</rules>-->
-                <!--<fail>true</fail>-->
-                <!--</configuration>-->
-                <!--</execution>-->
-                <!--</executions>-->
-                <!--</plugin>-->
             </plugins>
-        </build>
-
-
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>1.8.22</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <source>src/main/kotlin</source>
+                                <source>target/generated-sources/kapt</source>
+                                <source>target/generated-sources/kaptKotlin</source>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>17</jvmTarget>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.0</version>
+                <configuration>
+                    <workingDirectory>${basedir}\..\</workingDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>Main</mainClass>
+                </configuration>
+            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-enforcer-plugin</artifactId>-->
+            <!--<version>3.0.0-M2</version>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<id>enforce-banned-dependencies</id>-->
+            <!--<goals>-->
+            <!--<goal>enforce</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<rules>-->
+            <!--&lt;!&ndash;<bannedDependencies>&ndash;&gt;-->
+            <!--&lt;!&ndash;<includes>&ndash;&gt;-->
+            <!--&lt;!&ndash;<exclude></exclude>&ndash;&gt;-->
+            <!--&lt;!&ndash;</includes>&ndash;&gt;-->
+            <!--&lt;!&ndash;</bannedDependencies>&ndash;&gt;-->
+            <!--<bannedDependencies>-->
+            <!--<excludes>-->
+            <!--<exclude>com.typesafe.akka:*</exclude>-->
+            <!--</excludes>-->
+            <!--</bannedDependencies>-->
+            <!--<searchTransitive>false</searchTransitive>-->
+            <!--</rules>-->
+            <!--<fail>true</fail>-->
+            <!--</configuration>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--</plugin>-->
+        </plugins>
+    </build>
     <dependencies>
-
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit</artifactId>
-            <version>1.5.10</version>
+            <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>1.2.61</version>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej</artifactId>
@@ -186,6 +189,11 @@
             <groupId>org.scijava</groupId>
             <artifactId>scijava-ui-swing</artifactId>
             <version>0.13.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scijava</groupId>
+            <artifactId>scijava-common</artifactId>
+            <version>2.94.1</version>
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -213,7 +221,6 @@
             <artifactId>gson</artifactId>
             <version>2.8.5</version>
         </dependency>
-
         <dependency>
             <groupId>org.dockingframes</groupId>
             <artifactId>docking-frames-common</artifactId>
@@ -253,12 +260,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/slf4j-api-1.7.5.jar</systemPath>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.openjfx</groupId>-->
-            <!--<artifactId>javafx</artifactId>-->
-            <!--<version>11</version>-->
-            <!--<type>pom</type>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
@@ -295,5 +296,4 @@
             <version>19</version>
         </dependency>
     </dependencies>
-
 </project>
