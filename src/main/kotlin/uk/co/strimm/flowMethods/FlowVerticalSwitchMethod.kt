@@ -19,7 +19,7 @@ open class FlowVerticalSwitchMethod() : FlowMethod {
         this.flow = flow
     }
 
-    override fun run(image: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(image: List<STRIMMBuffer>): List<STRIMMBuffer> {
         //the flow function should know the
         count++
         //println("Flow processing image " + image.size + "  " + count)
@@ -46,7 +46,7 @@ open class FlowVerticalSwitchMethod() : FlowMethod {
 //        }
 
         //im1.images[0].pix = pix
-        return STRIMMImage( arrayListOf(ImageData(pix1,w,h,16,System.nanoTime(), count)),0, "", 1)
+        return listOf(STRIMMImage( arrayListOf(ImageData(pix1,w,h,16,System.nanoTime(), count)),0, "", 1))
     }
 
     override fun preStart(){

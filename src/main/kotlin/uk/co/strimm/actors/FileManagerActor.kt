@@ -19,6 +19,7 @@ import uk.co.strimm.actors.messages.ask.*
 import uk.co.strimm.actors.messages.tell.TellIsSaving
 import uk.co.strimm.actors.messages.tell.TellMarkerFlowMap
 import uk.co.strimm.actors.messages.tell.TellStopReceived
+import kotlin.collections.ArrayList
 
 
 class FileManagerActor : AbstractActor() {
@@ -143,7 +144,6 @@ class FileManagerActor : AbstractActor() {
                                         //retrieve the handle for this group
                                         val hand =
                                             handles["group_node_ix_" + keySz + "_" + f.toString() + "_imageData"]!!
-                                        println(hand.toString() + "*******************")
                                         //create a dataset
                                         var datasetId = 0
                                         when (type_frm) {
@@ -233,8 +233,6 @@ class FileManagerActor : AbstractActor() {
                                         //close resources
                                         H5.H5Sclose(dataspaceMatrixData)
                                         H5.H5Dclose(datasetId)
-
-                                        //////////////////////////
                                     }
                                     if (data[frame][f].traceData != null) {
                                         var dims = data[frame][f].getTraceDataDims()
@@ -307,321 +305,326 @@ class FileManagerActor : AbstractActor() {
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .match<STRIMMSaveBuffer>(STRIMMSaveBuffer::class.java) {
-                //most of activity takes place here, creates the group structure and flushes buffers
                 /**
+                 * Most of activity takes place here, creates the group structure and flushes buffers
                  * Note the order that data is displayed in HDF5View is not the same as ImageJ
                  * so you will see a managled image in HDF5View
                  */
 
                 //Only save the STRIMMSaveBuffer if in ACQUISITION mode (and not ACQUISITION_PAUSED or PREVIEW)
                 if (GUIMain.strimmUIService.state == UIstate.ACQUISITION) {
-                        //set a flag to show that processing a received save-buffer (which is a buffer which has the name of the dataset)
-                        isCapturingBuffers = true
-                        if (it.data[0].className == "STRIMMSequenceCameraDataBuffer") {
-                            //save a burst of images from a software trigger camera
-                            var data = buffers[it.name]
-                            if (data != null) {
-                                //the dataset is currently registered
-                                //add the STRIMMSaveBuffer to buffers
-                                //retrieve the List<List<STRIMMBuffer>>
-                                data = data as ArrayList<List<STRIMMBuffer>>
-                                var dat = it.data[0] as STRIMMSequenceCameraDataBuffer
-                                for (f in 0..dat.data.size - 1) {
-                                    data.add(listOf<STRIMMBuffer>(dat.data[f]))
-                                }
+                    //set a flag to show that processing a received save-buffer (which is a buffer which has the name of the dataset)
+                    isCapturingBuffers = true
 
-                                //is a flush needed when the number of frames == flushCount
-                                if (data.size == flushCount) {
-                                    //save matrix data//
-                                    for (frame in 0..data.size - 1) {
-                                        for (f in 0..data[frame].size - 1) {
-                                            //println("******* write dataset")
-                                            //the subimages in each frame could have different dims and pixel type
-                                            val dims_frm = data[frame][f].getImageDataDims()
-                                            if (data[frame][f].imageData != null) {
-                                                //imageDataNumberMap is used to ensure that each datasource has the correct frame number for each buffer saved ie 0,1,2 etc
-                                                var type_frm = data[frame][f].getImageDataType()
-                                                val dataspaceMatrixData =
-                                                    H5.H5Screate_simple(dims_frm.size, dims_frm, null)
-                                                val hand =
-                                                    handles["group_node_ix_" + it.name + "_" + f.toString() + "_imageData"]!!
-                                                var datasetId = 0
-                                                when (type_frm) {
-                                                    0 -> { //BYTE
-                                                        type_frm = HDF5Constants.H5T_NATIVE_INT8
-                                                        datasetId = H5.H5Dcreate(
-                                                            hand,
-                                                            imageDataNumberMap[it.name]!!.toString(),
-                                                            HDF5Constants.H5T_NATIVE_INT8,
-                                                            dataspaceMatrixData,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT
-                                                        )
-                                                    }
-                                                    1 -> { //SHORT
-                                                        type_frm = HDF5Constants.H5T_NATIVE_INT16
-                                                        datasetId = H5.H5Dcreate(
-                                                            hand,
-                                                            imageDataNumberMap[it.name]!!.toString(),
-                                                            HDF5Constants.H5T_NATIVE_INT16, //TODO
-                                                            dataspaceMatrixData,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT
-                                                        )
-                                                    }
-                                                    2 -> { //INT
-                                                        type_frm = HDF5Constants.H5T_NATIVE_INT32
-                                                        datasetId = H5.H5Dcreate(
-                                                            hand,
-                                                            imageDataNumberMap[it.name]!!.toString(),
-                                                            HDF5Constants.H5T_NATIVE_INT32, //TODO
-                                                            dataspaceMatrixData,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT
-                                                        )
-                                                    }
-                                                    3 -> { //LONG
-                                                        type_frm = HDF5Constants.H5T_NATIVE_INT64
-                                                        datasetId = H5.H5Dcreate(
-                                                            hand,
-                                                            imageDataNumberMap[it.name]!!.toString(),
-                                                            HDF5Constants.H5T_NATIVE_INT64, //TODO
-                                                            dataspaceMatrixData,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT
-                                                        )
-                                                    }
-                                                    4 -> { //FLOAT
-                                                        type_frm = HDF5Constants.H5T_NATIVE_FLOAT
-                                                        datasetId = H5.H5Dcreate(
-                                                            hand,
-                                                            imageDataNumberMap[it.name]!!.toString(),
-                                                            HDF5Constants.H5T_NATIVE_FLOAT, //TODO
-                                                            dataspaceMatrixData,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT
-                                                        )
-                                                    }
-                                                    5 -> { //DOUBLE
-                                                        type_frm = HDF5Constants.H5T_NATIVE_DOUBLE
-                                                        datasetId = H5.H5Dcreate(
-                                                            hand,
-                                                            imageDataNumberMap[it.name]!!.toString(),
-                                                            HDF5Constants.H5T_NATIVE_DOUBLE, //TODO
-                                                            dataspaceMatrixData,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT,
-                                                            HDF5Constants.H5P_DEFAULT
-                                                        )
-                                                    }
+                    val flattenedData = flattenData(it.data)
+                    if (flattenedData[0].className == "STRIMMSequenceCameraDataBuffer") {
+                        //save a burst of images from a software trigger camera
+                        var data = buffers[it.name]
+                        if (data != null) {
+                            //the dataset is currently registered
+                            //add the STRIMMSaveBuffer to buffers
+                            //retrieve the List<List<STRIMMBuffer>>
+                            data = data as ArrayList<List<STRIMMBuffer>>
+                            var dat = flattenedData[0] as STRIMMSequenceCameraDataBuffer
+                            for (f in 0..dat.data.size - 1) {
+                                data.add(listOf<STRIMMBuffer>(dat.data[f]))
+                            }
+
+                            //is a flush needed when the number of frames == flushCount
+                            if (data.size == flushCount) {
+                                //save matrix data//
+                                for (frame in 0..data.size - 1) {
+                                    for (f in 0..data[frame].size - 1) {
+                                        //println("******* write dataset")
+                                        //the subimages in each frame could have different dims and pixel type
+                                        val dims_frm = data[frame][f].getImageDataDims()
+                                        if (data[frame][f].imageData != null) {
+                                            //imageDataNumberMap is used to ensure that each datasource has the correct frame number for each buffer saved ie 0,1,2 etc
+                                            var type_frm = data[frame][f].getImageDataType()
+                                            val dataspaceMatrixData =
+                                                H5.H5Screate_simple(dims_frm.size, dims_frm, null)
+                                            val hand =
+                                                handles["group_node_ix_" + it.name + "_" + f.toString() + "_imageData"]!!
+                                            var datasetId = 0
+                                            when (type_frm) {
+                                                0 -> { //BYTE
+                                                    type_frm = HDF5Constants.H5T_NATIVE_INT8
+                                                    datasetId = H5.H5Dcreate(
+                                                        hand,
+                                                        imageDataNumberMap[it.name]!!.toString(),
+                                                        HDF5Constants.H5T_NATIVE_INT8,
+                                                        dataspaceMatrixData,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT
+                                                    )
                                                 }
-
-                                                H5.H5Dwrite(
-                                                    datasetId,
-                                                    type_frm,
-                                                    HDF5Constants.H5S_ALL,
-                                                    HDF5Constants.H5S_ALL,
-                                                    HDF5Constants.H5P_DEFAULT,
-                                                    data[frame][f].imageData
-                                                )
-
-                                                imageDataNumberMap[it.name] = imageDataNumberMap[it.name]!! + 1
-                                                H5.H5Sclose(dataspaceMatrixData)
-                                                H5.H5Dclose(datasetId)
+                                                1 -> { //SHORT
+                                                    type_frm = HDF5Constants.H5T_NATIVE_INT16
+                                                    datasetId = H5.H5Dcreate(
+                                                        hand,
+                                                        imageDataNumberMap[it.name]!!.toString(),
+                                                        HDF5Constants.H5T_NATIVE_INT16, //TODO
+                                                        dataspaceMatrixData,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT
+                                                    )
+                                                }
+                                                2 -> { //INT
+                                                    type_frm = HDF5Constants.H5T_NATIVE_INT32
+                                                    datasetId = H5.H5Dcreate(
+                                                        hand,
+                                                        imageDataNumberMap[it.name]!!.toString(),
+                                                        HDF5Constants.H5T_NATIVE_INT32, //TODO
+                                                        dataspaceMatrixData,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT
+                                                    )
+                                                }
+                                                3 -> { //LONG
+                                                    type_frm = HDF5Constants.H5T_NATIVE_INT64
+                                                    datasetId = H5.H5Dcreate(
+                                                        hand,
+                                                        imageDataNumberMap[it.name]!!.toString(),
+                                                        HDF5Constants.H5T_NATIVE_INT64, //TODO
+                                                        dataspaceMatrixData,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT
+                                                    )
+                                                }
+                                                4 -> { //FLOAT
+                                                    type_frm = HDF5Constants.H5T_NATIVE_FLOAT
+                                                    datasetId = H5.H5Dcreate(
+                                                        hand,
+                                                        imageDataNumberMap[it.name]!!.toString(),
+                                                        HDF5Constants.H5T_NATIVE_FLOAT, //TODO
+                                                        dataspaceMatrixData,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT
+                                                    )
+                                                }
+                                                5 -> { //DOUBLE
+                                                    type_frm = HDF5Constants.H5T_NATIVE_DOUBLE
+                                                    datasetId = H5.H5Dcreate(
+                                                        hand,
+                                                        imageDataNumberMap[it.name]!!.toString(),
+                                                        HDF5Constants.H5T_NATIVE_DOUBLE, //TODO
+                                                        dataspaceMatrixData,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT,
+                                                        HDF5Constants.H5P_DEFAULT
+                                                    )
+                                                }
                                             }
 
-                                            //directly append the trace matrix in data[frame][f]
-                                            //f indexes each STRIMMBuffer within a frame (which is a List<STRIMMBuffer>)
-                                            val dims = data[frame][f].getTraceDataDims()
-                                            /**
-                                             * It is possible that the different STRIMMBuffers in each frame have different lengths of traceData
-                                             * each frame will always contain size(List<STRIMMBuffer>) but they might have come from different sources
-                                             * and have different lenghts eg the source might be a car and each STRIMMBuffer traceData could be a particular sensor
-                                             * might might have recorded a different number of measurements.
-                                             * traceDataNumberMap keeps a record of the length of each STRIMMBuffer's trace data
-                                             *
-                                             * traceDataNumberMap is necessary in order to append in h5 in order to append new data in h5
-                                             */
-                                            val curLength = traceDataNumberMap[it.name]!![f]
-                                            val newLength: Long = (curLength + dims[0])
-                                            val dataset_append =
-                                                handles["dataset_" + it.name + "_traceData_" + f.toString()]!!
-
-                                            H5.H5Dset_extent(dataset_append, longArrayOf(newLength, dims[1]))
-
-                                            val newOffset: Long = curLength
-                                            val extLength: Long = dims[0]
-                                            var filespace = H5.H5Dget_space(dataset_append)
-
-
-                                            H5.H5Sselect_hyperslab(
-                                                filespace,
-                                                HDF5Constants.H5S_SELECT_SET,
-                                                longArrayOf(newOffset, 0),
-                                                null,
-                                                longArrayOf(extLength, dims[1]),
-                                                null
-                                            )
-                                            var memspace = H5.H5Screate_simple(
-                                                2,
-                                                longArrayOf(extLength, dims[1]),
-                                                null
-                                            ) //TODO is the rank = 2
                                             H5.H5Dwrite(
-                                                dataset_append,
-                                                HDF5Constants.H5T_NATIVE_DOUBLE,
-                                                memspace,
-                                                filespace,
+                                                datasetId,
+                                                type_frm,
+                                                HDF5Constants.H5S_ALL,
+                                                HDF5Constants.H5S_ALL,
                                                 HDF5Constants.H5P_DEFAULT,
-                                                data[frame][f].traceData
+                                                data[frame][f].imageData
                                             )
-                                            H5.H5Sclose(memspace)
-                                            H5.H5Sclose(filespace)
-                                            traceDataNumberMap[it.name]!![f] += dims[0] //update traceDataNumberMap to allow for the appended data
+
+                                            imageDataNumberMap[it.name] = imageDataNumberMap[it.name]!! + 1
+                                            H5.H5Sclose(dataspaceMatrixData)
+                                            H5.H5Dclose(datasetId)
                                         }
-                                        buffers[it.name] = ArrayList<List<STRIMMBuffer>>()
-                                    }
-                                }
-                            }
-                            else {
-                                //NEW DATA SOURCE this is where all of the new groups etc are defined.
-                                if (file > 0) { //make sure have true h5 file handle
-                                    //println("***new data source " + it.name)
-                                    buffers[it.name] = ArrayList<List<STRIMMBuffer>>()
-                                    imageDataNumberMap[it.name] = 0
-                                    //add this frame
-                                    val data = buffers[it.name] as ArrayList<List<STRIMMBuffer>>
-                                    var dat = it.data[0] as STRIMMSequenceCameraDataBuffer
-                                    for (f in 0..dat.data.size - 1) {
-                                        data.add(listOf<STRIMMBuffer>(dat.data[f]))
-                                    }
-                                    //
-                                    val group_node = H5.H5Gcreate(
-                                        file, it.name, HDF5Constants.H5P_DEFAULT,
-                                        HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
-                                    )
-                                    handles["group_" + it.name + "_node"] = group_node
-                                    traceDataNumberMap[it.name] =
-                                        LongArray(data[0].size) //data[0].size is the number of sub images
 
-                                    for (f in 0..it.data.size - 1) {//go through the sub images
-                                        traceDataNumberMap[it.name]!![f] = 0
-                                        //println("****create Group:" + f.toString())
-                                        val group_node_ix = H5.H5Gcreate(
-                                            group_node, f.toString(), HDF5Constants.H5P_DEFAULT,
-                                            HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
-                                        ) ////////////default
-                                        handles["group_node_ix_" + it.name + "_" + f.toString()] = group_node_ix
+                                        //directly append the trace matrix in data[frame][f]
+                                        //f indexes each STRIMMBuffer within a frame (which is a List<STRIMMBuffer>)
+                                        val dims = data[frame][f].getTraceDataDims()
+                                        /**
+                                         * It is possible that the different STRIMMBuffers in each frame have different lengths of traceData
+                                         * each frame will always contain size(List<STRIMMBuffer>) but they might have come from different sources
+                                         * and have different lenghts eg the source might be a car and each STRIMMBuffer traceData could be a particular sensor
+                                         * might might have recorded a different number of measurements.
+                                         * traceDataNumberMap keeps a record of the length of each STRIMMBuffer's trace data
+                                         *
+                                         * traceDataNumberMap is necessary in order to append in h5 in order to append new data in h5
+                                         */
+                                        val curLength = traceDataNumberMap[it.name]!![f]
+                                        val newLength: Long = (curLength + dims[0])
+                                        val dataset_append =
+                                            handles["dataset_" + it.name + "_traceData_" + f.toString()]!!
 
-                                        //println("******create Group: image_data")/////////////////////////////////////////////////////////////
-                                        val group_node_ix_imageData = H5.H5Gcreate(
-                                            group_node_ix, "imageData", HDF5Constants.H5P_DEFAULT,
-                                            HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
+                                        H5.H5Dset_extent(dataset_append, longArrayOf(newLength, dims[1]))
+
+                                        val newOffset: Long = curLength
+                                        val extLength: Long = dims[0]
+                                        var filespace = H5.H5Dget_space(dataset_append)
+
+
+                                        H5.H5Sselect_hyperslab(
+                                            filespace,
+                                            HDF5Constants.H5S_SELECT_SET,
+                                            longArrayOf(newOffset, 0),
+                                            null,
+                                            longArrayOf(extLength, dims[1]),
+                                            null
                                         )
-                                        handles["group_node_ix_" + it.name + "_" + f.toString() + "_imageData"] =
-                                            group_node_ix_imageData
-
-                                        //println("******add attributes for image data")
-                                        val datamapm = data[0][f].getImageDataMap()
-                                        for (szAttr in datamapm.keys) {
-                                            val dims = longArrayOf(1)
-                                            val dataspace_id = H5.H5Screate_simple(1, dims, null);
-                                            val group_node_ix_imageData_attributes = H5.H5Acreate(
-                                                group_node_ix_imageData,
-                                                szAttr,
-                                                HDF5Constants.H5T_STD_I32BE,
-                                                dataspace_id,
-                                                HDF5Constants.H5P_DEFAULT,
-                                                HDF5Constants.H5P_DEFAULT
-                                            )
-                                            H5.H5Awrite(
-                                                group_node_ix_imageData_attributes,
-                                                HDF5Constants.H5T_NATIVE_DOUBLE,
-                                                doubleArrayOf(datamapm[szAttr]!!)
-                                            )
-                                            H5.H5Aclose(group_node_ix_imageData_attributes)
-                                            H5.H5Sclose(dataspace_id)
-                                        }
-
-                                        //print("******create Group: vector_data")///////////////////////////////////////////////////////////////
-                                        val group_node_ix_traceData = H5.H5Gcreate(
-                                            group_node_ix, "traceData", HDF5Constants.H5P_DEFAULT,
-                                            HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
-                                        )
-
-                                        handles["group_node_ix_" + it.name + "_" + f.toString() + "_traceData"] =
-                                            group_node_ix_traceData
-
-                                        //print("******create vector attributes*****")
-                                        val datamapv = data[0][f].getTraceDataMap()
-                                        for (szAttr in datamapv.keys) {
-                                            val dims = longArrayOf(1)
-                                            val dataspace_id = H5.H5Screate_simple(1, dims, null);
-                                            val group_node_ix_traceData_attributes = H5.H5Acreate(
-                                                group_node_ix_traceData,
-                                                szAttr,
-                                                HDF5Constants.H5T_STD_I32BE,
-                                                dataspace_id,
-                                                HDF5Constants.H5P_DEFAULT,
-                                                HDF5Constants.H5P_DEFAULT
-                                            )
-                                            H5.H5Awrite(
-                                                group_node_ix_traceData_attributes,
-                                                HDF5Constants.H5T_NATIVE_DOUBLE,
-                                                doubleArrayOf(datamapv[szAttr]!!)
-                                            )
-                                            H5.H5Aclose(group_node_ix_traceData_attributes)
-                                            H5.H5Sclose(dataspace_id)
-                                        }
-
-                                        //
-                                        //have unlimited y dimension and x is the number of
-
-                                        val traceDataDims = data[0][f].getTraceDataDims()
-                                        val maxdims =
-                                            longArrayOf(HDF5Constants.H5S_UNLIMITED.toLong(), traceDataDims[1])
-                                        val dims = longArrayOf(0, traceDataDims[1])
-                                        val chunk_dims = longArrayOf(flushCount.toLong(), traceDataDims[1])
-                                        val dataspace = H5.H5Screate_simple(2, dims, maxdims) // the 2 is the rank
-                                        //create handle to a creation property list
-                                        val prop = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE)
-                                        //set chunk size on the creation property list - chunks are needed for an extensible array
-                                        var status = H5.H5Pset_chunk(prop, 2, chunk_dims) //2 is the rank
-                                        //create dataset, native int and pass the dataspace and creation property. So it knows it has chunking and that can be extended
-                                        val dataset_vector = H5.H5Dcreate(
-                                            group_node_ix_traceData,
-                                            "data",
+                                        var memspace = H5.H5Screate_simple(
+                                            2,
+                                            longArrayOf(extLength, dims[1]),
+                                            null
+                                        ) //TODO is the rank = 2
+                                        H5.H5Dwrite(
+                                            dataset_append,
                                             HDF5Constants.H5T_NATIVE_DOUBLE,
-                                            dataspace,
+                                            memspace,
+                                            filespace,
                                             HDF5Constants.H5P_DEFAULT,
-                                            prop,
-                                            HDF5Constants.H5P_DEFAULT
+                                            data[frame][f].traceData
                                         )
-                                        handles["dataset_" + it.name + "_traceData_" + f.toString()] = dataset_vector
-
-                                        H5.H5Sclose(dataspace)
-                                        H5.H5Pclose(prop)
+                                        H5.H5Sclose(memspace)
+                                        H5.H5Sclose(filespace)
+                                        traceDataNumberMap[it.name]!![f] += dims[0] //update traceDataNumberMap to allow for the appended data
                                     }
+                                    buffers[it.name] = ArrayList<List<STRIMMBuffer>>()
                                 }
                             }
                         }
                         else {
-                            //see if the dataset it.name already is stored, every new datasoyrce is added and processed
-                            val data = buffers[it.name]
-                            if (data != null) {
-                                addToExistingDataset(it, data)
-                            }
-                            else {
-                                createNewDataset(it)
+                            //NEW DATA SOURCE this is where all of the new groups etc are defined.
+                            if (file > 0) { //make sure have true h5 file handle
+                                //println("***new data source " + it.name)
+                                buffers[it.name] = ArrayList<List<STRIMMBuffer>>()
+                                imageDataNumberMap[it.name] = 0
+                                //add this frame
+                                val data = buffers[it.name] as ArrayList<List<STRIMMBuffer>>
+                                var dat = flattenedData[0] as STRIMMSequenceCameraDataBuffer
+                                for (f in 0..dat.data.size - 1) {
+                                    data.add(listOf<STRIMMBuffer>(dat.data[f]))
+                                }
+                                //
+                                val group_node = H5.H5Gcreate(
+                                    file, it.name, HDF5Constants.H5P_DEFAULT,
+                                    HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
+                                )
+                                handles["group_" + it.name + "_node"] = group_node
+                                traceDataNumberMap[it.name] =
+                                    LongArray(data[0].size) //data[0].size is the number of sub images
+
+                                for (f in 0..flattenedData.size - 1) {//go through the sub images
+                                    traceDataNumberMap[it.name]!![f] = 0
+                                    //println("****create Group:" + f.toString())
+                                    val group_node_ix = H5.H5Gcreate(
+                                        group_node, f.toString(), HDF5Constants.H5P_DEFAULT,
+                                        HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
+                                    ) ////////////default
+                                    handles["group_node_ix_" + it.name + "_" + f.toString()] = group_node_ix
+
+                                    //println("******create Group: image_data")/////////////////////////////////////////////////////////////
+                                    val group_node_ix_imageData = H5.H5Gcreate(
+                                        group_node_ix, "imageData", HDF5Constants.H5P_DEFAULT,
+                                        HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
+                                    )
+                                    handles["group_node_ix_" + it.name + "_" + f.toString() + "_imageData"] =
+                                        group_node_ix_imageData
+
+                                    //println("******add attributes for image data")
+                                    val datamapm = data[0][f].getImageDataMap()
+                                    for (szAttr in datamapm.keys) {
+                                        val dims = longArrayOf(1)
+                                        val dataspace_id = H5.H5Screate_simple(1, dims, null);
+                                        val group_node_ix_imageData_attributes = H5.H5Acreate(
+                                            group_node_ix_imageData,
+                                            szAttr,
+                                            HDF5Constants.H5T_STD_I32BE,
+                                            dataspace_id,
+                                            HDF5Constants.H5P_DEFAULT,
+                                            HDF5Constants.H5P_DEFAULT
+                                        )
+                                        H5.H5Awrite(
+                                            group_node_ix_imageData_attributes,
+                                            HDF5Constants.H5T_NATIVE_DOUBLE,
+                                            doubleArrayOf(datamapm[szAttr]!!)
+                                        )
+                                        H5.H5Aclose(group_node_ix_imageData_attributes)
+                                        H5.H5Sclose(dataspace_id)
+                                    }
+
+                                    //print("******create Group: vector_data")///////////////////////////////////////////////////////////////
+                                    val group_node_ix_traceData = H5.H5Gcreate(
+                                        group_node_ix, "traceData", HDF5Constants.H5P_DEFAULT,
+                                        HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT
+                                    )
+
+                                    handles["group_node_ix_" + it.name + "_" + f.toString() + "_traceData"] =
+                                        group_node_ix_traceData
+
+                                    //print("******create vector attributes*****")
+                                    val datamapv = data[0][f].getTraceDataMap()
+                                    for (szAttr in datamapv.keys) {
+                                        val dims = longArrayOf(1)
+                                        val dataspace_id = H5.H5Screate_simple(1, dims, null);
+                                        val group_node_ix_traceData_attributes = H5.H5Acreate(
+                                            group_node_ix_traceData,
+                                            szAttr,
+                                            HDF5Constants.H5T_STD_I32BE,
+                                            dataspace_id,
+                                            HDF5Constants.H5P_DEFAULT,
+                                            HDF5Constants.H5P_DEFAULT
+                                        )
+                                        H5.H5Awrite(
+                                            group_node_ix_traceData_attributes,
+                                            HDF5Constants.H5T_NATIVE_DOUBLE,
+                                            doubleArrayOf(datamapv[szAttr]!!)
+                                        )
+                                        H5.H5Aclose(group_node_ix_traceData_attributes)
+                                        H5.H5Sclose(dataspace_id)
+                                    }
+
+                                    //
+                                    //have unlimited y dimension and x is the number of
+
+                                    val traceDataDims = data[0][f].getTraceDataDims()
+                                    val maxdims =
+                                        longArrayOf(HDF5Constants.H5S_UNLIMITED.toLong(), traceDataDims[1])
+                                    val dims = longArrayOf(0, traceDataDims[1])
+                                    val chunk_dims = longArrayOf(flushCount.toLong(), traceDataDims[1])
+                                    val dataspace = H5.H5Screate_simple(2, dims, maxdims) // the 2 is the rank
+                                    //create handle to a creation property list
+                                    val prop = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE)
+                                    //set chunk size on the creation property list - chunks are needed for an extensible array
+                                    var status = H5.H5Pset_chunk(prop, 2, chunk_dims) //2 is the rank
+                                    //create dataset, native int and pass the dataspace and creation property. So it knows it has chunking and that can be extended
+                                    val dataset_vector = H5.H5Dcreate(
+                                        group_node_ix_traceData,
+                                        "data",
+                                        HDF5Constants.H5T_NATIVE_DOUBLE,
+                                        dataspace,
+                                        HDF5Constants.H5P_DEFAULT,
+                                        prop,
+                                        HDF5Constants.H5P_DEFAULT
+                                    )
+                                    handles["dataset_" + it.name + "_traceData_" + f.toString()] = dataset_vector
+
+                                    H5.H5Sclose(dataspace)
+                                    H5.H5Pclose(prop)
+                                }
                             }
                         }
-                        isCapturingBuffers = false
+                    }
+                    else {
+                        //see if the dataset it.name already is stored, every new datasource is added and processed
+                        val data = buffers[it.name]
+
+                        if (data != null) {
+                            addToExistingDataset(it, data)
+                        }
+                        else {
+                            createNewDataset(it)
+                        }
+                    }
+                    isCapturingBuffers = false
                 }
+
+                //TODO this acknowledgement may not be needed as SinkSaveMethod is sending the STRIMMSaveBuffer so sender will not be an actor i.e. will be null
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .matchAny { imm ->
@@ -827,11 +830,9 @@ class FileManagerActor : AbstractActor() {
     }
 
     fun addToExistingDataset(saveBuffer : STRIMMSaveBuffer, bufferData : List<List<STRIMMBuffer>>?){
-        //the dataset is currently registered
-        //add the STRIMMSaveBuffer to buffers
-        //retrieve the List<List<STRIMMBuffer>>
         val data = bufferData as ArrayList<List<STRIMMBuffer>>
-        data.add(saveBuffer.data)
+        val flattenedData = flattenData(saveBuffer.data)
+        data.add(flattenedData)
 
         //is a flush needed when the number of frames == flushCount
         if (data.size == flushCount) {
@@ -842,15 +843,15 @@ class FileManagerActor : AbstractActor() {
                     val dims_frm = data[frame][f].getImageDataDims()
                     if (data[frame][f].imageData != null) {
                         //imageDataNumberMap is used to ensure that each datasource has the correct frame number for each buffer saved ie 0,1,2 etc
-                        var type_frm = data[frame][f].getImageDataType()
+                        var dataType = data[frame][f].getImageDataType()
                         val dataspaceMatrixData =
                             H5.H5Screate_simple(dims_frm.size, dims_frm, null)
                         val hand =
                             handles["group_node_ix_" + saveBuffer.name + "_" + f.toString() + "_imageData"]!!
                         var datasetId = 0
-                        when (type_frm) {
+                        when (dataType) {
                             0 -> { //BYTE
-                                type_frm = HDF5Constants.H5T_NATIVE_INT8
+                                dataType = HDF5Constants.H5T_NATIVE_INT8
                                 datasetId = H5.H5Dcreate(
                                     hand,
                                     imageDataNumberMap[saveBuffer.name]!!.toString(),
@@ -862,7 +863,7 @@ class FileManagerActor : AbstractActor() {
                                 )
                             }
                             1 -> { //SHORT
-                                type_frm = HDF5Constants.H5T_NATIVE_INT16
+                                dataType = HDF5Constants.H5T_NATIVE_INT16
                                 datasetId = H5.H5Dcreate(
                                     hand,
                                     imageDataNumberMap[saveBuffer.name]!!.toString(),
@@ -874,7 +875,7 @@ class FileManagerActor : AbstractActor() {
                                 )
                             }
                             2 -> { //INT
-                                type_frm = HDF5Constants.H5T_NATIVE_INT32
+                                dataType = HDF5Constants.H5T_NATIVE_INT32
                                 datasetId = H5.H5Dcreate(
                                     hand,
                                     imageDataNumberMap[saveBuffer.name]!!.toString(),
@@ -886,7 +887,7 @@ class FileManagerActor : AbstractActor() {
                                 )
                             }
                             3 -> { //LONG
-                                type_frm = HDF5Constants.H5T_NATIVE_INT64
+                                dataType = HDF5Constants.H5T_NATIVE_INT64
                                 datasetId = H5.H5Dcreate(
                                     hand,
                                     imageDataNumberMap[saveBuffer.name]!!.toString(),
@@ -898,7 +899,7 @@ class FileManagerActor : AbstractActor() {
                                 )
                             }
                             4 -> { //FLOAT
-                                type_frm = HDF5Constants.H5T_NATIVE_FLOAT
+                                dataType = HDF5Constants.H5T_NATIVE_FLOAT
                                 datasetId = H5.H5Dcreate(
                                     hand,
                                     imageDataNumberMap[saveBuffer.name]!!.toString(),
@@ -910,7 +911,7 @@ class FileManagerActor : AbstractActor() {
                                 )
                             }
                             5 -> { //DOUBLE
-                                type_frm = HDF5Constants.H5T_NATIVE_DOUBLE
+                                dataType = HDF5Constants.H5T_NATIVE_DOUBLE
                                 datasetId = H5.H5Dcreate(
                                     hand,
                                     imageDataNumberMap[saveBuffer.name]!!.toString(),
@@ -925,7 +926,7 @@ class FileManagerActor : AbstractActor() {
 
                         H5.H5Dwrite(
                             datasetId,
-                            type_frm,
+                            dataType,
                             HDF5Constants.H5S_ALL,
                             HDF5Constants.H5S_ALL,
                             HDF5Constants.H5P_DEFAULT,
@@ -1008,7 +1009,8 @@ class FileManagerActor : AbstractActor() {
 
             //add this frame
             val data = buffers[saveBuffer.name] as ArrayList<List<STRIMMBuffer>>
-            data.add(saveBuffer.data)
+            val flattenedData = flattenData(saveBuffer.data)
+            data.add(flattenedData)
 
             val groupNode = H5.H5Gcreate(
                 file, saveBuffer.name, HDF5Constants.H5P_DEFAULT,
@@ -1085,7 +1087,6 @@ class FileManagerActor : AbstractActor() {
 
                 //have unlimited y dimension and x is the number of
                 val traceDataDims = data[0][f].getTraceDataDims()
-                GUIMain.loggerService.log(Level.INFO, "Trace data x dim is: ${traceDataDims[1]}")
                 val maxdims = longArrayOf(HDF5Constants.H5S_UNLIMITED.toLong(), maxTraces)
                 val dims = longArrayOf(0, traceDataDims[1])
                 val chunk_dims = longArrayOf(flushCount.toLong(), traceDataDims[1])

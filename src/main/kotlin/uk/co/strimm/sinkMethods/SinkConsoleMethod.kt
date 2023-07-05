@@ -9,8 +9,9 @@ import uk.co.strimm.STRIMMSignalBuffer1
 import uk.co.strimm.actors.messages.complete.CompleteStreaming
 import uk.co.strimm.actors.messages.start.StartStreaming
 import uk.co.strimm.experiment.Sink
+import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
-
+import java.util.logging.Level
 
 
 class SinkConsoleMethod() : SinkMethod {
@@ -74,7 +75,13 @@ class SinkConsoleMethod() : SinkMethod {
         return CompleteStreaming()
     }
     override fun fail(ex: Throwable) {
-        println("FAIL")
+        try{
+            throw ex
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Stream failed in SinkConsoleMethod. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
     }
     override fun postStop() {
 

@@ -35,11 +35,10 @@ class ActorFlowTest  : FlowMethod {
         println("flowtestsctor " + actor)
     }
 
-    override fun run(image: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(image: List<STRIMMBuffer>): List<STRIMMBuffer> {
         val future =  PatternsCS.ask(actor, AskMessageTest(), 500000) as CompletionStage<STRIMMBuffer>
         val chunk = future.toCompletableFuture().get() as STRIMMBuffer
-        return chunk
-
+        return listOf(chunk)
     }
 
     override fun preStart(){

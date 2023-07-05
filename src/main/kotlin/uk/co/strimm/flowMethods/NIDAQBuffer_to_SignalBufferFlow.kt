@@ -44,7 +44,7 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
         }
     }
 
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         //the flow function should know the
         var dataIn = data[0] as STRIMMNIDAQBuffer
         var numSamples = dataIn.numSamples
@@ -122,7 +122,7 @@ open class NIDAQBuffer_to_SignalBufferFlow() : FlowMethod {
             }
         }
 
-        return STRIMMSignalBuffer(data, times, numSamples, channelNames, dataIn.dataID, dataIn.status)
+        return listOf(STRIMMSignalBuffer(data, times, numSamples, channelNames, dataIn.dataID, dataIn.status))
     }
 
     override fun preStart(){}

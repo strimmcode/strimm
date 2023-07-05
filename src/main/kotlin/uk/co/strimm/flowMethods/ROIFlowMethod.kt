@@ -21,6 +21,7 @@ import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMPixelBuffer
 import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.experiment.Flow
+import uk.co.strimm.flattenData
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
 import java.util.logging.Level
@@ -41,7 +42,7 @@ class ROIFlowMethod : FlowMethod {
         //will get the ROIs from the OverlayManager based on SinkName and then output them as a buffer to be plotted
         sinkName = properties["ImageJSinkName"]!!
     }
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         val overlays = GUIMain.overlayService.overlays
         val disp = GUIMain.experimentService.experimentStream.cameraDisplays[sinkName]
 
@@ -51,7 +52,8 @@ class ROIFlowMethod : FlowMethod {
             //apply each overlay to the pixels and calculate the mean(?)
             //assemble into a row of data, along with the SINK:IDs as names
 
-            val image = data[0] as STRIMMPixelBuffer
+//            val image = data[0] as STRIMMPixelBuffer
+            val image = flattenData(data)[0] as STRIMMPixelBuffer
             val roiInfo = averageROI(filteredOverlays, image)
 
             val dataToSend = DoubleArray(roiInfo.size)
@@ -68,10 +70,10 @@ class ROIFlowMethod : FlowMethod {
             }
 
             val buffer = STRIMMSignalBuffer(dataToSend, times, numSamples, channelNames, image.dataID, image.status)
-            return buffer
+            return listOf(buffer)
         }
         else {
-            return STRIMMBuffer(0, 2)
+            return listOf(STRIMMBuffer(0, 2))
         }
     }
 

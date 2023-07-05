@@ -59,8 +59,7 @@ class MMZStageFlowRaw() : FlowMethod {
 
     }
 
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
-
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         var status = 1
         var ret = mutableListOf<Any>()
         var dat = data[0] as STRIMM_MMCommandBuffer
@@ -121,8 +120,7 @@ class MMZStageFlowRaw() : FlowMethod {
         }
         dataID++
 
-        return STRIMM_MMCommandBuffer("Result", ret, dataID, status)
-
+        return listOf(STRIMM_MMCommandBuffer("Result", ret, dataID, status))
     }
 
     fun loadCfg() {

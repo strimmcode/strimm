@@ -28,7 +28,7 @@ class ImageSplitterFlow : FlowMethod {
         GUIMain.loggerService.log(Level.INFO, "Image splitter flow configured with: x=$x, y=$y, w=$w, h=$h")
     }
 
-    override fun run(image: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(image: List<STRIMMBuffer>): List<STRIMMBuffer> {
         val originalImage = image[0] as STRIMMPixelBuffer
 
         /**
@@ -44,9 +44,11 @@ class ImageSplitterFlow : FlowMethod {
             status = originalImage.status,
             pixelType = originalImage.pixelType,
             timeAcquired = originalImage.timeAcquired,
+            cameraLabel = flow.flowName,
             pix = sliceImage(originalImage, flow.splitCoordinates[0])
         )
-        return imageToReturn
+//        println("Sending image from ${flow.flowName}")
+        return listOf(imageToReturn)
     }
 
     /**

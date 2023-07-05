@@ -138,6 +138,12 @@ class NIDAQSinkMethod() : SinkMethod {
         return CompleteStreaming()
     }
     override fun fail(ex: Throwable) {
-        println("FAIL")
+        try{
+            throw ex
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Stream failed in NIDAQSinkMethod. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
     }
 }

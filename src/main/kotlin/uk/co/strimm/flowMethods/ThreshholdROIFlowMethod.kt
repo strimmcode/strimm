@@ -64,7 +64,7 @@ class ThreshholdROIFlowMethod() : FlowMethod {
 
     }
 
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         val dat = data[0]
         if (dat.className == "STRIMMSignalBuffer") {
             dat as STRIMMSignalBuffer
@@ -82,26 +82,25 @@ class ThreshholdROIFlowMethod() : FlowMethod {
             }
             if (triggerOn == "and"){
                 if (bResultAnd == true){
-                    return STRIMMBuffer(dat.dataID,1)
+                    return listOf(STRIMMBuffer(dat.dataID,1))
                 }
                 else{
-                    return STRIMMBuffer(dat.dataID,0)
+                    return listOf(STRIMMBuffer(dat.dataID,0))
                 }
             }
             else{
                 if (bResultOr == true){
-                    return STRIMMBuffer(dat.dataID,1)
+                    return listOf(STRIMMBuffer(dat.dataID,1))
                 }
                 else{
-                    return STRIMMBuffer(dat.dataID,0)
+                    return listOf(STRIMMBuffer(dat.dataID,0))
                 }
 
             }
         }
         else {
-            return STRIMMBuffer(dat.dataID,0)
+            return listOf(STRIMMBuffer(dat.dataID,0))
         }
-
     }
     private fun averageROI(roiList: List<Overlay>, image: STRIMMPixelBuffer): List< Pair<String, Double> > {
 

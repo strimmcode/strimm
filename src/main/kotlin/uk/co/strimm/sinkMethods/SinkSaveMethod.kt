@@ -47,10 +47,10 @@ class SinkSaveMethod : SinkMethod {
     }
 
     override fun run(data : List<STRIMMBuffer>){
-        GUIMain.actorService.fileManagerActor.tell(STRIMMSaveBuffer(data, sink.sinkName), null)
+        val saveBuffer = STRIMMSaveBuffer(data, sink.sinkName)
+        GUIMain.actorService.fileManagerActor.tell(saveBuffer, null)
 
         if (data.any { x -> x.status == 0 }) {
-//            GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of 0")
             GUIMain.actorService.fileManagerActor.tell(TellStopReceived(false), null)
         } else if (data.any { x -> x.status == -1 }) {
             GUIMain.loggerService.log(Level.INFO, "SinkSaveMethod received status of -1")
@@ -71,7 +71,13 @@ class SinkSaveMethod : SinkMethod {
     }
 
     override fun fail(ex: Throwable) {
-        println("FAIL")
+        try{
+            throw ex
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Stream failed in SinkSaveMethod. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
     }
 
     override fun postStop() {

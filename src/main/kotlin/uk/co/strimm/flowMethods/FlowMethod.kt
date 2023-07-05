@@ -11,7 +11,7 @@ interface FlowMethod {
     val properties : HashMap<String, String>
     var actor : ActorRef?
     fun init(flow : Flow)
-    fun run(image : List<STRIMMBuffer>) : STRIMMBuffer
+    fun run(images : List<STRIMMBuffer>) : List<STRIMMBuffer>
     fun preStart()
     fun postStop()
 }

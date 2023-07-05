@@ -14,6 +14,7 @@ import uk.co.strimm.experiment.Sink
 import uk.co.strimm.gui.CameraWindowPlugin
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
+import java.util.logging.Level
 
 class SinkImageJPixelTest() : SinkMethod {
     var cameraActor : ActorRef? = null
@@ -84,7 +85,13 @@ class SinkImageJPixelTest() : SinkMethod {
         return CompleteStreaming()
     }
     override fun fail(ex: Throwable) {
-        println("FAIL")
+        try{
+            throw ex
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Stream failed in SinkImageJPixelTest. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
     }
     override fun postStop() {
 

@@ -40,7 +40,7 @@ open class RatioFlowMethod() : FlowMethod {
         }
     }
 
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         //the flow function should know the
 
         val im = data[0] as STRIMMPixelBuffer
@@ -64,7 +64,7 @@ open class RatioFlowMethod() : FlowMethod {
         im_old = im
 
         //var pix : Any?, val w : Int, val h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Double, dataID : Int, status : Int
-        return STRIMMPixelBuffer(pix, im.w, im.h, im.pixelType, im.numChannels, GUIMain.softwareTimerService.getTime(), im.dataID, statusID )
+        return listOf(STRIMMPixelBuffer(pix, im.w, im.h, im.pixelType, im.numChannels, GUIMain.softwareTimerService.getTime(), flow.flowName, im.dataID, statusID))
 
     }
     override fun preStart(){

@@ -104,17 +104,13 @@ class MMCameraFlow() : FlowMethod {
 
     }
 
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
-
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         if (bSnapped){
-
             return runSnapped()!!
         }
         else {
             return runCircBuffer()!!
         }
-
-
     }
 
     fun loadCfg() {
@@ -154,15 +150,13 @@ class MMCameraFlow() : FlowMethod {
         Thread.sleep(2000)  //TODO does it need this?
     }
 
-
     @Synchronized
-    fun runSnapped() : STRIMMBuffer? {
-
+    fun runSnapped() : List<STRIMMBuffer> {
         //snap acquisition
         if (IntMath.mod(dataID, 100) == 0){
             println("snap " + dataID + "  time: " + GUIMain.softwareTimerService.getTime())
-
         }
+
         core!!.snapImage()
         try {
             val pix = core!!.image
@@ -174,17 +168,17 @@ class MMCameraFlow() : FlowMethod {
                     } else {
                         //8 Bit GREY
                         dataID++
-                        return STRIMMPixelBuffer(
+                        return listOf(STRIMMPixelBuffer(
                             pix,
                             w,
                             h,
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
-                        )
-
+                        ))
                     }
                 }
                 else if (numChannels == 4) {
@@ -206,16 +200,17 @@ class MMCameraFlow() : FlowMethod {
                         }
 
                         dataID++
-                        return STRIMMPixelBuffer(
+                        return listOf(STRIMMPixelBuffer(
                             pix2,
                             w,
                             h,
                             pixelType,
                             3,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
-                        )
+                        ))
                     }
                 }
                 else {
@@ -229,17 +224,17 @@ class MMCameraFlow() : FlowMethod {
                     } else {
                         //16bit GREY
                         dataID++
-                        return STRIMMPixelBuffer(
+                        return listOf(STRIMMPixelBuffer(
                             pix,
                             w,
                             h,
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
-                        )
-
+                        ))
                     }
                 }
                 else if (numChannels == 4) {
@@ -248,16 +243,17 @@ class MMCameraFlow() : FlowMethod {
                     } else {
                         //RGB64
                         dataID++
-                        return STRIMMPixelBuffer(
+                        return listOf(STRIMMPixelBuffer(
                             pix,
                             w,
                             h,
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
-                        )
+                        ))
                     }
                 }
                 else {
@@ -271,16 +267,17 @@ class MMCameraFlow() : FlowMethod {
                     } else {
                         //32bit float
                         dataID++
-                        return STRIMMPixelBuffer(
+                        return listOf(STRIMMPixelBuffer(
                             pix,
                             w,
                             h,
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
-                        )
+                        ))
                     }
                 }
                 else {
@@ -295,12 +292,11 @@ class MMCameraFlow() : FlowMethod {
             println(core.toString())
             println(ex.message)  //something is going on with the camera
         }
-        return STRIMMPixelBuffer(null, 0, 0, "", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
-
+        return listOf(STRIMMPixelBuffer(null, 0, 0, "", 0, GUIMain.softwareTimerService.getTime(), "", dataID, 0))
     }
 
     @Synchronized
-    fun runCircBuffer() : STRIMMBuffer? {
+    fun runCircBuffer() : List<STRIMMBuffer> {
         //does not specify the type of pix
         //live acquisition from circular buffer - take the next image
         if (IntMath.mod(dataID, 1000) == 0){
@@ -356,7 +352,7 @@ class MMCameraFlow() : FlowMethod {
                 }else{
                     //8 Bit GREY
                     dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return listOf(STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), label, dataID, 1))
 
                 }
             }
@@ -377,7 +373,7 @@ class MMCameraFlow() : FlowMethod {
                     }
 
                     dataID++
-                    return STRIMMPixelBuffer(pix2, w, h, pixelType, 3, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return listOf(STRIMMPixelBuffer(pix2, w, h, pixelType, 3, GUIMain.softwareTimerService.getTime(), label, dataID, 1))
                 }
             }
             else{
@@ -391,7 +387,7 @@ class MMCameraFlow() : FlowMethod {
                 }else{
                     //16bit GREY
                     dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return listOf(STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), label, dataID, 1))
 
                 }
             }
@@ -401,7 +397,7 @@ class MMCameraFlow() : FlowMethod {
                 }else{
                     //RGB64
                     dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return listOf(STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), label, dataID, 1))
                 }
             }
             else{
@@ -415,7 +411,7 @@ class MMCameraFlow() : FlowMethod {
                 }else{
                     //32bit float
                     dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return listOf(STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), label, dataID, 1))
                 }
             }
             else{
@@ -427,11 +423,8 @@ class MMCameraFlow() : FlowMethod {
         }
         // GUIMain.protocolService.GDIPrintText(core.imageWidth.toInt(),core.imageHeight.toInt(), pix, "dataID : " + dataID.toString(),50.0, 50.0, 80)
 
-        return STRIMMPixelBuffer(null, 0, 0,"", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
-
+        return listOf(STRIMMPixelBuffer(null, 0, 0,"", 0, GUIMain.softwareTimerService.getTime(), "", dataID, 0))
     }
-
-
 
     private fun StartAcquisition() {
         val memSize: Long = core!!.bytesPerPixel * core!!.imageHeight * core!!.imageWidth * properties["framesInCircularBuffer"]!!.toLong() / 1024 / 1024

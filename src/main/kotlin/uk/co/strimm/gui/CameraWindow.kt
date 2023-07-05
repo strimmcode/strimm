@@ -34,8 +34,7 @@ class CameraWindowPlugin : AbstractDockableWindow() {
     override var title = ""
     lateinit var cameraWindowController: CameraWindow
 
-    override fun
-            setCustomData(data: Any?) {
+    override fun setCustomData(data: Any?) {
         if (data is DisplayInfo) {
             cameraWindowController.displayInfo = data
             dockableWindowMultiple.titleText = data.displayName
@@ -55,7 +54,6 @@ class CameraWindowPlugin : AbstractDockableWindow() {
 }
 
 class CameraWindow constructor(val windowPanel: JPanel) {
-
     var displayInfo: DisplayInfo? = null
     var dataset: Dataset? = null
     var display: Display<*>? = null

@@ -178,7 +178,7 @@ class PixelTypeMethod() : SourceBaseMethod() {
             println("Pixel type is not supported")
         }
         dataID++
-        return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+        return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), "", dataID, 1)
     }
     override fun postStop() {
     }

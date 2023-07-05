@@ -23,6 +23,7 @@ import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.STRIMMSignalBuffer1
 import uk.co.strimm.experiment.Sink
+import uk.co.strimm.flattenData
 import uk.co.strimm.gui.GUIMain.Companion.markerEventLabel
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
@@ -140,17 +141,16 @@ class TraceWindow {
         green: Double,
         blue: Double,
         alpha: Double,
-        series: XYChart.Series<Number, Number>
-    ) {
-        // println("TraceWindow::setSeriesColour")
+        series: XYChart.Series<Number, Number>) {
         val line = series.node.lookup(".chart-series-line")
         line.style = "-fx-stroke: rgba(${red * 255},${green * 255},${blue * 255},$alpha);"
     }
 
     fun updateChart(data: List<STRIMMBuffer>) {
         Platform.runLater {
-            if (data[0] is STRIMMSignalBuffer) {
-                val dat = data[0] as STRIMMSignalBuffer
+            val flattenedData = flattenData(data)
+            if (flattenedData[0] is STRIMMSignalBuffer) {
+                val dat = flattenedData[0] as STRIMMSignalBuffer
                 for (f in 0..dat!!.channelNames!!.size - 1) {
                     var series = allSeries[dat!!.channelNames!!.get(f)]
                     if (series == null) {
@@ -199,40 +199,39 @@ class TraceWindow {
                         series.data!!.add(XYChart.Data(time, value))
                     }
                 }
-
             }
-            else if (data[0] is STRIMMSignalBuffer1) {
-                val dat = data[0] as STRIMMSignalBuffer1
-                val numChannels = dat!!.channelNames!!.size
-                val numSamples = dat!!.traceData.size / numChannels
-                for (f in 0..dat!!.channelNames!!.size - 1) {
-                    var series = allSeries[dat!!.channelNames!!.get(f)]
-                    if (series == null) {
-                        //make and add a new series
-                        if (dat!!.channelNames!!.get(f) == "DO8" || dat!!.channelNames!!.get(f) == "DO9") {
-                            series = XYChart.Series<Number, Number>()
-                            series.name = dat!!.channelNames!!.get(f)
-                            allSeries[dat!!.channelNames!!.get(f)] = series
-                            lineChart.data.add(series)
-                        }
-                    }
-
-                    //add the new data
-                    series = allSeries[dat!!.channelNames!!.get(f)]
-                    if (series != null) {
-                        for (ff in 0..numSamples - 1) {
-                            val time = dat!!.traceData!!.get(ff * numChannels)
-                            var value = 0.0
-                            if (dat!!.channelNames!!.get(f) == "DO8") {
-                                value = dat!!.traceData!!.get(1 + ff * numChannels)
-                            } else if (dat!!.channelNames!!.get(f) == "DO9") {
-                                value = dat!!.traceData!!.get(2 + ff * numChannels)
-                            }
-                            series!!.data!!.add(XYChart.Data(time, value))
-                        }
-                    }
-                }
-            }
+//            else if (data[0] is STRIMMSignalBuffer1) {
+//                val dat = data[0] as STRIMMSignalBuffer1
+//                val numChannels = dat!!.channelNames!!.size
+//                val numSamples = dat!!.traceData.size / numChannels
+//                for (f in 0..dat!!.channelNames!!.size - 1) {
+//                    var series = allSeries[dat!!.channelNames!!.get(f)]
+//                    if (series == null) {
+//                        //make and add a new series
+//                        if (dat!!.channelNames!!.get(f) == "DO8" || dat!!.channelNames!!.get(f) == "DO9") {
+//                            series = XYChart.Series<Number, Number>()
+//                            series.name = dat!!.channelNames!!.get(f)
+//                            allSeries[dat!!.channelNames!!.get(f)] = series
+//                            lineChart.data.add(series)
+//                        }
+//                    }
+//
+//                    //add the new data
+//                    series = allSeries[dat!!.channelNames!!.get(f)]
+//                    if (series != null) {
+//                        for (ff in 0..numSamples - 1) {
+//                            val time = dat!!.traceData!!.get(ff * numChannels)
+//                            var value = 0.0
+//                            if (dat!!.channelNames!!.get(f) == "DO8") {
+//                                value = dat!!.traceData!!.get(1 + ff * numChannels)
+//                            } else if (dat!!.channelNames!!.get(f) == "DO9") {
+//                                value = dat!!.traceData!!.get(2 + ff * numChannels)
+//                            }
+//                            series!!.data!!.add(XYChart.Data(time, value))
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 }

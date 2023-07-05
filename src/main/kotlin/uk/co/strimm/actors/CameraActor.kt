@@ -190,7 +190,7 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
     override fun createReceive(): Receive {
         return receiveBuilder()
             .match<Message>(Message::class.java) { message ->
-                println("cameraActor <MESSAGE>")
+                GUIMain.loggerService.log(Level.INFO, "Camera actor received basic message")
                 plugin.cameraWindowController.associatedActor = self
                 GUIMain.actorService.cameraActorDisplays[plugin.cameraWindowController.displayInfo!!.displayName] = self
             }
@@ -230,13 +230,13 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                 GUIMain.loggerService.log(Level.SEVERE, stackTraceString)
             }
             .match<TerminateActor>(TerminateActor::class.java){
-                println("terminate actor ***********")
+                GUIMain.loggerService.log(Level.INFO, "Camera actor received TerminateActor message")
                 if (camThread != null) {
                     camThread!!.EndThread()
                 }
                 GUIMain.loggerService.log(Level.INFO, "Camera actor ${self.path().name()} terminating")
                 self.tell(Kill.getInstance(), self)
-                println("success terminate actor *******")
+                GUIMain.loggerService.log(Level.INFO, "Successfully terminated actor")
             }
             .match<List<*>>(List::class.java){ imm ->
                 if (GUIMain.softwareTimerService.getTime() > timeLast + displayInfo!!.previewInterval) {
@@ -252,10 +252,11 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                     //type in situations like this
 
                     imm as List<STRIMMBuffer>
+                    val flattenedData = flattenData(imm as List<List<STRIMMBuffer>>)
                     //STRIMMPixelBuffer is a single image
-                    if (imm[0].className == "STRIMMPixelBuffer"){
-                        val imageList1 = imm as List<STRIMMPixelBuffer>
-                        var im1 =  imageList1[0]
+                    if (flattenedData[0].className == "STRIMMPixelBuffer"){
+//                        val imageList1 = imm as List<STRIMMPixelBuffer>
+                        var im1 =  flattenedData[0] as STRIMMPixelBuffer
                         //println("dataID " + im1.dataID)
                         var w = displayInfo!!.width.toInt()
                         var h = displayInfo!!.height.toInt()
@@ -264,16 +265,15 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                         val numChannels = displayInfo!!.numChannels
                         if ((w != im1.w || h != im1.h || im1.pixelType != pixelType || im1.numChannels != numChannels)){
                             GUIMain.loggerService.log(Level.SEVERE, "The info carried by the STRIMMBuffer is different to the Sink's configured expectations")
-                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer width=${im1.w} sink width=$w")
-                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer height=${im1.w} sink height=$h")
-                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer pixelType=${im1.pixelType} sink pixelType=$pixelType")
-                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer numChannels=${im1.numChannels} sink numChannels=$numChannels")
+                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer width=${im1.w} vs sink width=$w")
+                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer height=${im1.w} vs sink height=$h")
+                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer pixelType=${im1.pixelType} vs sink pixelType=$pixelType")
+                            GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer numChannels=${im1.numChannels} vs sink numChannels=$numChannels")
                         }
 
                         val dataset = plugin.cameraWindowController.dataset!!
                         if (im1.pixelType == "Byte"){
                             var pix = im1.pix as ByteArray
-
                             for (ch in 0 until numChannels) {
                                 val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
                                 if (ch < numChannels-1) {
@@ -396,14 +396,14 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                             }
                         }
 
-                        dataset.isDirty = true   //what does this do?
-
+                        dataset.isDirty = true   //Tells SciJava/ImageJ services dataset has been altered and needs to be updated
                     }
                     //STRIMMSequenceCamwraDataBuffer is a group of images taken by a fast camera
-                    else if (imm[0].className == "STRIMMSequenceCameraDataBuffer"){
-                        val imageList1 = (imm[0] as STRIMMSequenceCameraDataBuffer).data
+                    else if (flattenedData[0].className == "STRIMMSequenceCameraDataBuffer"){
+//                        val imageList1 = (imm[0] as STRIMMSequenceCameraDataBuffer).data
+                        val imageList1 = flattenedData
                         for (ffff in 0..imageList1.size-1){
-                            var im1 =  imageList1[ffff]
+                            var im1 =  imageList1[ffff] as STRIMMPixelBuffer
                             //println("dataID " + im1.dataID)
                             val w = displayInfo!!.width.toInt()
                             val h = displayInfo!!.height.toInt()
@@ -443,7 +443,6 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                                 }
                             }
                             else if (im1.pixelType == "Short"){
-
                                 val pix = im1.pix as ShortArray
                                 for (ch in 0..numChannels-1) {
                                     if (ch < numChannels-1) dataset.setPlaneSilently(ch, pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1)))
@@ -536,11 +535,7 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                             dataset.isDirty = true
 
                             Thread.sleep(imageSequenceIntervalMs)
-
                         }
-
-
-
                     }
 
                     timeLast = GUIMain.softwareTimerService.getTime()

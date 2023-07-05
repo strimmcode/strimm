@@ -6,6 +6,7 @@ import uk.co.strimm.STRIMMPixelBuffer
 import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.actors.messages.tell.TellMarkerFlowMap
 import uk.co.strimm.experiment.Flow
+import uk.co.strimm.flattenData
 import uk.co.strimm.gui.GUIMain
 import uk.co.strimm.services.UIstate
 import java.util.logging.Level
@@ -36,7 +37,8 @@ class EventMarkerFlow : FlowMethod {
         }
     }
 
-    override fun run(image: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(image: List<STRIMMBuffer>): List<STRIMMBuffer> {
+        val flattenedData = flattenData(image)
         if(GUIMain.strimmUIService.state == UIstate.ACQUISITION) {
             //Get an event key presses that match the event keys for this flow and order them
             val filteredKeyPresses =
@@ -49,13 +51,13 @@ class EventMarkerFlow : FlowMethod {
                 GUIMain.strimmUIService.eventMarkerLabelThread.updateEventMarkerLabel(press.second)
                 //Remove the key press from the list so it isn't processed again next time this method is run
                 GUIMain.strimmUIService.pressedEventKeys.remove(press)
-                val newBuffer = makeNewBuffer(image.first(), true, press.second)
-                return newBuffer
+                val newBuffer = makeNewBuffer(flattenedData.first(), true, press.second)
+                return listOf(newBuffer)
             }
         }
 
-        val newBuffer = makeNewBuffer(image.first(), false, "")
-        return newBuffer
+        val newBuffer = makeNewBuffer(flattenedData.first(), false, "")
+        return listOf(newBuffer)
     }
 
     /**

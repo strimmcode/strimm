@@ -130,11 +130,6 @@ open class MMCameraSource : SourceMethod {
 
     @Synchronized
     fun runSnapped(): STRIMMBuffer? {
-        //snap acquisition
-//        if (mod(dataID, 100) == 0) {
-//            println("snap " + dataID + "  time: " + GUIMain.softwareTimerService.getTime())
-//        }
-
         core!!.snapImage()
 
         try {
@@ -156,6 +151,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1)
                     }
@@ -187,6 +183,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             3,
                             GUIMain.softwareTimerService.getTime(), //System.nanoTime().toDouble()/1000000.0,
+                            label,
                             dataID,
                             1)
                     }
@@ -211,6 +208,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1)
                     }
@@ -224,6 +222,7 @@ open class MMCameraSource : SourceMethod {
                         pixelType,
                         numChannels,
                         GUIMain.softwareTimerService.getTime(),
+                        label,
                         dataID,
                         1)
                 }
@@ -241,6 +240,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1)
                     }
@@ -264,6 +264,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1)
                     }
@@ -282,7 +283,7 @@ open class MMCameraSource : SourceMethod {
         }
 
         //If we're here then something went wrong. We just return an empty STRIMMPixelBuffer object
-        return STRIMMPixelBuffer(null, 0, 0, "", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
+        return STRIMMPixelBuffer(null, 0, 0, "", 0, GUIMain.softwareTimerService.getTime(), "", dataID, 0)
     }
 
     @Synchronized
@@ -318,7 +319,7 @@ open class MMCameraSource : SourceMethod {
                 if (core!!.remainingImageCount == 0) {
                     GUIMain.loggerService.log(Level.INFO, "Remaining image count is 0. Stop=true")
                     stop = true
-                    return STRIMMPixelBuffer(null, 0, 0, "", 0, -1.0, dataID, 0)
+                    return STRIMMPixelBuffer(null, 0, 0, "", 0, -1.0, "", dataID, 0)
                 }
             }
             catch (ex: Exception) {
@@ -343,6 +344,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             numChannels,
                             time,
+                            label,
                             dataID,
                             1)
                     }
@@ -372,6 +374,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             3,
                             time,
+                            label,
                             dataID,
                             1)
                     }
@@ -395,6 +398,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             numChannels,
                             time,
+                            label,
                             dataID,
                             1)
                     }
@@ -408,6 +412,7 @@ open class MMCameraSource : SourceMethod {
                         pixelType,
                         numChannels,
                         time,
+                        label,
                         dataID,
                         1)
                 }
@@ -425,6 +430,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             numChannels,
                             time,
+                            label,
                             dataID,
                             1)
                     }
@@ -448,6 +454,7 @@ open class MMCameraSource : SourceMethod {
                             pixelType,
                             numChannels,
                             time,
+                            label,
                             dataID,
                             1)
                     }
@@ -462,7 +469,7 @@ open class MMCameraSource : SourceMethod {
         }
 
         stop = true //The stop flag is used to stop this method from spinnng infinitely if there are no more images in the buffer
-        return STRIMMPixelBuffer(null, 0, 0, "", 0, -1.0, dataID, 0)
+        return STRIMMPixelBuffer(null, 0, 0, "", 0, -1.0, "", dataID, 0)
     }
 
     override fun preStart() {

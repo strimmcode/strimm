@@ -13,11 +13,88 @@
 	"flowConfig":{
 		"flows" : [
 			{
+				"flowName" : "ximeaSplit1",
+				"flowType" : "ImageSplitterFlow",
+				"flowCfg" : "",
+				"inputNames" : [
+					"ximeaCamera"
+				],
+				"splitCoordinates" : [
+					{
+						"x" : 0,
+						"y" : 0,
+						"w" : 60,
+						"h" : 120
+					}
+				]
+			},
+			{
+				"flowName" : "ximeaSplit2",
+				"flowType" : "ImageSplitterFlow",
+				"flowCfg" : "",
+				"inputNames" : [
+					"ximeaCamera"
+				],
+				"splitCoordinates" : [
+					{
+						"x" : 59,
+						"y" : 0,
+						"w" : 60,
+						"h" : 120
+					}
+				]
+			},
+			{
 				"flowName" : "ROIFlow1",
 				"flowType" : "ROIFlowMethod",
 				"flowCfg" : "ximeaROIFlowSplit1.cfg",
 				"inputNames" : [
-					"ximeaCamera"
+					"ximeaSplit1"
+				]
+			},
+			{
+				"flowName" : "ROIFlow2",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "ximeaROIFlowSplit2.cfg",
+				"inputNames" : [
+					"ximeaSplit2"
+				]
+			},
+			{
+				"flowName" : "ROIMarkerFlow",
+				"flowType" : "EventMarkerFlow",
+				"flowCfg" : "",
+				"inputNames" : [
+					"ROIFlow1"
+				],
+				"eventKeys" : [
+					"1",
+					"2",
+					"3"
+				],
+				"associatedSaveSink" : "ROI1Save"
+			},
+			{
+				"flowName" : "Split1MarkerFlow",
+				"flowType" : "EventMarkerFlow",
+				"flowCfg" : "",
+				"inputNames" : [
+					"ximeaSplit1"
+				],
+				"eventKeys" : [
+					"4",
+					"5",
+					"6"
+				],
+				"associatedSaveSink" : "ximeaSaveSplit1"
+			},
+			{
+				"flowName" : "histogramFlow",
+				"flowType" : "HistogramFlow",
+				"flowCfg" : "",
+				"inputNames" : [
+					"ximeaSplit1",
+					"ximeaSplit2"
 				]
 			}
 		]
@@ -25,19 +102,11 @@
 	"sinkConfig":{ 
 		"sinks" : [
 			{
-				"sinkName" : "Split1ROIDisplaySink",
-				"sinkType" : "SinkTraceMethod",
-				"sinkCfg" : "ximea_ROI_sink_preview.cfg",
-				"inputNames" : [
-					"ROIFlow1"
-				]
-			},
-			{
-				"sinkName" : "ximeaSaveSplit1",
-				"sinkType" : "SinkSaveMethod",
+				"sinkName" : "histogramSink",
+				"sinkType" : "HistogramSink",
 				"sinkCfg" : "Null.cfg",
 				"inputNames" : [
-					"ximeaCamera"
+					"histogramFlow"
 				]
 			},
 			{
@@ -45,10 +114,81 @@
 				"sinkType" : "SinkImageJDisplayMethod",
 				"sinkCfg" : "ximeaSink2.cfg",
 				"inputNames" : [
-					"ximeaCamera"
+					"ximeaSplit1"
+				]
+			},
+			{
+				"sinkName" : "ximeaSaveSplit1",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ximeaSplit1"
+				]
+			},
+			{
+				"sinkName" : "ximeaDisplaySplit2",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "ximeaSink2.cfg",
+				"inputNames" : [
+					"ximeaSplit2"
+				]
+			},
+			{
+				"sinkName" : "ximeaSaveSplit2",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ximeaSplit2"
+				]
+			},
+			{
+				"sinkName" : "ROI1Save",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ROIFlow1"
+				]
+			},
+			{
+				"sinkName" : "ROI1Display",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "ximea_ROI_sink_preview.cfg",
+				"inputNames" : [
+					"ROIFlow1"
+				]
+			},
+			{
+				"sinkName" : "ROI2Save",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ROIFlow2"
+				]
+			},
+			{
+				"sinkName" : "ROI2Display",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "ximea_ROI_sink_preview.cfg",
+				"inputNames" : [
+					"ROIFlow2"
+				]
+			},
+			{
+				"sinkName" : "ROIMarkerSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"ROIMarkerFlow"
+				]
+			},
+			{
+				"sinkName" : "split1MarkerSave",
+				"sinkType" : "SinkSaveMethod",
+				"sinkCfg" : "Null.cfg",
+				"inputNames" : [
+					"Split1MarkerFlow"
 				]
 			}
 		]
 	}
-
 }

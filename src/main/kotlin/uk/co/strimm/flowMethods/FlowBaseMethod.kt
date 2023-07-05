@@ -33,15 +33,12 @@ open class FlowBaseMethod() : FlowMethod {
             }
         }
     }
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         //the flow function should know the
-
-
         for (f in 0..data.size - 1) {
             println("FlowBaseMethod:= data_ix " + f)
         }
-        return data[0]
-
+        return listOf(data[0])
     }
 
     override fun preStart(){

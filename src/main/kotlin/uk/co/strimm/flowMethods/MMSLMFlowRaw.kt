@@ -56,8 +56,7 @@ class MMSLMFlowRaw () : FlowMethod {
 
     }
 
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
-
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         var status = 1
         var ret = mutableListOf<Any>()
         var dat = data[0] as STRIMM_MMCommandBuffer
@@ -115,8 +114,7 @@ class MMSLMFlowRaw () : FlowMethod {
         }
         dataID++
         //the buffer emitted once the command has finished (synchronous)
-        return STRIMM_MMCommandBuffer("Result", ret, dataID, status)
-
+        return listOf(STRIMM_MMCommandBuffer("Result", ret, dataID, status))
     }
 
     fun loadCfg() {
@@ -140,7 +138,6 @@ class MMSLMFlowRaw () : FlowMethod {
         else{
 
         }
-
     }
     override fun preStart(){
 
@@ -151,11 +148,9 @@ class MMSLMFlowRaw () : FlowMethod {
 
     }
 
-
     fun setSLMImage (pixelsByte : ByteArray) {
         //Write an 8-bit monochrome image to the SLM.
         core!!.setSLMImage(label, pixelsByte)
-
     }
 
     fun	setSLMImage (pixelsInt : IntArray) {
@@ -230,8 +225,6 @@ class MMSLMFlowRaw () : FlowMethod {
         //Load a sequence of images into the SLM
         core!!.loadSLMSequence(label, imageSequence)
     }
-
-
 }
 
 

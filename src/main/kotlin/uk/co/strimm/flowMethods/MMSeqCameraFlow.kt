@@ -110,14 +110,13 @@ class MMSeqCameraFlow : FlowMethod {
 
     }
 
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         //combination of the position in the list of images (for each burst)
         //and the dataID can be used to provide an index and order for each image.
         //Each STRIMMPixelBuffer contains its own time
         var timeCnt = GUIMain.softwareTimerService.getTime()
         var curTime = timeCnt
         var images = mutableListOf<STRIMMPixelBuffer>()
-
 
         //TODO need a better naming convention for batch images than this
         //at the moment hdf5 sinply takes the order than the batches and the images
@@ -138,9 +137,7 @@ class MMSeqCameraFlow : FlowMethod {
             timeCnt = curTime
         }
 
-        return STRIMMSequenceCameraDataBuffer(images , dataID, 1)
-
-
+        return listOf(STRIMMSequenceCameraDataBuffer(images , dataID, 1))
     }
 
     fun loadCfg() {
@@ -207,6 +204,7 @@ class MMSeqCameraFlow : FlowMethod {
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
                         )
@@ -238,6 +236,7 @@ class MMSeqCameraFlow : FlowMethod {
                             pixelType,
                             3,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
                         )
@@ -259,6 +258,7 @@ class MMSeqCameraFlow : FlowMethod {
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
                         )
@@ -277,6 +277,7 @@ class MMSeqCameraFlow : FlowMethod {
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
                         )
@@ -298,6 +299,7 @@ class MMSeqCameraFlow : FlowMethod {
                             pixelType,
                             numChannels,
                             GUIMain.softwareTimerService.getTime(),
+                            label,
                             dataID,
                             1
                         )
@@ -313,7 +315,7 @@ class MMSeqCameraFlow : FlowMethod {
             println(core.toString())
             println(ex.message)  //something is going on with the camera
         }
-        return STRIMMPixelBuffer(null, 0, 0, "", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
+        return STRIMMPixelBuffer(null, 0, 0, "", 0, GUIMain.softwareTimerService.getTime(), "", dataID, 0)
 
     }
 
@@ -374,7 +376,7 @@ class MMSeqCameraFlow : FlowMethod {
                 }else{
                     //8 Bit GREY
                     dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), label, dataID, 1)
 
                 }
             }
@@ -395,7 +397,7 @@ class MMSeqCameraFlow : FlowMethod {
                     }
 
                     dataID++
-                    return STRIMMPixelBuffer(pix2, w, h, pixelType, 3, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return STRIMMPixelBuffer(pix2, w, h, pixelType, 3, GUIMain.softwareTimerService.getTime(), label, dataID, 1)
                 }
             }
             else{
@@ -409,7 +411,7 @@ class MMSeqCameraFlow : FlowMethod {
                 }else{
                     //16bit GREY
                     dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), label, dataID, 1)
 
                 }
             }
@@ -419,7 +421,7 @@ class MMSeqCameraFlow : FlowMethod {
                 }else{
                     //RGB64
                     dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), label, dataID, 1)
                 }
             }
             else{
@@ -433,7 +435,7 @@ class MMSeqCameraFlow : FlowMethod {
                 }else{
                     //32bit float
                     dataID++
-                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), dataID, 1)
+                    return STRIMMPixelBuffer(pix, w, h, pixelType, numChannels, GUIMain.softwareTimerService.getTime(), label, dataID, 1)
                 }
             }
             else{
@@ -445,7 +447,7 @@ class MMSeqCameraFlow : FlowMethod {
         }
         // GUIMain.protocolService.GDIPrintText(core.imageWidth.toInt(),core.imageHeight.toInt(), pix, "dataID : " + dataID.toString(),50.0, 50.0, 80)
 
-        return STRIMMPixelBuffer(null, 0, 0,"", 0, GUIMain.softwareTimerService.getTime(), dataID, 0)
+        return STRIMMPixelBuffer(null, 0, 0,"", 0, GUIMain.softwareTimerService.getTime(), label, dataID, 0)
 
     }
 

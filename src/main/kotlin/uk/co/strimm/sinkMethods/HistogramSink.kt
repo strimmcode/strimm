@@ -1,6 +1,5 @@
 package uk.co.strimm.sinkMethods
 
-
 import akka.actor.ActorRef
 import com.opencsv.CSVReader
 import uk.co.strimm.STRIMMBuffer
@@ -10,8 +9,9 @@ import uk.co.strimm.experiment.Sink
 import uk.co.strimm.gui.GUIMain
 import uk.co.strimm.gui.HistogramWindowPlugin
 import java.io.FileReader
+import java.util.logging.Level
 
-class SinkHistogramMethod() : SinkMethod {
+class HistogramSink() : SinkMethod {
     var histogramActor : ActorRef? = null
     lateinit var sink : Sink
     override lateinit var properties : HashMap<String, String>
@@ -35,19 +35,21 @@ class SinkHistogramMethod() : SinkMethod {
                     }
                 }
             } catch (ex: Exception) {
-                println(ex.message)
+                GUIMain.loggerService.log(Level.SEVERE, "Error reading CSV file for histogram sink. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             }
         }
+
         val plugin: HistogramWindowPlugin = GUIMain.dockableWindowPluginService.createPlugin(
             HistogramWindowPlugin::class.java,
-            properties, /// data
+            properties,
             true,
-            sink.sinkName
-        )
-        plugin.histogramWindowController.sink = sink
-        plugin.histogramWindowController.furtherInit()
+            sink.sinkName)
+
+//        plugin.histogramWindowController.sink = sink
+//        plugin.histogramWindowController.furtherInit()
         histogramActor = GUIMain.actorService.getActorByName(sink.sinkName)
-        plugin?.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
+        plugin.dock(GUIMain.strimmUIService.dockableControl, GUIMain.strimmUIService.strimmFrame)
 
     }
     override fun run(data : List<STRIMMBuffer>){
@@ -63,7 +65,13 @@ class SinkHistogramMethod() : SinkMethod {
         return CompleteStreaming()
     }
     override fun fail(ex: Throwable) {
-        println("FAIL")
+        try{
+            throw ex
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Stream failed in HistogramSink. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
     }
     override fun postStop() {
 

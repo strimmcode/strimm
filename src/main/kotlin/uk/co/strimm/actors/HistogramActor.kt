@@ -27,14 +27,12 @@ class HistogramActor(val plugin: HistogramWindowPlugin) : AbstractActor(){
                 GUIMain.loggerService.log(Level.INFO,"Histogram actor receiving message")
             }
             .match<StartStreaming>(StartStreaming::class.java){
-                println("HistogramActor:startStreaming")
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .match<CompleteStreaming>(CompleteStreaming::class.java){
-                println("HistogramActor::completeStreaming")
             }
             .match<FailStreaming>(FailStreaming::class.java){
-                println("HistogramActor::failStreaming")
+                GUIMain.loggerService.log(Level.INFO,"Histogram actor fail streaming (this may be expected)")
             }
             .match<TerminateActor>(TerminateActor::class.java){
                 GUIMain.loggerService.log(Level.INFO, "Histogram actor ${self.path().name()} terminating")
@@ -45,9 +43,7 @@ class HistogramActor(val plugin: HistogramWindowPlugin) : AbstractActor(){
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .matchAny{
-                GUIMain.loggerService.log(Level.SEVERE, "Trace actor does not recognise incoming message")
+                GUIMain.loggerService.log(Level.SEVERE, "Histogram actor does not recognise incoming message")
             }.build()
     }
-
-
 }

@@ -27,20 +27,16 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 import java.util.function.Supplier
 import java.util.logging.Level
-
-
 class ExperimentStream(val expConfig: ExperimentConfiguration){
     //construction of the stream
-
     //var sourceList = arrayListOf<SourceMethod>()
-
     var experimentSources = arrayListOf<ExperimentSource>()
     var experimentFlows = arrayListOf<ExperimentFlow>()
     var experimentSinks = arrayListOf<ExperimentSink>()
 
-    var sourceMethods = hashMapOf<String, SourceMethod>() ////////////
-    var flowMethods = hashMapOf<String, FlowMethod>() //////////
-    var sinkMethods = hashMapOf<String, SinkMethod>() ////////////
+    var sourceMethods = hashMapOf<String, SourceMethod>()
+    var flowMethods = hashMapOf<String, FlowMethod>()
+    var sinkMethods = hashMapOf<String, SinkMethod>()
 
     var numConnectionsSpecified = 0
     var numConnectionsMade = 0
@@ -55,21 +51,14 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
     //reset when IJ is reset.
     var overlayList = hashMapOf<ImageDisplay, List<Overlay>>()
 
-
-
-
-
     var cameraDataStoreActors = hashMapOf<ActorRef, String>()
     var traceDataStoreActors = hashMapOf<ActorRef, String>()
 
-
     val newTraceROIActors = hashMapOf<ActorRef, String>()//traces created at runtime rather than loaded with json
-
     var durationMs = 0
     var isRunning = false
 
     fun createStream(expConfig : ExperimentConfiguration) : RunnableGraph<NotUsed>?{
-
         try{
             setNumberOfSpecifiedConnections(expConfig)
             val graph = createStreamGraph(expConfig)
@@ -155,14 +144,13 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
         experimentFlows.forEach { x ->
             sb.append("Flow name: ${x.imgFlowName}, ")
             sb.append("number of flow inlets: ${x.ins.size}, ")
-            sb.append("number of flow outlets: ${x.outs.size}, ")
+            sb.append("number of flow outlets: ${x.outs.size}\n")
 
         }
         experimentSinks.forEach { x ->
             sb.append("Sink name: ${x.imageSinkName}, ")
             sb.append("number of sink inlets: ${x.ins.size}\n")
         }
-
 
         GUIMain.loggerService.log(Level.INFO,sb.toString())
     }
@@ -229,8 +217,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
     private fun setBroadcastObjectForSources(builder : GraphDSL.Builder<NotUsed>){
         try {
             experimentSources.forEach { x ->
-                    x.bcastObject = builder.add(Broadcast.create<STRIMMBuffer>(x.outs.size))
-                    builder.from(x.source).viaFanOut(x.bcastObject)
+                x.bcastObject = builder.add(Broadcast.create<List<STRIMMBuffer>>(x.outs.size))
+                builder.from(x.source).viaFanOut(x.bcastObject)
             }
         }
         catch(ex : Exception){
@@ -242,7 +230,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
     private fun setBroadcastObjectForFlows(builder : GraphDSL.Builder<NotUsed>){
         try {
             experimentFlows.forEach { x ->
-                x.bcastObject = builder.add(Broadcast.create<STRIMMBuffer>(x.outs.size))
+                x.bcastObject = builder.add(Broadcast.create<List<STRIMMBuffer>>(x.outs.size))
                 builder.from(x.flow).viaFanOut(x.bcastObject)
             }
         }
@@ -255,7 +243,8 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
     private fun setMergeObjectForSinks(builder : GraphDSL.Builder<NotUsed>){
         try {
             experimentSinks.forEach { x ->
-                x.mergeObject = builder.add(MergeLatest.create<STRIMMBuffer>(x.ins.size))
+                val mergeOperator = Merge.create<List<STRIMMBuffer>>(x.ins.size)
+                x.mergeObject = builder.add(mergeOperator)
                 builder.from(x.mergeObject).to(x.sink)
             }
         }
@@ -268,8 +257,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
     private fun setMergeObjectForFlows(builder : GraphDSL.Builder<NotUsed>){
         try {
             experimentFlows.forEach { x ->
-                        x.mergeObject = builder.add(MergeLatest.create<STRIMMBuffer>(x.ins.size))
-                        builder.from(x.mergeObject).via(x.flow)
+                val mergeOperator = Merge.create<List<STRIMMBuffer>>(x.ins.size)
+                x.mergeObject = builder.add(mergeOperator)
+                builder.from(x.mergeObject).via(x.flow)
             }
         }
         catch (ex : Exception){
@@ -285,78 +275,59 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
     }
 
     private fun populateSources(expConfig: ExperimentConfiguration, builder : GraphDSL.Builder<NotUsed>){
-            try {
-
+        try {
             for (source in expConfig.sourceConfig.sources) {
-                    val expSource = ExperimentSource(source.sourceName)
-                    val cl = Class.forName("uk.co.strimm.sourceMethods." + source.sourceType)
-                    val sourceMethod = cl.newInstance() as SourceMethod
-                    sourceMethod.init(source)
-                    //sourceList.add(sourceMethod)
-                    sourceMethods[source.sourceName] = sourceMethod
+                val expSource = ExperimentSource(source.sourceName)
+                val cl = Class.forName("uk.co.strimm.sourceMethods." + source.sourceType)
+                val sourceMethod = cl.newInstance() as SourceMethod
+                sourceMethod.init(source)
+                sourceMethods[source.sourceName] = sourceMethod
 
-                    //sourceMethods[source.sourceName] = sourceMethod
-
-                    val akkaSource =
-                        if (source.isTimeLapse) {
-                            if (source.async) {
-                                //this option will take images at a rate determined by Tick
-                                Source.tick(Duration.ZERO, Duration.ofMillis(source.intervalMs.toLong()), Unit)
-                                    //.map { sourceMethod.run() }
-                                    //.filter{ GUIMain.experimentService.experimentStream.isRunning == true}
-                                    .mapAsync(
-                                        1,
-                                        akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
-                                    )
-//                                    .filter { it.status == 1 }
-                                    .async() //ensures that akka-stream source gets its own thread so cameras can work in parallel
-                                    .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
-                            }
-                            else{
-                                //this option will take images at a rate determined by Tick
-                                Source.tick(Duration.ZERO, Duration.ofMillis(source.intervalMs.toLong()), Unit)
-                                    //.map { sourceMethod.run() }
-                                    //.filter{ GUIMain.experimentService.experimentStream.isRunning == true}
-                                    .mapAsync(1,
-                                        akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
-                                    )
-//                                    .filter { it.status == 1 }
-                                    .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
-                            }
+                val akkaSource =
+                    if (source.isTimeLapse) {
+                        if (source.async) {
+                            //this option will take images at a rate determined by Tick
+                            Source.tick(Duration.ZERO, Duration.ofMillis(source.intervalMs.toLong()), Unit)
+                                //.map { sourceMethod.run() }
+                                //.filter{ GUIMain.experimentService.experimentStream.isRunning == true}
+                                .mapAsync(1,
+                                    akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { listOf(sourceMethod.run()) }) as CompletionStage<List<STRIMMBuffer>> }
+                                )
+                                .async() //ensures that akka-stream source gets its own thread so cameras can work in parallel
+                                .named(source.sourceName) as Source<List<STRIMMBuffer>, NotUsed>
                         }
-                        else {
-                            //previously done with unfoldAsync
-//                                Source.unfoldAsync(
-//                                    startState,
-//                                    { currentState ->
-//                                       CompletableFuture.supplyAsync(Supplier {
-//                                           Optional.of(akka.japi.Pair(currentState, sourceMethod.run() ))
-//                                       })
-//                                    })
-                            if (source.async) {
-                                Source.repeat(Unit)
-                                    .filter { GUIMain.experimentService.experimentStream.isRunning == true }
-
-                                    .mapAsync(
-                                        1,
-                                        akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
-                                    )
-//                                    .filter { it.status == 1 }
-                                    .async()
-                                    .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
-                            }
-                            else{
-                                Source.repeat(Unit)
-                                    .filter { GUIMain.experimentService.experimentStream.isRunning == true }
-                                    .mapAsync(1,
-                                        akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { sourceMethod.run() }) as CompletionStage<STRIMMBuffer> }
-                                    )
-//                                    .filter { it.status == 1 }
-                                    .named(source.sourceName) as Source<STRIMMBuffer, NotUsed>
-                            }
+                        else{
+                            //this option will take images at a rate determined by Tick
+                            Source.tick(Duration.ZERO, Duration.ofMillis(source.intervalMs.toLong()), Unit)
+                                //.map { sourceMethod.run() }
+                                //.filter{ GUIMain.experimentService.experimentStream.isRunning == true}
+                                .mapAsync(1,
+                                    akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { listOf(sourceMethod.run()) }) as CompletionStage<List<STRIMMBuffer>> }
+                                )
+                                .named(source.sourceName) as Source<List<STRIMMBuffer>, NotUsed>
                         }
-                    expSource.source = builder.add(akkaSource)
-                    experimentSources.add(expSource)
+                    }
+                    else {
+                        if (source.async) {
+                            Source.repeat(Unit)
+                                .filter { GUIMain.experimentService.experimentStream.isRunning }
+                                .mapAsync(1,
+                                    akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { listOf(sourceMethod.run()) }) as CompletionStage<List<STRIMMBuffer>> }
+                                )
+                                .async()
+                                .named(source.sourceName) as Source<List<STRIMMBuffer>, NotUsed>
+                        }
+                        else{
+                            Source.repeat(Unit)
+                                .filter { GUIMain.experimentService.experimentStream.isRunning }
+                                .mapAsync(1,
+                                    akka.japi.function.Function { t: Unit -> CompletableFuture.supplyAsync(Supplier { listOf(sourceMethod.run()) }) as CompletionStage<List<STRIMMBuffer>> }
+                                )
+                                .named(source.sourceName) as Source<List<STRIMMBuffer>, NotUsed>
+                        }
+                    }
+                expSource.source = builder.add(akkaSource)
+                experimentSources.add(expSource)
             }
         }
         catch(ex : Exception){
@@ -386,10 +357,9 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                 }) as CompletionStage<STRIMMBuffer>
                             }
                         )
-//                        .filter { it.status == 1 }
                         .async()
                         .named(flow.flowName)
-                    expFlow.flow = builder.add(akkaFlow) as FlowShape<List<STRIMMBuffer>, STRIMMBuffer>
+                    expFlow.flow = builder.add(akkaFlow) as FlowShape<List<STRIMMBuffer>, List<STRIMMBuffer>>
                     experimentFlows.add(expFlow)
                 }
                 else{
@@ -404,7 +374,7 @@ class ExperimentStream(val expConfig: ExperimentConfiguration){
                                 }) as CompletionStage<STRIMMBuffer>
                             }
                         ).named(flow.flowName)
-                    expFlow.flow = builder.add(akkaFlow) as FlowShape<List<STRIMMBuffer>, STRIMMBuffer>
+                    expFlow.flow = builder.add(akkaFlow) as FlowShape<List<STRIMMBuffer>, List<STRIMMBuffer>>
                     experimentFlows.add(expFlow)
                 }
             }

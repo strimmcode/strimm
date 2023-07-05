@@ -54,8 +54,7 @@ class MMXYStageFlowRaw() : FlowMethod {
 
     }
 
-    override fun run(data: List<STRIMMBuffer>): STRIMMBuffer {
-
+    override fun run(data: List<STRIMMBuffer>): List<STRIMMBuffer> {
         var status = 1
         var dat = data[0] as STRIMMXYStageBuffer
         if (dat.szCommand == "setXYPosition"){
@@ -83,8 +82,7 @@ class MMXYStageFlowRaw() : FlowMethod {
         }
         dataID++
         //the buffer emitted once the command has finished (synchronous)
-        return STRIMMBuffer(dataID, status)
-
+        return listOf(STRIMMBuffer(dataID, status))
     }
 
     fun loadCfg() {

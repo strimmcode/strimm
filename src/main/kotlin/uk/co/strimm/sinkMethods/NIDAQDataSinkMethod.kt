@@ -13,6 +13,7 @@ import uk.co.strimm.actors.messages.start.StartStreaming
 import uk.co.strimm.experiment.Sink
 import uk.co.strimm.gui.GUIMain
 import java.io.FileReader
+import java.util.logging.Level
 
 //NIDAQDataSinkMethod will execute a sequence on the NIDAQ determined by the STRIMMBuffer at runtime
 
@@ -102,6 +103,12 @@ class NIDAQDataSinkMethod() : SinkMethod {
         return CompleteStreaming()
     }
     override fun fail(ex: Throwable) {
-        println("FAIL")
+        try{
+            throw ex
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Stream failed in NIDAQDataSinkMethod. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
     }
 }

@@ -54,7 +54,7 @@ class FlowTestActor() : AbstractActor(){
                 for (f in 0..pix.size-1){
                     pix[f] = (Math.random()*255).toInt().toByte()
                 }
-                sender().tell(STRIMMPixelBuffer(pix,640,480,"Byte", 3,0.0, dataID, 1), self() )
+                sender().tell(STRIMMPixelBuffer(pix,640,480,"Byte", 3,0.0, "", dataID, 1), self() )
             }
             .matchAny{ imm ->
                 sender().tell(Acknowledgement.INSTANCE, self())

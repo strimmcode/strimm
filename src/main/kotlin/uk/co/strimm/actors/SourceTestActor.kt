@@ -53,7 +53,7 @@ class SourceTestActor() : AbstractActor(){
                 //Thread.sleep(100)
                 dataID++
                 val pix = ByteArray(640*480*3)
-                sender().tell(STRIMMPixelBuffer(pix,640,480,"Byte", 3,0.0, dataID, 1), self() )
+                sender().tell(STRIMMPixelBuffer(pix,640,480,"Byte", 3,0.0, "", dataID, 1), self() )
             }
             .matchAny{ imm ->
                 sender().tell(Acknowledgement.INSTANCE, self())

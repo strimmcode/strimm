@@ -34,7 +34,7 @@ class TraceActor(val plugin: TraceWindowPlugin) : AbstractActor(){
                 println("TraceActor::completeStreaming")
             }
             .match<FailStreaming>(FailStreaming::class.java){
-                println("TraceActor::failStreaming")
+                GUIMain.loggerService.log(Level.INFO,"Trace actor fail streaming (this may be expected)")
             }
             .match<TerminateActor>(TerminateActor::class.java){
                 GUIMain.loggerService.log(Level.INFO, "Trace actor ${self.path().name()} terminating")

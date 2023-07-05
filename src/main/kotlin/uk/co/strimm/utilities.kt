@@ -1,26 +1,21 @@
 package uk.co.strimm
 
-import akka.actor.ActorRef
-import com.google.gson.annotations.SerializedName
-import hdf.hdf5lib.HDF5Constants
-import net.imagej.Main
 //import com.google.common.collect.HashBiMap
 //import com.google.gson.annotations.SerializedName
-import net.imagej.overlay.Overlay
-import org.scijava.module.*
-import org.scijava.plugin.PluginInfo
-import scala.Byte
 
-import uk.co.strimm.experiment.ROI
 //import uk.co.strimm.gui.TraceSeries
 //import uk.co.strimm.plugins.DataDescription
 //import uk.co.strimm.plugins.PipelinePlugin
+import net.imagej.Main
+import net.imagej.overlay.Overlay
+import org.apache.commons.collections.iterators.SingletonListIterator
+import uk.co.strimm.experiment.ROI
+import uk.co.strimm.gui.GUIMain
 import uk.co.strimm.services.LoggerService
 import java.awt.Image
 import java.util.logging.Level
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
-import kotlin.reflect.KType
 
 fun setIcon(width: Int, height: Int, path: String, title: String = "",
             loggerService: LoggerService, isButton: Boolean = true) : ImageIcon? {
@@ -41,15 +36,39 @@ enum class Acknowledgement {
 }
 data class DockableWindowPosition(val x : Double, val y: Double, val width: Double, val height: Double)
 
+fun flattenData(incommingData : Any) : ArrayList<STRIMMBuffer>{
+    val dataAsList = arrayListOf<STRIMMBuffer>()
+    try {
+        val stream = (incommingData as List<STRIMMBuffer>).stream().toArray()
+        for (i in stream) {
+            val iter = SingletonListIterator(i)
+            while (iter.hasNext()) {
+                /**
+                 * The incoming data will be a list of lists if the number of inlets to the node is >1
+                 * The incoming data will be a single item if the number of inlets to the node is ==1
+                 */
+                when(val item = iter.next()){
+                    is List<*> -> {
+                        val itemAsList = item as List<STRIMMBuffer>
+                        dataAsList.add(itemAsList.first())
+                    }
+                    is STRIMMBuffer -> {
+                        dataAsList.add(item)
+                    }
+                }
+            }
+        }
+    }
+    catch(ex : Exception){
+        GUIMain.loggerService.log(Level.SEVERE, "Error flattening data. ${ex.message}")
+        GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+    }
+
+    return dataAsList
+}
+
 //base data transfer class - know how to create the correct kind of H5 dataset object
 //write its entry and read its entry
-//
-//
-//
-//
-//
-//
-//
 open class STRIMMBuffer(var dataID : Int, val status : Int, val className : String? = "STRIMMBuffer"){
     open var imageData : Any? = null
     open var traceData = arrayOf<Double>(dataID.toDouble(),status.toDouble())
@@ -77,7 +96,7 @@ open class STRIMMBuffer(var dataID : Int, val status : Int, val className : Stri
 }
 open class STRIMMSaveBuffer(val data : List<STRIMMBuffer>, val name : String)
 
-open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Double, dataID : Int, status : Int) :
+open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Double, var cameraLabel: String, dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status, "STRIMMPixelBuffer"){
     override var imageData = pix
     override open var traceData = arrayOf<Double>(dataID.toDouble(), timeAcquired.toDouble())
