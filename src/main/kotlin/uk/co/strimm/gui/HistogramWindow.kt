@@ -1,29 +1,25 @@
 package uk.co.strimm.gui
 
 import bibliothek.gui.dock.common.DefaultMultipleCDockable
-import com.sun.javafx.charts.Legend
 import javafx.application.Platform
+import javafx.collections.FXCollections.observableArrayList
 import javafx.embed.swing.JFXPanel
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
 import javafx.scene.chart.BarChart
-import javafx.scene.chart.LineChart
+import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
-import javafx.scene.control.Label
+import javafx.scene.control.ScrollPane
 import javafx.scene.layout.VBox
-import net.imagej.overlay.RectangleOverlay
 import org.scijava.plugin.Plugin
 import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMSignalBuffer
-import uk.co.strimm.experiment.Sink
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
+import java.util.*
 import java.util.logging.Level
-import kotlin.math.floor
-import kotlin.math.max
-import kotlin.math.min
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Histogram")
 class HistogramWindowPlugin : AbstractDockableWindow() {
@@ -62,135 +58,160 @@ class HistogramWindowPlugin : AbstractDockableWindow() {
 }
 
 class HistogramWindow {
-//    var sink: Sink? = null
     lateinit var properties: HashMap<String, String>
-//    var xMN = 0.0;
-//    var xMX = 20.0;
-//    var numBins: Int = 20;
-//    var xStep = 1.0
-//
-//    //JavaFX structures
-//    var allSeries = hashMapOf<String, XYChart.Series<Number, Number>>()
-//    var freqArray = hashMapOf<String, MutableList<Double>>()
-//    var xAxis = NumberAxis()
-//    var yAxis = NumberAxis()
-//    var lineChart = LineChart<Number, Number>(xAxis, yAxis)
-//    var innerPane = VBox()
-//
-//    fun furtherInit() {
-//        if (properties["xAxisLabel"] != null) xAxis.label = properties["xAxisLabel"]
-//        if (properties["yAxisLabel"] != null) yAxis.label = properties["yAxisLabel"]
-//        if (properties["Title"] != null) lineChart.setTitle(properties["Title"])
-//
-//        if (properties["xMX"] != null) xMX = properties["xMX"]?.toDouble() ?: 20.0
-//        if (properties["xMN"] != null) xMN = properties["xMN"]?.toDouble() ?: 0.0
-//        if (properties["numBins"] != null) numBins = properties["numBins"]?.toInt() ?: 20
-//
-//        xStep = (xMX - xMN) / numBins.toDouble()
-//
-//    }
 
     @FXML
-    lateinit var histogramPane: VBox
+    lateinit var scrollPaneVBox : VBox
 
-    var histograms = hashMapOf<String, BarChart<Number, Number>>()
+    var scrollPane = ScrollPane()
+    var histogramPane = VBox() //Each histogram will be added to this
+    var histograms = hashMapOf<String, BarChart<String, Number>>()
+
+    //The incoming data will already be binned, but we will further bin the data so it presents better
+    var numPresentatonBins = 75
 
     @FXML
     fun initialize() {
         GUIMain.loggerService.log(Level.INFO, "Initialising histogram window")
-        histogramPane.children.add(Label("Testing"))
-        //println("HistogramWindow::initialize")
-//            lineChart.createSymbols = false
-//            lineChart.isLegendVisible = true
-//            lineChart.animated = false
-//            innerPane.children.add(lineChart)
-//            tracePane.children.add(innerPane)
-//            xAxis.isAutoRanging = true
-//            yAxis.isAutoRanging = true
-//            setTraceRenderFeatures()
-
+        scrollPaneVBox.children.add(scrollPane)
+        scrollPane.content = histogramPane
     }
 
-//    fun setTraceRenderFeatures() {
-//        innerPane.prefWidthProperty().bind(tracePane.widthProperty())
-//        innerPane.prefHeightProperty().bind(tracePane.heightProperty())
-//        lineChart.prefHeightProperty().bind(innerPane.heightProperty())
-//        setAxisFeatures()
-//    }
-
-//    fun setAxisFeatures() {
-//        xAxis.lowerBound = 0.0
-//        xAxis.upperBound = 20.0
-//        yAxis.lowerBound = 0.0
-//        yAxis.upperBound = 20.0
-//
-//        var isXAutoRanging = true
-//        val isYAutoRanging = true
-//
-//        xAxis.isAutoRanging = isXAutoRanging
-//        yAxis.isAutoRanging = isYAutoRanging
-//
-//
-//        xAxis.isMinorTickVisible = true
-//        xAxis.isTickLabelsVisible = true
-//
-//
-//        yAxis.isTickLabelsVisible = true
-//        yAxis.isMinorTickVisible = true
-//
-//    }
-
+    /**
+     * This method is called by the HistogramActor and initially receives the data from the HistogramFlow
+     * @param data The histogram data as List<STRIMMSignalBuffer>
+     */
     fun updateChart(data: List<STRIMMBuffer>){
-//        println("UpdateChart called")
-//        val test = isNewChart(data[0] as STRIMMSignalBuffer)
+        for(buffer in data){
+            val signalBuffer = buffer as STRIMMSignalBuffer
+            val isNewChart = isNewChart(signalBuffer)
+            if(isNewChart){
+                createNewHistogram(signalBuffer)
+            }
+            else{
+                updateExistingHistogram(signalBuffer)
+            }
+        }
     }
 
-    fun isNewChart(dataObject : STRIMMSignalBuffer): Boolean{
-        return false
+    /**
+     * If a histogram already exists for the camera/flow then clear it's existing data and replace with new histogram
+     * data
+     * @param buffer The buffer containing the new histogram data
+     */
+    fun updateExistingHistogram(buffer: STRIMMSignalBuffer){
+        Platform.runLater {
+            for (histogram in histograms) {
+                if (histogram.key in buffer.channelNames!!) {
+                    val series = XYChart.Series<String, Number>()
+                    var maxVal = 0.0
+                    for (i in 0 until buffer.data!!.size) {
+                        val index = i.toString()
+                        val count = buffer.data!![i]
+                        if(count > maxVal){
+                            maxVal = count
+                        }
+                        series.data.add(XYChart.Data(index, count))
+                    }
+
+                    (histogram.value.yAxis as NumberAxis).upperBound = maxVal
+
+                    histogram.value.data.clear()
+                    histogram.value.data.add(series)
+                }
+            }
+        }
     }
-//    fun updateChart(data: List<STRIMMBuffer>) {
-//        Platform.runLater {
-//            val dat = data[0] as STRIMMSignalBuffer
-//            for (f in 0..dat!!.channelNames!!.size - 1) {
-//                val name = dat!!.channelNames!!.get(f)
-//                // println(name)
-//                var series = allSeries[name]
-//                if (series == null) {
-//                    println("add new series")
-//                    //make and add a new series
-//                    series = XYChart.Series<Number, Number>()
-//                    series.name = name
-//                    // println("numBins " + numBins)
-//                    for (f in 1..numBins + 1) {
-//                        series.data.add(XYChart.Data(xMN + (f - 1) * xStep, 0.0))
-//                        series.data.add(XYChart.Data(xMN + (f - 1) * xStep, 0.0))
-//
-//                    }
-//                    var array = DoubleArray(numBins)
-//                    freqArray[name] = array.toMutableList()
-//                    allSeries[name] = series
-//                    lineChart.data.add(series)
+
+    /**
+     * If no histogram already exists for the camera/flow then create one
+     * @param buffer The first buffer containing histogram data
+     */
+    fun createNewHistogram(buffer : STRIMMSignalBuffer){
+        GUIMain.loggerService.log(Level.INFO, "Creating histogram for ${buffer.channelNames!!.first()} image feed")
+
+        val range = 0..255 step 255/numPresentatonBins
+        val xAxis = CategoryAxis()
+        xAxis.categories = observableArrayList(range.map{ x -> x.toString()}.toList())
+        val yAxis = NumberAxis()
+        val histogram = BarChart(xAxis, yAxis)
+
+        histograms[buffer.channelNames.first()] = histogram
+
+        yAxis.isTickLabelsVisible = true
+        yAxis.isMinorTickVisible = false
+        yAxis.isAutoRanging = false
+        yAxis.tickUnit = 0.2
+
+        xAxis.isAutoRanging = false
+        xAxis.isTickLabelsVisible = false
+        xAxis.isTickMarkVisible = false
+
+        histogram.isLegendVisible = false
+        histogram.animated = false
+        histogram.prefHeight = 50.0
+        histogram.maxHeight = 50.0
+        histogram.prefWidth = 400.0
+        histogram.title = buffer.channelNames.first()
+        histogram.barGap = 0.0
+        histogram.categoryGap = 0.0
+
+        val series = XYChart.Series<String, Number>()
+        var initialMax = 0.0
+        for(i in 0 until buffer.data!!.size){
+            val index = i.toString()
+            val datum = buffer.data!![i]
+            if(datum > initialMax){
+                initialMax = datum
+            }
+
+            series.data.add(XYChart.Data(index, datum))
+        }
+
+        histogram.data.add(series)
+        yAxis.upperBound = initialMax
+        yAxis.lowerBound = 0.0
+
+        Platform.runLater {
+            histogramPane.children.add(histogram)
+        }
+    }
+
+    /**
+     * Check if there is a histogram chart for the incoming data based on channel name (which is actually the
+     * cameraLabel property or flow name, @see HistogramFlow).
+     * @param buffer The STRIMMSignalBuffer object representing the incoming data
+     * @return boolean which is true if there is no existing histogram chart, false if there is an existing histogram
+     * chart
+     */
+    fun isNewChart(buffer : STRIMMSignalBuffer): Boolean{
+        for(channelName in buffer.channelNames!!){
+            if(channelName in histograms.keys){
+                return false
+            }
+        }
+
+        return true
+    }
+
+//    fun determineRange(buffer : STRIMMSignalBuffer) : LongProgression{
+//        val pixelType = pixelTypeHashMap[buffer.imagePixelType]
+//        var range = 0L..255L step 1
+//        if(pixelType != null){
+//            when(pixelType){
+//                "Byte" -> {
+//                    range = 0L..255L step 1
 //                }
-//                //add the new data
-//                for (ff in 0..dat!!.times!!.size - 1) {
-//                    //fill freq array
-//                    val value = dat!!.data!!.get(f + ff * (dat!!.channelNames!!.size))
-//                    if (value >= xMN && value < xMX) {
-//                        var ix = floor((value - xMN) / xStep).toInt()
-//                        freqArray[name]?.set(ix, (freqArray[name]?.get(ix))?.plus(1) ?: 0.0)
-//
-//                    }
+//                "Short" -> {
+//                    range = 0L..((Short.MAX_VALUE*2)+1).toLong() step 256L
 //                }
-//                //fill the series
-//                var cnt = 0
-//                for (ff in 0..numBins - 1) {
-//                    series.data.set(cnt, XYChart.Data(xMN + ff * xStep, freqArray[name]?.get(ff)))
-//                    cnt = cnt + 1
-//                    series.data.set(cnt, XYChart.Data(xMN + (ff + 1) * xStep, freqArray[name]?.get(ff)))
-//                    cnt = cnt + 1
+//                "Float" -> {
+//                    range = 0L..(2.0.pow(32)-1).toLong() step 16777216L
 //                }
 //            }
 //        }
+//
+//        return range
 //    }
 }
 

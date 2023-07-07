@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils.isNumeric
 import org.scijava.plugin.Plugin
 import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMSignalBuffer
-import uk.co.strimm.STRIMMSignalBuffer1
 import uk.co.strimm.experiment.Sink
 import uk.co.strimm.flattenData
 import uk.co.strimm.gui.GUIMain.Companion.markerEventLabel

@@ -112,7 +112,6 @@ open class MMCameraSource : SourceMethod {
             }
         }
 
-
         if(!bSnapped) {
             //This is done so when stopping the acquisiton, each core can be shut down appropriately using stopSequenceAcquistion()
             GUIMain.loggerService.log(Level.INFO, "Adding core to cores list")
@@ -134,7 +133,7 @@ open class MMCameraSource : SourceMethod {
 
         try {
             val pix = core!!.image //TODO should this use taggedImage instead?
-
+//            println("Image min is: ${(pix as ByteArray).min()}, max is: ${(pix as ByteArray).max()}")
             //note that ImageJ display supports many more pixelTypes and num of channels than MMan Core
             if (pixelType == "Byte") {
                 if (numChannels == 1) {

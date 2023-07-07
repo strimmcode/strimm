@@ -5,7 +5,6 @@ import akka.actor.Kill
 import akka.actor.Props
 import uk.co.strimm.Acknowledgement
 import uk.co.strimm.STRIMMBuffer
-import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.actors.messages.Message
 import uk.co.strimm.actors.messages.complete.CompleteStreaming
 import uk.co.strimm.actors.messages.fail.FailStreaming
@@ -24,12 +23,14 @@ class HistogramActor(val plugin: HistogramWindowPlugin) : AbstractActor(){
     override fun createReceive(): Receive {
         return receiveBuilder()
             .match<Message>(Message::class.java) { message ->
-                GUIMain.loggerService.log(Level.INFO,"Histogram actor receiving message")
+                GUIMain.loggerService.log(Level.INFO,"Histogram actor receiving basic message")
             }
             .match<StartStreaming>(StartStreaming::class.java){
+                GUIMain.loggerService.log(Level.INFO,"Histogram actor started streaming")
                 sender().tell(Acknowledgement.INSTANCE, self())
             }
             .match<CompleteStreaming>(CompleteStreaming::class.java){
+                GUIMain.loggerService.log(Level.INFO,"Histogram actor completed streaming")
             }
             .match<FailStreaming>(FailStreaming::class.java){
                 GUIMain.loggerService.log(Level.INFO,"Histogram actor fail streaming (this may be expected)")

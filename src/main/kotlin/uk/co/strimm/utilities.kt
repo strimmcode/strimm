@@ -94,44 +94,40 @@ open class STRIMMBuffer(var dataID : Int, val status : Int, val className : Stri
         return hashMapOf("dataID" to 9999.0 , "status" to 9999.0)
     }
 }
+
+var pixelTypeHashMap = hashMapOf(
+    Pair(0, "Byte"),
+    Pair(1, "Short"),
+    Pair(2, "Int"),
+    Pair(3, "Long"),
+    Pair(4, "Float"),
+    Pair(5, "Double"))
 open class STRIMMSaveBuffer(val data : List<STRIMMBuffer>, val name : String)
 
 open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Double, var cameraLabel: String, dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status, "STRIMMPixelBuffer"){
     override var imageData = pix
-    override open var traceData = arrayOf<Double>(dataID.toDouble(), timeAcquired.toDouble())
+    override var traceData = arrayOf<Double>(dataID.toDouble(), timeAcquired.toDouble())
 
-    override open fun getImageDataDims() : LongArray {
+    override fun getImageDataDims() : LongArray {
         //h,w,ch originally
         return longArrayOf(numChannels.toLong(), h.toLong(), w.toLong())
     }
-    override open fun getTraceDataDims() : LongArray{
+    override fun getTraceDataDims() : LongArray{
         return longArrayOf(1,2)
     }
 
-    override open fun getImageDataType() : Int {
-        if (pixelType == "Byte"){
-            return 0
+    override fun getImageDataType() : Int {
+        for(kvp in pixelTypeHashMap){
+            if(pixelType == kvp.value){
+                return kvp.key
+            }
         }
-        else if (pixelType == "Short"){
-            return 1
-        }
-        else if (pixelType == "Int"){
-            return 2
-        }
-        else if (pixelType == "Long"){
-            return 3
-        }
-        else if (pixelType == "Float"){
-            return 4
-        }
-        else if (pixelType == "Double"){
-            return 5
-        }
+
         return -1
     }
 
-    override open fun getImageDataMap(): HashMap<String , Double>{
+    override fun getImageDataMap(): HashMap<String , Double>{
         var bitDepth = 0
         if (pixelType == "Byte"){
             bitDepth = 8
@@ -218,13 +214,13 @@ open class STRIMMNIDAQBuffer(
     dataID : Int, status : Int) : STRIMMBuffer(dataID, status, "STRIMMNIDAQBuffer") {
 }
 
-open class STRIMMSignalBuffer1(var data : Any?, val numChannels : Int, val channelNames : List<String>,  dataID : Int, status : Int) :
-    STRIMMBuffer(dataID, status, "STRIMMSignalBuffer1"){
-    override open var traceData = data as Array<Double>
-    override open fun getTraceDataDims() : LongArray{
+//TODO either safe delete this class (used in SinkConsoleMethod and possibly elsewhere) or rename to something more appropriate
+open class STRIMMSignalBuffer1(var data : Any?, val numChannels : Int, val channelNames : List<String>,  dataID : Int, status : Int) : STRIMMBuffer(dataID, status, "STRIMMSignalBuffer1"){
+    override var traceData = data as Array<Double>
+    override fun getTraceDataDims() : LongArray{
         return longArrayOf((traceData.size / numChannels).toLong(), numChannels.toLong())
     }
-    override open fun getTraceDataMap(): HashMap<String , Double>{
+    override fun getTraceDataMap(): HashMap<String , Double>{
         val ret = hashMapOf<String, Double>()
         ret["numChannels"] = numChannels.toDouble()
         for (ch in channelNames){
@@ -232,36 +228,43 @@ open class STRIMMSignalBuffer1(var data : Any?, val numChannels : Int, val chann
         }
         return ret
     }
-    }
+}
 
 open class STRIMMSignalBuffer(var data : DoubleArray?, var times : DoubleArray?,  val numSamples : Int,  val channelNames : List<String>?,  dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status, "STRIMMSignalBuffer"){
-        override var traceData = arrayOf<Double>()
-        init{
-            val ret = mutableListOf<Double>()
-            for (sampleNumber in 0 until numSamples){
-                ret.add(times!![sampleNumber])
-                for (channelNumber in 0 until channelNames!!.size){
-                    ret.add(data!![sampleNumber*channelNames.size + channelNumber])
-                }
-            }
-            traceData = ret.toTypedArray()
-        }
-        override fun getTraceDataDims() : LongArray{
-            return longArrayOf(numSamples.toLong(),(1 + channelNames!!.size).toLong())
-        }
+    override var traceData = arrayOf<Double>()
 
-        override fun getTraceDataMap(): HashMap<String , Double> {
-        //these are the names that will be used in the h5 attributes in form  1   'times'   done this way else h5 puts them into alpha order
-            val ret = hashMapOf<String, Double>()
-            var cnt = 0
-            ret["$cnt 'times'"] = 0.0
-            for (ch in 0 until channelNames!!.size){
-                cnt++
-                ret[cnt.toString() + " '" + channelNames!![ch] + "'"] = 0.0
+    /**
+     * Used if the STRIMMSignalBuffer has been derived from a STRIMMPixelBuffer and we need to keep the pixel type
+     * @see HistogramFlow
+     */
+    var imagePixelType = -1
+
+    init{
+        val ret = mutableListOf<Double>()
+        for (sampleNumber in 0 until numSamples){
+            ret.add(times!![sampleNumber])
+            for (channelNumber in 0 until channelNames!!.size){
+                ret.add(data!![sampleNumber*channelNames.size + channelNumber])
             }
-            return ret
         }
+        traceData = ret.toTypedArray()
+    }
+    override fun getTraceDataDims() : LongArray{
+        return longArrayOf(numSamples.toLong(),(1 + channelNames!!.size).toLong())
+    }
+
+    override fun getTraceDataMap(): HashMap<String , Double> {
+    //these are the names that will be used in the h5 attributes in form  1   'times'   done this way else h5 puts them into alpha order
+        val ret = hashMapOf<String, Double>()
+        var cnt = 0
+        ret["$cnt 'times'"] = 0.0
+        for (ch in 0 until channelNames!!.size){
+            cnt++
+            ret[cnt.toString() + " '" + channelNames!![ch] + "'"] = 0.0
+        }
+        return ret
+    }
 }
 
 //Packages a group of images obtained by say a fast camera
@@ -277,7 +280,6 @@ open class STRIMMXYStageBuffer(
     dataID : Int,
     status : Int
 ) : STRIMMBuffer(dataID, status, "STRIMMXYStageBuffer"){
-
 }
 
 open class STRIMM_MMCommandBuffer(

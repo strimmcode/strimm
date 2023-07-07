@@ -47,7 +47,7 @@ class ImageSplitterFlow : FlowMethod {
             cameraLabel = flow.flowName,
             pix = sliceImage(originalImage, flow.splitCoordinates[0])
         )
-//        println("Sending image from ${flow.flowName}")
+
         return listOf(imageToReturn)
     }
 

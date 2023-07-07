@@ -4,7 +4,7 @@
 			{
 				"sourceName" : "ximeaCamera",
 				"sourceType" : "MMCameraSource",
-				"sourceCfg" : "ximeaSource.cfg",
+				"sourceCfg" : "democamSource.cfg",
 				"isTimeLapse" : False,
 				"intervalMs" : 10.0
 			}
