@@ -76,10 +76,41 @@ class HistogramFlow : FlowMethod{
             //Set the pixel type so it can be used by the HistogramWindow
             val pixelType = buffer.getImageDataType()
             newSignalBuffer.imagePixelType = pixelType
+            //Set the min and max pixel values for use in autostretching
+            newSignalBuffer.pixelMinMax = getMinMaxPixelVals(buffer)
             histogramBuffers.add(newSignalBuffer)
         }
 
         return histogramBuffers
+    }
+
+    /**
+     * Get the minimum and maximum pixel values for the image. This is used for autostretching in the HistogramWindow
+     * @see HistogramWindow
+     * @param image The image as a STRIMMPixelBuffer
+     * @return A pair with the min and max pixel values as Pair(min, max)
+     */
+    private fun getMinMaxPixelVals(image: STRIMMPixelBuffer) : Pair<Number, Number>{
+        val minMax = Pair(0, 0)
+        when(image.pix){
+            is ByteArray -> {
+                val min = (image.pix as ByteArray).min()
+                val max = (image.pix as ByteArray).max()
+                return Pair(min, max)
+            }
+            is ShortArray -> {
+                val min = (image.pix as ShortArray).min()
+                val max = (image.pix as ShortArray).max()
+                return Pair(min, max)
+            }
+            is FloatArray -> {
+                val min = (image.pix as FloatArray).min()
+                val max = (image.pix as FloatArray).max()
+                return Pair(min, max)
+            }
+        }
+
+        return minMax
     }
 
     /**

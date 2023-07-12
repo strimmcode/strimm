@@ -268,6 +268,22 @@ class ExperimentService  : AbstractService(), ImageJService {
     }
 
     /**
+     * Utility method that will get an display sinks associated with an image eed
+     * @param imageFeedName The name of the image feed which could be the source/flow name
+     * @return A list of all SinkImageJDisplayMethod sinks who have an input corresponding to the imageFeedName
+     */
+    fun getDownstreamDisplaySinksForImageFeed(imageFeedName : String) : ArrayList<String>{
+        val sinks = ArrayList<String>()
+        val sinkConfig = expConfig.sinkConfig
+        for(sink in sinkConfig.sinks){
+            if(sink.inputNames.contains(imageFeedName) && sink.sinkType == "SinkImageJDisplayMethod") {
+                sinks.add(sink.sinkName)
+            }
+        }
+        return sinks
+    }
+
+    /**
      * Close all open windows. This is called before the h5 file is read and window plugins created
      */
     fun closeOpenWindows(){

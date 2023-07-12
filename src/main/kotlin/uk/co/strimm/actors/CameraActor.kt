@@ -183,6 +183,8 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
     var viewportWidth = 0
     var viewportHeight = 0
     var bNormalise = false
+    var doAutoStretch = false
+    var autoStretchMinMax = Pair(0.0, 0.0)
 
     var camThread : MonitorCameraThread? = null
     var imageSequenceIntervalMs : Long = 100 //delay between showing bursts of images in response to a software trigger
@@ -201,7 +203,14 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                 displayInfo = displayInfoMessage.displayInfo
             }
             .match<TellDisplayNormalise>(TellDisplayNormalise::class.java){normaliseMessage->
+                GUIMain.loggerService.log(Level.INFO, "Setting normalise flag in ${self.path().name()} to ${normaliseMessage.bNormalise}")
                 bNormalise = normaliseMessage.bNormalise
+            }
+            .match<TellAutoStretch>(TellAutoStretch::class.java){
+                doAutoStretch = it.doAutoStretch
+                if(doAutoStretch) {
+                    autoStretchMinMax = it.minMax
+                }
             }
             .match<StartStreaming>(StartStreaming::class.java){
                 timeLast = 0.0
@@ -240,29 +249,15 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
             }
             .match<List<*>>(List::class.java){ imm ->
                 if (GUIMain.softwareTimerService.getTime() > timeLast + displayInfo!!.previewInterval) {
-                    //check if there are new runtime rois and give a new max number as an index
-//                    val overlays = GUIMain.overlayService.getOverlays()
-//                    val disp = GUIMain.experimentService.experimentStream.cameraDisplays[sink!!.sinkName]
-//                    val over = GUIMain.overlayService.getOverlays(disp) //overlays in disp but might be reapeted
-//                    val filteredOverlays = overlays.filter{it in over}
-//                    val can = (plugin.cameraWindowController.display as ImageDisplay).canvas
-                    //this 'switch' statement cannot distinguish types of List hence
-                    //says List<*> so will match all lists
-                    //Hence the addition of a className to STRIMMBuffer in order to differentiate
-                    //type in situations like this
-
                     imm as List<STRIMMBuffer>
                     val flattenedData = flattenData(imm as List<List<STRIMMBuffer>>)
-                    //STRIMMPixelBuffer is a single image
                     if (flattenedData[0].className == "STRIMMPixelBuffer"){
-//                        val imageList1 = imm as List<STRIMMPixelBuffer>
-                        var im1 =  flattenedData[0] as STRIMMPixelBuffer
-                        //println("dataID " + im1.dataID)
-                        var w = displayInfo!!.width.toInt()
-                        var h = displayInfo!!.height.toInt()
-
+                        val im1 =  flattenedData[0] as STRIMMPixelBuffer
+                        val w = displayInfo!!.width.toInt()
+                        val h = displayInfo!!.height.toInt()
                         val pixelType = displayInfo!!.pixelType
                         val numChannels = displayInfo!!.numChannels
+
                         if ((w != im1.w || h != im1.h || im1.pixelType != pixelType || im1.numChannels != numChannels)){
                             GUIMain.loggerService.log(Level.SEVERE, "The info carried by the STRIMMBuffer is different to the Sink's configured expectations")
                             GUIMain.loggerService.log(Level.INFO, "STRIMMBuffer width=${im1.w} vs sink width=$w")
@@ -272,131 +267,115 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                         }
 
                         val dataset = plugin.cameraWindowController.dataset!!
-                        if (im1.pixelType == "Byte"){
-                            var pix = im1.pix as ByteArray
-                            for (ch in 0 until numChannels) {
-                                val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
-                                if (ch < numChannels-1) {
-                                    dataset.setPlaneSilently(ch, imageSlice)
+                        //TODO in this when statement determine if "Int" and "Double" options are needed i.e. will images ever be of Int or Double pixel types?
+                        when(im1.pixelType){
+                            "Byte" -> {
+                                val pix = im1.pix as ByteArray
+                                for (ch in 0 until numChannels) {
+                                    val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
+                                    if (ch < numChannels-1) {
+                                        dataset.setPlaneSilently(ch, imageSlice)
+                                    }
+                                    else {
+                                        dataset.setPlane(ch, imageSlice)
+                                    }
+
+                                    if (bNormalise) {
+                                        val minMax : Pair<Double, Double> = if(doAutoStretch){
+                                            autoStretchMinMax
+                                        }
+                                        else {
+                                            val minPix = UByte.MIN_VALUE.toDouble()
+                                            val maxPix = UByte.MAX_VALUE.toDouble()
+                                            Pair(minPix, maxPix)
+                                        }
+                                        plugin.cameraWindowController.view?.setChannelRange(ch, minMax.first, minMax.second)
+                                    }
+                                    else{
+                                        plugin.cameraWindowController.view?.setChannelRange(ch, UByte.MIN_VALUE.toDouble(), UByte.MAX_VALUE.toDouble())
+                                    }
                                 }
-                                else {
-                                    dataset.setPlane(ch, imageSlice)
+                            }
+                            "Short" -> {
+                                val pix = im1.pix as ShortArray
+                                for (ch in 0 until numChannels) {
+                                    val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
+                                    if (ch < numChannels-1) {
+                                        dataset.setPlaneSilently(ch, imageSlice)
+                                    }
+                                    else {
+                                        dataset.setPlane(ch, imageSlice)
+                                    }
+
+                                    if (bNormalise) {
+                                        val minMax : Pair<Double, Double> = if(doAutoStretch){
+                                            autoStretchMinMax
+                                        }
+                                        else {
+                                            val minPix = UShort.MIN_VALUE.toDouble()
+                                            val maxPix = UShort.MAX_VALUE.toDouble()
+                                            Pair(minPix, maxPix)
+                                        }
+
+                                        plugin.cameraWindowController.view?.setChannelRange(ch, minMax.first, minMax.second)
+                                    }
+                                    else{
+                                        plugin.cameraWindowController.view?.setChannelRange(ch, UShort.MIN_VALUE.toDouble(), UShort.MAX_VALUE.toDouble())
+                                    }
                                 }
+                            }
+                            "Float" -> {
+                                //ImageJ sets crazy values for MAX and MIN
+                                val pix = im1.pix as FloatArray
+                                dataset.setPlane(0, pix)
 
                                 if (bNormalise) {
-                                    val minMax = imageSlice.fold(
-                                        Pair(
-                                            Float.MAX_VALUE.toDouble(),
-                                            Float.MIN_VALUE.toDouble()
-                                        )
-                                    ) { acc, v ->
-                                        Pair(
-                                            kotlin.math.min(acc.first, v.toDouble()),
-                                            kotlin.math.max(acc.second, v.toDouble())
-                                        )
-                                    }
-                                    plugin.cameraWindowController.view?.setChannelRange(ch, minMax.first, minMax.second)
+                                    val minPix = pix.min().toDouble()
+                                    val maxPix = pix.max().toDouble()
+                                    plugin.cameraWindowController.view?.setChannelRange(0, minPix, maxPix)
+                                }
+                                else{
+                                    plugin.cameraWindowController.view?.setChannelRange(0, Float.MIN_VALUE.toDouble(), Float.MAX_VALUE.toDouble())
                                 }
                             }
-                        }
-                        else if (im1.pixelType == "Short"){
-                            var pix = im1.pix as ShortArray
+                            "Int" -> {
+                                val pix = im1.pix as IntArray
+                                for (ch in 0..numChannels-1) {
+                                    val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
+                                    if (ch < numChannels-1) {
+                                        dataset.setPlaneSilently(ch, imageSlice)
+                                    }
+                                    else {
+                                        dataset.setPlane(ch, imageSlice)
+                                    }
 
-                            for (ch in 0 until numChannels) {
-                                val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
-                                if (ch < numChannels-1) {
-                                    dataset.setPlaneSilently(ch, imageSlice)
+                                    if (bNormalise) {
+                                        val minPix = imageSlice.min().toDouble()
+                                        val maxPix = imageSlice.max().toDouble()
+                                        plugin.cameraWindowController.view?.setChannelRange(ch, minPix, maxPix)
+                                    }
+                                    else{
+                                        plugin.cameraWindowController.view?.setChannelRange(ch, UInt.MIN_VALUE.toDouble(), UInt.MAX_VALUE.toDouble())
+                                    }
                                 }
-                                else {
-                                    dataset.setPlane(ch, imageSlice)
-                                }
+                            }
+                            "Double" -> {
+                                val pix = im1.pix as DoubleArray
+                                dataset.setPlane(0, pix)
 
                                 if (bNormalise) {
-                                    val minMax = imageSlice.fold(
-                                        Pair(
-                                            Float.MAX_VALUE.toDouble(),
-                                            Float.MIN_VALUE.toDouble()
-                                        )
-                                    ) { acc, v ->
-                                        Pair(
-                                            kotlin.math.min(acc.first, v.toDouble()),
-                                            kotlin.math.max(acc.second, v.toDouble())
-                                        )
-                                    }
-                                    plugin.cameraWindowController.view?.setChannelRange(ch, minMax.first, minMax.second)
+                                    val minPix = pix.min()
+                                    val maxPix = pix.max()
+                                    plugin.cameraWindowController.view?.setChannelRange(0, minPix, maxPix)
                                 }
-
-
-                            }
-                        }
-                        else if (im1.pixelType == "Int"){
-                            val pix = im1.pix as IntArray
-                            for (ch in 0..numChannels-1) {
-                                val imageSlice = pix.sliceArray((ch * w * h)..(((ch + 1) * w * h) - 1))
-                                if (ch < numChannels-1) {
-                                    dataset.setPlaneSilently(ch, imageSlice)
+                                else{
+                                    plugin.cameraWindowController.view?.setChannelRange(0, Double.MIN_VALUE, Double.MAX_VALUE)
                                 }
-                                else {
-                                    dataset.setPlane(ch, imageSlice)
-                                }
-
-                                if (bNormalise) {
-                                    val minMax = pix.fold(
-                                        Pair(
-                                            Float.MAX_VALUE.toDouble(),
-                                            Float.MIN_VALUE.toDouble()
-                                        )
-                                    ) { acc, v ->
-                                        Pair(
-                                            kotlin.math.min(acc.first, v.toDouble()),
-                                            kotlin.math.max(acc.second, v.toDouble())
-                                        )
-                                    }
-                                    plugin.cameraWindowController.view?.setChannelRange(ch, minMax.first, minMax.second)
-                                }
-
-                            }
-                        }
-                        else if (im1.pixelType == "Float"){
-                            val pix = im1.pix as FloatArray
-                            dataset.setPlane(0, pix)
-                            //ImageJ sets crazy values for MAX and MIN
-                            if (bNormalise) {
-                                val minMax = pix.fold(
-                                    Pair(
-                                        Float.MAX_VALUE.toDouble(),
-                                        Float.MIN_VALUE.toDouble()
-                                    )
-                                ) { acc, v ->
-                                    Pair(
-                                        kotlin.math.min(acc.first, v.toDouble()),
-                                        kotlin.math.max(acc.second, v.toDouble())
-                                    )
-                                }
-                                plugin.cameraWindowController.view?.setChannelRange(0, minMax.first, minMax.second)
-                            }
-                        }
-                        else if (im1.pixelType == "Double"){
-                            val pix = im1.pix as DoubleArray
-                            dataset.setPlane(0, pix)
-                            //ImageJ sets crazy values for MAX and MIN
-                            if (bNormalise) {
-                                val minMax = pix.fold(
-                                    Pair(
-                                        Float.MAX_VALUE.toDouble(),
-                                        Float.MIN_VALUE.toDouble()
-                                    )
-                                ) { acc, v ->
-                                    Pair(
-                                        kotlin.math.min(acc.first, v.toDouble()),
-                                        kotlin.math.max(acc.second, v.toDouble())
-                                    )
-                                }
-                                plugin.cameraWindowController.view?.setChannelRange(0, minMax.first, minMax.second)
                             }
                         }
 
-                        dataset.isDirty = true   //Tells SciJava/ImageJ services dataset has been altered and needs to be updated
+                        //Tells SciJava/ImageJ services dataset has been altered and needs to be updated
+                        dataset.isDirty = true
                     }
                     //STRIMMSequenceCamwraDataBuffer is a group of images taken by a fast camera
                     else if (flattenedData[0].className == "STRIMMSequenceCameraDataBuffer"){
@@ -438,8 +417,6 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                                         }
                                         plugin.cameraWindowController.view?.setChannelRange(ch, minMax.first, minMax.second)
                                     }
-
-
                                 }
                             }
                             else if (im1.pixelType == "Short"){
@@ -465,10 +442,6 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
 
 
                                 }
-
-                                //normalisation
-
-
                             }
                             else if (im1.pixelType == "Int"){
                                 val pix = im1.pix as IntArray
@@ -490,7 +463,6 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                                         }
                                         plugin.cameraWindowController.view?.setChannelRange(ch, minMax.first, minMax.second)
                                     }
-
                                 }
                             }
                             else if (im1.pixelType == "Float"){

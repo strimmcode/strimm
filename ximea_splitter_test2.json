@@ -112,7 +112,7 @@
 			{
 				"sinkName" : "ximeaDisplaySplit1",
 				"sinkType" : "SinkImageJDisplayMethod",
-				"sinkCfg" : "ximeaSink2.cfg",
+				"sinkCfg" : "ximeaSink.cfg",
 				"inputNames" : [
 					"ximeaSplit1"
 				]

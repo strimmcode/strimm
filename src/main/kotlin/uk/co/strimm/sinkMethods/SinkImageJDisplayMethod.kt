@@ -44,25 +44,27 @@ class SinkImageJDisplayMethod : SinkMethod {
                     }
                 }
             } catch (ex: Exception) {
-                println(ex.message)
+                GUIMain.loggerService.log(Level.SEVERE, "Error reading CSV file in SinkImageJDisplayMethod. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
             }
         }
-        var bNormalise = properties["normalise"]!!.toBoolean()
-        var displayInfo: DisplayInfo = DisplayInfo(
+
+        val bNormalise = properties["normalise"]!!.toBoolean()
+        val displayInfo: DisplayInfo = DisplayInfo(
             sink.sinkName,
             properties["w"]!!.toLong(),
             properties["h"]!!.toLong(),
             properties["pixelType"]!!,
             properties["numChannels"]!!.toInt(),
             properties["previewInterval"]!!.toInt(),
-            properties["lut"]!!
-        )
+            properties["lut"]!!)
+
         val plugin: CameraWindowPlugin = GUIMain.dockableWindowPluginService.createPlugin(
             CameraWindowPlugin::class.java,
             displayInfo,
             true,
-            sink.sinkName
-        )
+            sink.sinkName)
+
         plugin.cameraWindowController.sink = sink
         cameraActor = GUIMain.actorService.getActorByName(sink.sinkName)
         if (cameraActor != null) {

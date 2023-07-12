@@ -240,6 +240,8 @@ open class STRIMMSignalBuffer(var data : DoubleArray?, var times : DoubleArray?,
      */
     var imagePixelType = -1
 
+    var pixelMinMax = Pair<Number, Number>(0, 0)
+
     init{
         val ret = mutableListOf<Double>()
         for (sampleNumber in 0 until numSamples){
