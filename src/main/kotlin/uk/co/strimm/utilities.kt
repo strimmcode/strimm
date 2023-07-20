@@ -107,7 +107,7 @@ open class STRIMMSaveBuffer(val data : List<STRIMMBuffer>, val name : String)
 open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixelType : String, val numChannels : Int, var timeAcquired : Double, var cameraLabel: String, dataID : Int, status : Int) :
     STRIMMBuffer( dataID, status, "STRIMMPixelBuffer"){
     override var imageData = pix
-    override var traceData = arrayOf<Double>(dataID.toDouble(), timeAcquired.toDouble())
+    override var traceData = arrayOf<Double>(dataID.toDouble(), timeAcquired)
 
     override fun getImageDataDims() : LongArray {
         //h,w,ch originally
@@ -129,23 +129,25 @@ open class STRIMMPixelBuffer(var pix : Any?, var w : Int, var h : Int, val pixel
 
     override fun getImageDataMap(): HashMap<String , Double>{
         var bitDepth = 0
-        if (pixelType == "Byte"){
-            bitDepth = 8
-        }
-        else if (pixelType == "Short"){
-            bitDepth = 16
-        }
-        else if (pixelType == "Int"){
-            bitDepth = 32
-        }
-        else if (pixelType == "Long"){
-            bitDepth = 64
-        }
-        else if (pixelType == "Float"){
-            bitDepth = 32
-        }
-        else if (pixelType == "Double"){
-            bitDepth = 64
+        when (pixelType) {
+            "Byte" -> {
+                bitDepth = 8
+            }
+            "Short" -> {
+                bitDepth = 16
+            }
+            "Int" -> {
+                bitDepth = 32
+            }
+            "Long" -> {
+                bitDepth = 64
+            }
+            "Float" -> {
+                bitDepth = 32
+            }
+            "Double" -> {
+                bitDepth = 64
+            }
         }
         return hashMapOf("0 'w'" to w.toDouble() , "1 'h'" to h.toDouble(), "2 'numChannels'" to numChannels.toDouble(), "3 'bitDepth'" to bitDepth.toDouble())
     }
@@ -241,6 +243,7 @@ open class STRIMMSignalBuffer(var data : DoubleArray?, var times : DoubleArray?,
     var imagePixelType = -1
 
     var pixelMinMax = Pair<Number, Number>(0, 0)
+    var avgPixelIntensity = 0.0
 
     init{
         val ret = mutableListOf<Double>()

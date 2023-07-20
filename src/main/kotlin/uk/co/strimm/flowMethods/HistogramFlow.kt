@@ -8,9 +8,9 @@ import uk.co.strimm.experiment.Flow
 
 class HistogramFlow : FlowMethod{
     lateinit var flow: Flow
-    val binsBytes = 0..255
-    val binsShorts = 0..65535
-    val binsFloats = 0..4294967295
+    val binsBytes = Byte.MIN_VALUE ..Byte.MAX_VALUE
+    val binsShorts = Short.MIN_VALUE .. Short.MAX_VALUE
+    val binsFloats = Int.MIN_VALUE .. Int.MAX_VALUE
     var binSize = 1
     val numBins = 256 //The number of bins we want regardless of the bit depth
     private var isFirst = true
@@ -38,7 +38,7 @@ class HistogramFlow : FlowMethod{
                 binSize = (binsShorts.last/(numBins-1))
             }
             "Float" -> {
-                binSize = (binsFloats.last/(numBins-1)).toInt()
+                binSize = ((Float.MAX_VALUE-1F)/(numBins-1)).toInt()
             }
         }
     }
@@ -78,6 +78,7 @@ class HistogramFlow : FlowMethod{
             newSignalBuffer.imagePixelType = pixelType
             //Set the min and max pixel values for use in autostretching
             newSignalBuffer.pixelMinMax = getMinMaxPixelVals(buffer)
+            newSignalBuffer.avgPixelIntensity = getAvgPixelIntensity(buffer)
             histogramBuffers.add(newSignalBuffer)
         }
 
@@ -113,6 +114,22 @@ class HistogramFlow : FlowMethod{
         return minMax
     }
 
+    private fun getAvgPixelIntensity(image : STRIMMPixelBuffer) : Double{
+        when(image.pix){
+            is ByteArray -> {
+                return (image.pix as ByteArray).average()
+            }
+            is ShortArray -> {
+                return (image.pix as ShortArray).average()
+            }
+            is FloatArray -> {
+                return (image.pix as FloatArray).average()
+            }
+        }
+
+        return 0.0
+    }
+
     /**
      * This method will actually make the histogram. It will go through the range of all possible pixel values (based
      * on bit depth) and count the pixels in each step range.
@@ -123,11 +140,13 @@ class HistogramFlow : FlowMethod{
         val counts = arrayListOf<Double>()
         when(image.pix){
             is ByteArray ->{
-                val pixels : ByteArray = if(isSigned(image)){
-                    shiftToUnsignedBytes(image)
-                } else{
-                    image.pix as ByteArray
-                }
+//                val pixels : ByteArray = if(isSigned(image)){
+//                    shiftToUnsignedBytes(image)
+//                }
+//                else{
+//                    image.pix as ByteArray
+//                }
+                val pixels = image.pix as ByteArray
 
                 for (bin in binsBytes.step(binSize)) {
                     val binStart = bin
@@ -137,11 +156,12 @@ class HistogramFlow : FlowMethod{
                 }
             }
             is ShortArray ->{
-                val pixels : ShortArray = if(isSigned(image)){
-                    shiftToUnsignedShorts(image)
-                } else{
-                    image.pix as ShortArray
-                }
+//                val pixels : ShortArray = if(isSigned(image)){
+//                    shiftToUnsignedShorts(image)
+//                } else{
+//                    image.pix as ShortArray
+//                }
+                val pixels = image.pix as ShortArray
 
                 for(bin in binsShorts.step(binSize)){
                     val binStart = bin
@@ -151,13 +171,14 @@ class HistogramFlow : FlowMethod{
                 }
             }
             is FloatArray ->{
-                val pixels : FloatArray = if(isSigned(image)){
-                    shiftToUnsignedFloats(image)
-                } else{
-                    image.pix as FloatArray
-                }
+//                val pixels : FloatArray = if(isSigned(image)){
+//                    shiftToUnsignedFloats(image)
+//                } else{
+//                    image.pix as FloatArray
+//                }
+                val pixels = image.pix as FloatArray
 
-                for(bin in binsFloats.step(binSize.toLong())){
+                for(bin in binsFloats.step(binSize)){
                     val binStart = bin
                     val binEnd = bin+1
                     val count = pixels.count { x -> x.toLong() in binStart until binEnd}
@@ -233,8 +254,10 @@ class HistogramFlow : FlowMethod{
     private fun shiftToUnsignedShorts(image: STRIMMPixelBuffer) : ShortArray{
         val pixels = image.pix as ShortArray
         val newPixels = ShortArray(pixels.size)
+        val test = 1.toShort()
+        val test2 = test.toUShort()
         pixels.forEachIndexed{i, x ->
-            newPixels[i] = x.plus(Short.MAX_VALUE).toShort()
+            newPixels[i] = x.toShort()
         }
         return newPixels
     }
