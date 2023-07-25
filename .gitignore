@@ -18,3 +18,4 @@ Launch_STRIMM/Debug/*
 Launch_STRIMM/Launch_STRIMM/Launch_STRIMM.vcxproj
 Launch_STRIMM/.vs/*
 NIDAQ/Test/x64/*
+src/main/resources/icons/*.afdesign
