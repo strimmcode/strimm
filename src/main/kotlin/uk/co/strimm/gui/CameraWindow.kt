@@ -22,12 +22,9 @@ import uk.co.strimm.experiment.Sink
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
 import uk.co.strimm.services.UIstate
-import java.awt.Dimension
-import java.awt.Robot
+import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.io.File
 import java.util.*
 import java.util.logging.Level
@@ -84,6 +81,7 @@ class CameraWindow constructor(val windowPanel: JPanel) {
      * the first place
      * @param width The new width of the camera feed
      * @param height The new height of the camera feed
+     * TODO can this method be removed (where and when was it used?)
      */
     fun initialiseDisplay(width: Long, height: Long) {
         java.awt.EventQueue.invokeLater {
@@ -104,43 +102,37 @@ class CameraWindow constructor(val windowPanel: JPanel) {
             windowPanel.remove(0)
         }
 
-        val exposureSettingPanel = JPanel()
-        exposureSettingPanel.size = Dimension(windowPanel.width, 25)
-        exposureSettingPanel.preferredSize = Dimension(windowPanel.width, 25)
+        windowPanel.updateUI()
+        windowPanel.layout = BorderLayout()
+
+        //Add components for the setting the exposure
         val exposureLabel = JLabel("Exposure (ms): ")
+        exposureLabel.preferredSize = Dimension(100, 25)
+        exposureLabel.maximumSize = Dimension(100, 25)
         val exposureTextBox = JTextField("")
         exposureTextBox.isEnabled = GUIMain.strimmUIService.state == UIstate.PREVIEW
-        exposureSettingPanel.add(exposureLabel)
-        exposureSettingPanel.add(exposureTextBox)
-        windowPanel.add(exposureSettingPanel)
+        exposureTextBox.preferredSize = Dimension(40, 25)
+        exposureTextBox.maximumSize = Dimension(40, 25)
+        val exposureSettingPanel = JPanel()
+        exposureSettingPanel.layout = FlowLayout()
+        exposureSettingPanel.add(exposureLabel, BorderLayout.NORTH)
+        exposureSettingPanel.add(exposureTextBox, BorderLayout.NORTH)
+        windowPanel.add(exposureSettingPanel, BorderLayout.NORTH)
         setExposureText(exposureTextBox)
         addExposureTextKeyListener(exposureTextBox)
 
-        windowPanel.updateUI()
+        //Add the camera image display
         if (dataset == null) {
             GUIMain.loggerService.log(Level.INFO, "Initialised camera window for feed ${displayInfo!!.displayName} " +
                     "with: w=${displayInfo!!.width}, " +
                     "h=${displayInfo!!.height}, " +
                     "pixel type=${displayInfo!!.pixelType}, " +
                     "no. channels=${displayInfo!!.numChannels}")
-            createDatasetAndAddToPanel(
-                displayInfo!!.width,
-                displayInfo!!.height,
-                displayInfo!!.displayName,
-                displayInfo!!
-            )
+            createDatasetAndAddToPanel(displayInfo!!)
         }
         else {
             createDisplayAndAddToPanel()
         }
-
-        windowPanel.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent) {
-                if (e.button == MouseEvent.BUTTON3) {
-                    //TODO is this needed?
-                }
-            }
-        })
     }
 
     private fun addExposureTextKeyListener(exposureTextBox : JTextField){
@@ -217,30 +209,6 @@ class CameraWindow constructor(val windowPanel: JPanel) {
         }
     }
 
-//    private fun getExposure() : Double{
-//        var exposure = 0.0
-//
-//        try {
-//            val associatedMMCore = GUIMain.experimentService.allMMCores.filter { x -> x.key == sink!!.primaryCamera }
-//            if (associatedMMCore.isNotEmpty()) {
-//                //Although a foreach is used here, there should only be one entry in associatedMMCore
-//                associatedMMCore.forEach { x ->
-//                    if (x.key == sink!!.primaryCamera) {
-//                        val cameraLabel = x.value.first
-//                        val mmCore = x.value.second
-//                        exposure = mmCore.getExposure(cameraLabel)
-//                    }
-//                }
-//            }
-//        }
-//        catch(ex : Exception){
-//            GUIMain.loggerService.log(Level.SEVERE, "Error getting exposure from mmcore for primary camera ${sink!!.primaryCamera}. Message: ${ex.message}")
-//            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
-//        }
-//
-//        return exposure
-//    }
-
     /**
      * This method is similar to createDatasetAndAddToPanel() however, it is used when the Camera Window's dataset
      * already exists. This is therefore only used when loading a previous experiment. This also contains a bug fix
@@ -261,13 +229,16 @@ class CameraWindow constructor(val windowPanel: JPanel) {
                         it.view(this, display)
                         pack()
                         val rootPane = this.rootPane
-                        windowPanel.add(rootPane)
+                        windowPanel.add(rootPane, BorderLayout.CENTER)
                     }
                 }
             }
     }
 
-    private fun createDatasetAndAddToPanel(width: Long, height: Long, label: String, displayInfo: DisplayInfo) {
+    private fun createDatasetAndAddToPanel(displayInfo: DisplayInfo) {
+        val width = displayInfo.width
+        val height = displayInfo.height
+        val label = displayInfo.displayName
         datasetName = label
         val lutSz = displayInfo.lut
         numChannels = displayInfo.numChannels
@@ -361,10 +332,7 @@ class CameraWindow constructor(val windowPanel: JPanel) {
         // add the rois to the displayWindow
         val overlaysROIInfo = GUIMain.experimentService.loadtimeRoiList[sink!!.sinkName]  //TODO is this init yet
         if (overlaysROIInfo != null) {
-            val overlays = overlaysROIInfo.map { it ->
-                it.overlay
-            }
-
+            val overlays = overlaysROIInfo.map { it.overlay }
             GUIMain.overlayService.addOverlays(display as ImageDisplay, overlays)
             GUIMain.experimentService.experimentStream.cameraDisplays[sink!!.sinkName] = display as ImageDisplay
         }
@@ -383,7 +351,7 @@ class CameraWindow constructor(val windowPanel: JPanel) {
 
                         pack()
                         val rootPane = this.rootPane
-                        windowPanel.add(rootPane)
+                        windowPanel.add(rootPane, BorderLayout.CENTER)
                     }
                 }
             }
