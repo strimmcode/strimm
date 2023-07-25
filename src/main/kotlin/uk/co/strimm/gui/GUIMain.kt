@@ -6,6 +6,8 @@ import akka.stream.ActorMaterializer
 import akka.stream.ActorMaterializerSettings
 import bibliothek.gui.dock.common.CControl
 import bibliothek.gui.dock.common.CGrid
+import com.opencsv.CSVReader
+import com.opencsv.CSVWriter
 import hdf.hdf5lib.H5
 import io.scif.services.DatasetIOService
 import javafx.application.Platform
@@ -97,63 +99,75 @@ class GUIMain : Command {
         val firstButton = imageJButtonBar.components[0] as JToggleButton
         imageJButtonBar.addSeparator()
 
-        //saveJSON is legacy and will be replaced with saveROI which will save out user
-        //selected ROIs into the format of imageJ ROI Manager so that they can be referenced in the JSON
+        /**
+         * saveJSON is legacy and will be replaced with saveROI which will save out user selected ROIs into the format
+         * of imageJ ROI Manager so that they can be referenced in the JSON
+         */
         saveJSON.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
-        // saveJSON.toolTipText = ComponentTexts.AcquisitionButtons.FULL_VIEW_TOOLTIP
+        saveJSON.toolTipText = "Save ROIs to config file"
         saveJSON.isEnabled = false
-        saveJSON.icon = setIcon(firstButton.width, firstButton.height, "/icons/saveROI.png", "Save ROIs", loggerService)
+        saveJSON.icon = setIcon(firstButton.width+10, firstButton.height+10, "/icons/saveROInew.png", "Save ROIs")
+
+        saveExposuresButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
+        saveExposuresButton.isEnabled = false
+        saveExposuresButton.toolTipText = "Save exposure to config file"
+        saveExposuresButton.icon = setIcon(firstButton.width+10, firstButton.height+10, "/icons/saveExposure.png", "Save Exposures")
 
         closeAllWindowsExistingExpButton.maximumSize = Dimension(firstButton.width + 30, firstButton.height + 5)
         closeAllWindowsExistingExpButton.toolTipText = "Close all windows"
         closeAllWindowsExistingExpButton.isEnabled = false
         closeAllWindowsExistingExpButton.icon =
-            setIcon(firstButton.width + 25, firstButton.height - 5, "/icons/close_all_button.png", "Close all windows", loggerService)
+            setIcon(firstButton.width + 25, firstButton.height - 5, "/icons/close_all_button.png", "Close all windows")
 
         loadExistingExperimentButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
         loadExistingExperimentButton.toolTipText = "Load existing experiment"
         loadExistingExperimentButton.isEnabled = true
         loadExistingExperimentButton.icon =
-            setIcon(firstButton.width, firstButton.height, "/icons/load_prev_experiment.png", "Load Existing Experiment", loggerService)
+            setIcon(firstButton.width, firstButton.height, "/icons/load_prev_experiment.png", "Load Existing Experiment")
 
         loadExperimentConfigButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
         loadExperimentConfigButton.toolTipText = "Load an experiment configuration"
         loadExperimentConfigButton.isEnabled = true
         loadExperimentConfigButton.icon =
-            setIcon(firstButton.width, firstButton.height, "/icons/load.png", "Load Experiment", loggerService)
+            setIcon(firstButton.width, firstButton.height, "/icons/load.png", "Load Experiment")
 
         startPreviewExperimentButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
         startPreviewExperimentButton.toolTipText = "Start preview"
         startPreviewExperimentButton.isEnabled = false
         startPreviewExperimentButton.icon =
-            setIcon(firstButton.width, firstButton.height, "/icons/startPreview.png", "StartPreview", loggerService)
+            setIcon(firstButton.width, firstButton.height, "/icons/startPreview.png", "StartPreview")
 
         startAcquisitionExperimentButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
         startAcquisitionExperimentButton.toolTipText = "Start acquisition"
         startAcquisitionExperimentButton.isEnabled = false
         startAcquisitionExperimentButton.icon =
-            setIcon(firstButton.width, firstButton.height, "/icons/startAcquisition.png", "StartPreview", loggerService)
+            setIcon(firstButton.width, firstButton.height, "/icons/startAcquisition.png", "StartPreview")
 
         pauseExperimentButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
         pauseExperimentButton.toolTipText = "Pause/restart acquisition"
         pauseExperimentButton.isEnabled = false
         pauseExperimentButton.icon =
-            setIcon(firstButton.width, firstButton.height, "/icons/pause.png", "Pause", loggerService)
+            setIcon(firstButton.width, firstButton.height, "/icons/pause.png", "Pause")
 
         stopExperimentButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
         stopExperimentButton.toolTipText = "Stop experiment"
         stopExperimentButton.isEnabled = false
         stopExperimentButton.icon =
-            setIcon(firstButton.width, firstButton.height, "/icons/stop.png", "Stop", loggerService)
+            setIcon(firstButton.width, firstButton.height, "/icons/stop.png", "Stop")
 
         // mainWindowIcon = setIcon(firstButton.width, firstButton.height, Paths.Icons.STRIMM_LOGO_ICON, "Strimm Logo", loggerService, false)
-        if (mainWindowIcon != null) strimmUIService.strimmFrame.iconImage = mainWindowIcon!!.image
+        if (mainWindowIcon != null) {
+            strimmUIService.strimmFrame.iconImage = mainWindowIcon!!.image
+        }
 
         imageJButtonBar.add(loadExistingExperimentButton)
         addLoadExistingExperimentButtonListener()
 
         imageJButtonBar.add(saveJSON)
         addSaveJSONButtonListener()
+
+        imageJButtonBar.add(saveExposuresButton)
+        addSaveExposuresButtonListener()
 
         imageJButtonBar.add(loadExperimentConfigButton)
         addLoadButtonListener()
@@ -265,7 +279,7 @@ class GUIMain : Command {
                                 roi.ROIName = over.name
                             }
                             else -> {
-                                GUIMain.loggerService.log(Level.WARNING, "ROI type ${roi.ROItype} not supported")
+                                loggerService.log(Level.WARNING, "ROI type ${roi.ROItype} not supported")
                             }
                         }
                         combinedList.add(roi)
@@ -277,6 +291,12 @@ class GUIMain : Command {
                     }
                 }
             }
+        }
+    }
+
+    private fun addSaveExposuresButtonListener(){
+        saveExposuresButton.addActionListener{
+            experimentService.writeNewExposures()
         }
     }
 
@@ -345,6 +365,7 @@ class GUIMain : Command {
             //Zero the pressed key events as they should only be listened to when in preview or live
             strimmUIService.pressedEventKeys = arrayListOf<Pair<Int, String>>()
             saveJSON.isEnabled = true
+            saveExposuresButton.isEnabled = true
             startPreviewExperimentButton.isEnabled = false
             startAcquisitionExperimentButton.isEnabled = false
             stopExperimentButton.isEnabled = true
@@ -514,7 +535,6 @@ class GUIMain : Command {
         }
 
         private fun remoteClose() {
-            println("Remotely close")
             if (strimmUIService.state == UIstate.PREVIEW || strimmUIService.state == UIstate.ACQUISITION || strimmUIService.state == UIstate.ACQUISITION_PAUSED || strimmUIService.state == UIstate.WAITING) {
                 //if PREVIEW destroy objects only otherwise savedata
                 //todo complete acquisition stop
@@ -525,14 +545,10 @@ class GUIMain : Command {
             }
             var bBusy = true
             shutdownRemoteControl()
-            //
-            //
+
             // end remote control
             shutdownRemoteControl()
             controlThread!!.EndThread()
-            //
-            //
-            //
             commandService.run(QuitProgram::class.java, false)
             Platform.exit()
         }
@@ -546,6 +562,7 @@ class GUIMain : Command {
         val stopExperimentButton = JButton() // stops the JSON, destroys existing resources and then reloads the experiment and moves back to a WAITING mode
         val pauseExperimentButton = JButton() // will prevent an acquisition from saving data as long as paused, puts STRIMM into the ACQUISITION_PAUSED mode
         val saveJSON = JButton() //legacy - this will be changed to a ROISave button - allowing the user to select ROIs and then  save them into an ImageJ format - which is then reference in the JSON, it also means that ROIs could be made directly in ImageJ and imported to STRIMM
+        val saveExposuresButton = JButton()
         var markerEventLabel = JLabel("")
         var mainWindowIcon: ImageIcon? = null
 

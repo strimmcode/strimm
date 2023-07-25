@@ -5,6 +5,8 @@ import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.stream.javadsl.RunnableGraph
 import com.google.gson.GsonBuilder
+import com.opencsv.CSVReader
+import com.opencsv.CSVWriter
 import hdf.hdf5lib.H5
 import hdf.hdf5lib.HDF5Constants
 import javafx.application.Platform
@@ -24,6 +26,7 @@ import uk.co.strimm.sinkMethods.SinkSaveMethod
 import uk.co.strimm.streams.ExperimentStream
 import java.io.File
 import java.io.FileReader
+import java.io.FileWriter
 import java.util.logging.Level
 
 @Plugin(type = Service::class)
@@ -51,6 +54,7 @@ class ExperimentService  : AbstractService(), ImageJService {
     var isFileSaving = false
 
     val allMMCores = hashMapOf<String, Pair<String, CMMCore>>() //Core name, Pair(Camera label, Core object)
+    val changedExposures = hashMapOf<String, Double>() //hashMap(Primary camera, exposure value)
 
     //convertGsonToConfig()    destroy the existing stream, capture the configFile, then load the expConfig from the JSON
     fun convertGsonToConfig(configFile: File): Boolean {
@@ -799,5 +803,54 @@ class ExperimentService  : AbstractService(), ImageJService {
             }
         }
         return ""
+    }
+
+    fun writeNewExposures(){
+        for(entry in changedExposures){
+            val sourceCameraName = entry.key
+            val exposureValue = entry.value
+            for(source in expConfig.sourceConfig.sources){
+                if(source.sourceName == sourceCameraName){
+                    var configProperties: List<Array<String>>? = null
+                    try {
+                        val reader = CSVReader(FileReader(source.sourceCfg))
+                        configProperties = reader.readAll()
+                        for (property in configProperties!!) {
+                            val propertyName = property[0]
+                            if (propertyName == "exposureMs") {
+                                GUIMain.loggerService.log(
+                                    Level.INFO,
+                                    "Setting new exposure for ${source.sourceName} to $exposureValue"
+                                )
+                                property[1] = exposureValue.toString()
+                            }
+                        }
+                        reader.close()
+                    }
+                    catch(ex : Exception){
+                        GUIMain.loggerService.log(Level.SEVERE, "Error reading ${source.sourceCfg} file. Message: ${ex.message}")
+                        GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                    }
+
+                    if(configProperties != null) {
+                        try {
+                            val writer = CSVWriter(
+                                FileWriter(source.sourceCfg),
+                                ',',
+                                CSVWriter.NO_QUOTE_CHARACTER,
+                                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                                CSVWriter.DEFAULT_LINE_END
+                            )
+                            writer.writeAll(configProperties)
+                            writer.close()
+                        }
+                        catch(ex : Exception){
+                            GUIMain.loggerService.log(Level.SEVERE, "Error writing to ${source.sourceCfg}. Message: ${ex.message}")
+                            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

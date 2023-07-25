@@ -32,6 +32,7 @@ import javax.swing.JLabel
 import javax.swing.JLayeredPane
 import javax.swing.JPanel
 import javax.swing.JTextField
+import kotlin.math.exp
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Camera Feed")
 class CameraWindowPlugin : AbstractDockableWindow() {
@@ -163,6 +164,11 @@ class CameraWindow constructor(val windowPanel: JPanel) {
         exposureTextBox.addKeyListener(keyListener)
     }
 
+    /**
+     * Method to set the text of the exposure text field based on the current exposure. The current exposure will come
+     * from the associated MMCore object
+     * @param textField The exposure text field for this camera window
+     */
     private fun setExposureText(textField : JTextField){
         try {
             val associatedMMCore = GUIMain.experimentService.allMMCores.filter { x -> x.key == sink!!.primaryCamera }
@@ -184,6 +190,11 @@ class CameraWindow constructor(val windowPanel: JPanel) {
         }
     }
 
+    /**
+     * Sets the exposure for the associated camera. Note - currently if image splitting is used, changing the exposure
+     * in one window will change the exposure for all windows reading from the same camera
+     * @param exposure The new exposure, which will have been parsed from the exposure text field
+     */
     private fun setExposure(exposure : Double){
         try {
             val associatedMMCore = GUIMain.experimentService.allMMCores.filter { x -> x.key == sink!!.primaryCamera }
@@ -194,6 +205,7 @@ class CameraWindow constructor(val windowPanel: JPanel) {
                         val mmCore = x.value.second
                         GUIMain.loggerService.log(Level.INFO, "Setting exposure to $exposure")
                         mmCore.setExposure(cameraLabel, exposure)
+                        GUIMain.experimentService.changedExposures[sink!!.primaryCamera] = exposure
                     }
                 }
             } else {

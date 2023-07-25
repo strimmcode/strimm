@@ -1,11 +1,5 @@
 package uk.co.strimm
 
-//import com.google.common.collect.HashBiMap
-//import com.google.gson.annotations.SerializedName
-
-//import uk.co.strimm.gui.TraceSeries
-//import uk.co.strimm.plugins.DataDescription
-//import uk.co.strimm.plugins.PipelinePlugin
 import net.imagej.Main
 import net.imagej.overlay.Overlay
 import org.apache.commons.collections.iterators.SingletonListIterator
@@ -17,17 +11,15 @@ import java.util.logging.Level
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 
-fun setIcon(width: Int, height: Int, path: String, title: String = "",
-            loggerService: LoggerService, isButton: Boolean = true) : ImageIcon? {
-
+fun setIcon(width: Int, height: Int, path: String, title: String = "", isButton: Boolean = true) : ImageIcon? {
     try {
         val img = ImageIO.read(Main::class.java.getResource(path))
         return ImageIcon(img.getScaledInstance(width, height, Image.SCALE_SMOOTH))
     }
     catch (ex : Exception) {
         val addMsg = if (isButton) { title.plus(" button icon") } else { title }
-        loggerService.log(Level.WARNING, "Could not load ".plus(addMsg))
-        loggerService.log(Level.WARNING, ex.stackTrace)
+        GUIMain.loggerService.log(Level.WARNING, "Could not load ".plus(addMsg))
+        GUIMain.loggerService.log(Level.WARNING, ex.stackTrace)
     }
     return null
 }
