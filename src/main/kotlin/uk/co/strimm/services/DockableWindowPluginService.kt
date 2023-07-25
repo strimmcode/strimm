@@ -108,9 +108,9 @@ class DockableWindowPluginService : AbstractPTService<DockableWindowPlugin>(), I
         val plugin = create(pluginClass) //factory scijava
         if (plugin != null) {
             plugin.initialise()
-            plugin.setCustomData(data)
             plugin.title = pluginTitle
             plugin.dockableWindowMultiple.titleText = pluginTitle
+            plugin.setCustomData(data)
             if(withActor) {
                 val mainActor = GUIMain.actorService.mainActor
                 tellMainActor(mainActor, plugin)

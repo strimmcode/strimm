@@ -73,8 +73,6 @@ open class MMCameraSource : SourceMethod {
             GUIMain.loggerService.log(Level.INFO, "Setting exposure to $exposureMs")
             core!!.setExposure(label, exposureMs)
         }
-//        val exp = core!!.getExposure(label)
-//        println("Exposure is : " +  exp)
 
         //MicroManager core supports:
         //Bytes    channels     BytesPerPixel
@@ -101,22 +99,23 @@ open class MMCameraSource : SourceMethod {
                     for (triggerCfg in r!!) {
                         try {
                             core!!.setProperty(label, triggerCfg[0], triggerCfg[1])
-                        } catch (ex: java.lang.Exception) {
-                            println(ex.message)
+                        } catch (ex: Exception) {
+                            GUIMain.loggerService.log(Level.WARNING, "Unable to set trigger property. Message: ${ex.message} Name=${triggerCfg[0]},value=${triggerCfg[1]} for $label")
+                            GUIMain.loggerService.log(Level.WARNING, ex.stackTrace)
                         }
                     }
                 }
-            } catch (ex: java.lang.Exception) {
+            } catch (ex: Exception) {
                 GUIMain.loggerService.log(Level.INFO, "Error reading $label camera trigger config. Message: ${ex.message}")
                 GUIMain.loggerService.log(Level.INFO, ex.stackTrace)
             }
         }
 
-        if(!bSnapped) {
+//        if(!bSnapped) {
             //This is done so when stopping the acquisiton, each core can be shut down appropriately using stopSequenceAcquistion()
             GUIMain.loggerService.log(Level.INFO, "Adding core to cores list")
-            GUIMain.experimentService.allMMCores.add(core!!)
-        }
+            GUIMain.experimentService.allMMCores[source.sourceName] = Pair(label, core!!)
+//        }
     }
 
     override fun run(): STRIMMBuffer? {

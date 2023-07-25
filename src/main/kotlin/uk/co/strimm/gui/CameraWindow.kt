@@ -2,7 +2,8 @@ package uk.co.strimm.gui
 
 import akka.actor.ActorRef
 import bibliothek.gui.dock.common.DefaultMultipleCDockable
-import net.imagej.*
+import javafx.scene.input.KeyCode
+import net.imagej.Dataset
 import net.imagej.axis.Axes
 import net.imagej.display.DatasetView
 import net.imagej.display.ImageDisplay
@@ -20,14 +21,20 @@ import uk.co.strimm.DisplayInfo
 import uk.co.strimm.experiment.Sink
 import uk.co.strimm.plugins.AbstractDockableWindow
 import uk.co.strimm.plugins.DockableWindowPlugin
-import java.awt.Color
-import java.awt.Font
+import uk.co.strimm.services.UIstate
+import java.awt.Dimension
 import java.awt.Robot
-import java.awt.event.*
+import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.io.File
 import java.util.*
-import javax.swing.*
-
+import java.util.logging.Level
+import javax.swing.JLabel
+import javax.swing.JLayeredPane
+import javax.swing.JPanel
+import javax.swing.JTextField
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Camera Feed")
 class CameraWindowPlugin : AbstractDockableWindow() {
@@ -38,12 +45,17 @@ class CameraWindowPlugin : AbstractDockableWindow() {
         if (data is DisplayInfo) {
             cameraWindowController.displayInfo = data
             dockableWindowMultiple.titleText = data.displayName
+            cameraWindowController.cameraFeedName = data.displayName
         } else if (data is Dataset) {
             cameraWindowController.dataset = data
         }
     }
 
     override var dockableWindowMultiple: DefaultMultipleCDockable = run {
+        /**
+         * Other GUI windows load an FXML file for the actual GUI elements. We don't load the camera window like that
+         * because it uses Swing components instead of JavaFX components
+         */
         this.createDock(title).apply {
             add(windowPanel)
             this.titleText = title
@@ -60,13 +72,11 @@ class CameraWindow constructor(val windowPanel: JPanel) {
     var view: DatasetView? = null
     var displayWindow: DisplayWindow? = null
     var associatedActor: ActorRef? = null
-    var datasetName = "Dataset" + Random().nextInt(1000000)//This will eventually be
-
+    var datasetName = "Dataset" + Random().nextInt(1000000) //TODO does this need to come from the image feed?
     var numChannels = 0
-
     var sink: Sink? = null
-
     var layer: JLayeredPane? = null
+    var cameraFeedName : String? = null
 
     /**
      * This method is called when a new camera display needs to be initialised, with a specific width an height however.
@@ -94,9 +104,25 @@ class CameraWindow constructor(val windowPanel: JPanel) {
             windowPanel.remove(0)
         }
 
+        val exposureSettingPanel = JPanel()
+        exposureSettingPanel.size = Dimension(windowPanel.width, 25)
+        exposureSettingPanel.preferredSize = Dimension(windowPanel.width, 25)
+        val exposureLabel = JLabel("Exposure (ms): ")
+        val exposureTextBox = JTextField("")
+        exposureTextBox.isEnabled = GUIMain.strimmUIService.state == UIstate.PREVIEW
+        exposureSettingPanel.add(exposureLabel)
+        exposureSettingPanel.add(exposureTextBox)
+        windowPanel.add(exposureSettingPanel)
+        setExposureText(exposureTextBox)
+        addExposureTextKeyListener(exposureTextBox)
+
         windowPanel.updateUI()
         if (dataset == null) {
-            println(displayInfo!!.width.toString() + "  " + displayInfo!!.height.toString() + "   " + displayInfo!!.displayName + "   " + displayInfo!!.pixelType + "  " + displayInfo!!.numChannels)
+            GUIMain.loggerService.log(Level.INFO, "Initialised camera window for feed ${displayInfo!!.displayName} " +
+                    "with: w=${displayInfo!!.width}, " +
+                    "h=${displayInfo!!.height}, " +
+                    "pixel type=${displayInfo!!.pixelType}, " +
+                    "no. channels=${displayInfo!!.numChannels}")
             createDatasetAndAddToPanel(
                 displayInfo!!.width,
                 displayInfo!!.height,
@@ -111,11 +137,109 @@ class CameraWindow constructor(val windowPanel: JPanel) {
         windowPanel.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
                 if (e.button == MouseEvent.BUTTON3) {
-                    println("RIGHT CLICK1")
+                    //TODO is this needed?
                 }
             }
         })
     }
+
+    private fun addExposureTextKeyListener(exposureTextBox : JTextField){
+        val keyListener: KeyListener = object : KeyListener {
+            override fun keyPressed(keyEvent: KeyEvent) {
+                val code = keyEvent.keyCode
+                if(code == KeyCode.ENTER.code){
+                    try {
+                        val exposure = exposureTextBox.text.toDouble()
+                        setExposure(exposure)
+                    }
+                    catch(ex : Exception){
+                        GUIMain.loggerService.log(Level.SEVERE, "Exposure could not be parsed. Message ${ex.message}")
+                        GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+                        //We only need to set the exposure text here as the typed exposure text is invalid
+                        setExposureText(exposureTextBox)
+                    }
+                }
+            }
+
+            override fun keyReleased(keyEvent: KeyEvent) {
+            }
+
+            override fun keyTyped(keyEvent: KeyEvent) {
+            }
+        }
+
+        exposureTextBox.addKeyListener(keyListener)
+    }
+
+    private fun setExposureText(textField : JTextField){
+        try {
+            val associatedMMCore = GUIMain.experimentService.allMMCores.filter { x -> x.key == sink!!.primaryCamera }
+            if (associatedMMCore.isNotEmpty()) {
+                //Although a foreach is used here, there should only be one entry in associatedMMCore
+                associatedMMCore.forEach { x ->
+                    if (x.key == sink!!.primaryCamera) {
+                        val cameraLabel = x.value.first
+                        val mmCore = x.value.second
+                        val exposure = mmCore.getExposure(cameraLabel).toString()
+                        textField.text = exposure
+                    }
+                }
+            }
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Error setting exposure text for primary camera ${sink!!.primaryCamera}. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
+    }
+
+    private fun setExposure(exposure : Double){
+        try {
+            val associatedMMCore = GUIMain.experimentService.allMMCores.filter { x -> x.key == sink!!.primaryCamera }
+            if (associatedMMCore.isNotEmpty()) {
+                associatedMMCore.forEach { x ->
+                    if (x.key == sink!!.primaryCamera) {
+                        val cameraLabel = x.value.first
+                        val mmCore = x.value.second
+                        GUIMain.loggerService.log(Level.INFO, "Setting exposure to $exposure")
+                        mmCore.setExposure(cameraLabel, exposure)
+                    }
+                }
+            } else {
+                GUIMain.loggerService.log(
+                    Level.WARNING,
+                    "No associated MMCore found for primary camera ${sink!!.primaryCamera}"
+                )
+            }
+        }
+        catch(ex : Exception){
+            GUIMain.loggerService.log(Level.SEVERE, "Error setting exposure for primary camera ${sink!!.primaryCamera}. Message ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+        }
+    }
+
+//    private fun getExposure() : Double{
+//        var exposure = 0.0
+//
+//        try {
+//            val associatedMMCore = GUIMain.experimentService.allMMCores.filter { x -> x.key == sink!!.primaryCamera }
+//            if (associatedMMCore.isNotEmpty()) {
+//                //Although a foreach is used here, there should only be one entry in associatedMMCore
+//                associatedMMCore.forEach { x ->
+//                    if (x.key == sink!!.primaryCamera) {
+//                        val cameraLabel = x.value.first
+//                        val mmCore = x.value.second
+//                        exposure = mmCore.getExposure(cameraLabel)
+//                    }
+//                }
+//            }
+//        }
+//        catch(ex : Exception){
+//            GUIMain.loggerService.log(Level.SEVERE, "Error getting exposure from mmcore for primary camera ${sink!!.primaryCamera}. Message: ${ex.message}")
+//            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+//        }
+//
+//        return exposure
+//    }
 
     /**
      * This method is similar to createDatasetAndAddToPanel() however, it is used when the Camera Window's dataset
@@ -143,10 +267,9 @@ class CameraWindow constructor(val windowPanel: JPanel) {
             }
     }
 
-    //could create a dataset/panel which is not attached to a camera
     private fun createDatasetAndAddToPanel(width: Long, height: Long, label: String, displayInfo: DisplayInfo) {
         datasetName = label
-        var lutSz = displayInfo.lut
+        val lutSz = displayInfo.lut
         numChannels = displayInfo.numChannels
         dataset = when (displayInfo.pixelType) {
             "Byte" ->
@@ -231,12 +354,12 @@ class CameraWindow constructor(val windowPanel: JPanel) {
 
         //todo color table for grey images and find out about channels>1
         if (lutSz != "") {
-            var colorTable = GUIMain.lutService.loadLUT(File(".\\luts\\" + lutSz))
+            val colorTable = GUIMain.lutService.loadLUT(File(".\\luts\\" + lutSz))
             (view as DatasetView).setColorTable(colorTable, 0)
         }
 
-// add the rois to the displayWindow
-        var overlaysROIInfo = GUIMain.experimentService.loadtimeRoiList[sink!!.sinkName]  //TODO is this init yet
+        // add the rois to the displayWindow
+        val overlaysROIInfo = GUIMain.experimentService.loadtimeRoiList[sink!!.sinkName]  //TODO is this init yet
         if (overlaysROIInfo != null) {
             val overlays = overlaysROIInfo.map { it ->
                 it.overlay
@@ -248,20 +371,10 @@ class CameraWindow constructor(val windowPanel: JPanel) {
 
         //Create a display window to actually display the image
         displayWindow = GUIMain.uiService.defaultUI.createDisplayWindow(display)
-//        GUIMain.zoomService.zoomOriginalScale(display as ImageDisplay)
-//        val can = (display as ImageDisplay).getCanvas()
-//        val zzz = can.zoomFactor
-//        val www = can.viewportHeight
-//        val hhh = can.viewportWidth
-//        val off = can.panOffset
 
         GUIMain.uiService.viewerPlugins
-            .map {
-                GUIMain.pluginService.createInstance(it)
-            }
-            .find {
-                it != null && it.canView(display) && it.isCompatible(GUIMain.uiService.defaultUI)
-            }
+            .map { GUIMain.pluginService.createInstance(it) }
+            .find { it != null && it.canView(display) && it.isCompatible(GUIMain.uiService.defaultUI) }
             ?.let {
                 GUIMain.threadService.queue {
                     (displayWindow as SwingDisplayWindow).apply {
@@ -271,22 +384,6 @@ class CameraWindow constructor(val windowPanel: JPanel) {
                         pack()
                         val rootPane = this.rootPane
                         windowPanel.add(rootPane)
-
-                        //although this allows buttons and things to be added they would have
-                        //to track the movement of the rois etc - which will be very fiddly
-                        //
-                        //
-                        /////////////////////////////  ROI_CODE
-                        //number code - buggy this way 221224
-//                        layer = rootPane.getLayeredPane() as JLayeredPane
-//                        for (f in 0..200) {
-//                            val jlab = JLabel("unused", SwingConstants.LEFT)
-//                            jlab.font = Font("Serif", Font.BOLD, 20)
-//                            jlab.foreground = Color.WHITE
-//
-//                            jlab.setBounds(2000, 2000, 40, 20)
-//                            layer!!.add(jlab)
-//                        }
                     }
                 }
             }

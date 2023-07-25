@@ -104,9 +104,11 @@ class TraceWindow {
     }
 
     fun furtherInit() {
-        if (properties["xAxisLabel"] != null) xAxis.label = properties["xAxisLabel"]
-        if (properties["yAxisLabel"] != null) yAxis.label = properties["yAxisLabel"]
-        if (properties["Title"] != null) lineChart.setTitle(properties["Title"])
+        Platform.runLater {
+            if (properties["xAxisLabel"] != null) xAxis.label = properties["xAxisLabel"]
+            if (properties["yAxisLabel"] != null) yAxis.label = properties["yAxisLabel"]
+            if (properties["Title"] != null) lineChart.setTitle(properties["Title"])
+        }
     }
 
     fun setTraceRenderFeatures() {

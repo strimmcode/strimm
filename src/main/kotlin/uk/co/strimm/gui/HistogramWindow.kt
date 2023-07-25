@@ -92,7 +92,6 @@ class CustomBarChart(xAxis : CategoryAxis, yAxis : NumberAxis) : BarChart<String
             x.node = null
         }
         markers.clear()
-        layoutPlotChildren()
     }
 
     override fun layoutPlotChildren(){
@@ -229,7 +228,7 @@ class HistogramWindow {
     fun createNewHistogram(buffer : STRIMMSignalBuffer){
         GUIMain.loggerService.log(Level.INFO, "Creating histogram for ${buffer.channelNames!!.first()} image feed")
 
-        val range = binMin.toInt()..binMax.toInt() step 1
+        val range = binMin.toInt()..binMax.toInt() step 5
         val xAxis = CategoryAxis()
         xAxis.categories = observableArrayList(range.map{ x -> x.toString()}.toList())
 

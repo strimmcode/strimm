@@ -196,6 +196,9 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                 plugin.cameraWindowController.associatedActor = self
                 GUIMain.actorService.cameraActorDisplays[plugin.cameraWindowController.displayInfo!!.displayName] = self
             }
+            .match<TellCameraName>(TellCameraName::class.java){ tellCameraNameMessage ->
+                plugin.cameraWindowController.cameraFeedName = tellCameraNameMessage.cameraName
+            }
             .match<TellDisplaySink>(TellDisplaySink::class.java){sinkMessage->
                 sink = sinkMessage.sink
             }
@@ -374,6 +377,8 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                             }
                         }
 
+                        plugin.cameraWindowController.datasetName = im1.cameraLabel
+                        dataset.name = im1.cameraLabel
                         //Tells SciJava/ImageJ services dataset has been altered and needs to be updated
                         dataset.isDirty = true
                     }

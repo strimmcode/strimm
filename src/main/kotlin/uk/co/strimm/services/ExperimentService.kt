@@ -50,7 +50,7 @@ class ExperimentService  : AbstractService(), ImageJService {
     var hdfFileID = 0
     var isFileSaving = false
 
-    val allMMCores = arrayListOf<CMMCore>()
+    val allMMCores = hashMapOf<String, Pair<String, CMMCore>>() //Core name, Pair(Camera label, Core object)
 
     //convertGsonToConfig()    destroy the existing stream, capture the configFile, then load the expConfig from the JSON
     fun convertGsonToConfig(configFile: File): Boolean {

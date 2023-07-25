@@ -5,4 +5,5 @@ class Sink{
     var sinkType = ""
     var sinkCfg = ""
     var inputNames = arrayListOf<String>()
+    var primaryCamera = ""
 }
