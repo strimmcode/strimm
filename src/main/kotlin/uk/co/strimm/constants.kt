@@ -72,6 +72,12 @@ class SettingKeys{
             const val GROUP_NAME = "Camera"
         }
     }
+
+    class ConfigFileSettings{
+        companion object{
+            const val EXPOSURE_MS_PROP = "exposureMs"
+        }
+    }
 }
 
 class ComponentTexts{

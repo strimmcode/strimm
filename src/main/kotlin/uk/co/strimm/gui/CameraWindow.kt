@@ -136,6 +136,11 @@ class CameraWindow constructor(val windowPanel: JPanel) {
         }
     }
 
+    /**
+     * Adds a key listener to the exposure text box. The exposure setting will only be changed if the enter key is
+     * pressed
+     * @param exposureTextBox The text field where the exposure can be changed
+     */
     private fun addExposureTextKeyListener(exposureTextBox : JTextField){
         val keyListener: KeyListener = object : KeyListener {
             override fun keyPressed(keyEvent: KeyEvent) {

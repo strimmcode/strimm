@@ -18,6 +18,7 @@ import org.scijava.service.Service
 import uk.co.strimm.FileConstants
 import uk.co.strimm.HDFImageDataset
 import uk.co.strimm.RoiInfo
+import uk.co.strimm.SettingKeys.ConfigFileSettings.Companion.EXPOSURE_MS_PROP
 import uk.co.strimm.actors.messages.stop.TerminateActor
 import uk.co.strimm.actors.messages.tell.TellStopReceived
 import uk.co.strimm.experiment.*
@@ -805,6 +806,12 @@ class ExperimentService  : AbstractService(), ImageJService {
         return ""
     }
 
+    /**
+     * Based on a record of exposures that have been changed, find the relevant config file(s) and update the exposure
+     * setting, and then write to the relevant config file. The "changedExposures" hashMap will be populated from
+     * the setExposure() method in CameraWindow.ky
+     * @see CameraWindow
+     */
     fun writeNewExposures(){
         for(entry in changedExposures){
             val sourceCameraName = entry.key
@@ -812,12 +819,13 @@ class ExperimentService  : AbstractService(), ImageJService {
             for(source in expConfig.sourceConfig.sources){
                 if(source.sourceName == sourceCameraName){
                     var configProperties: List<Array<String>>? = null
+                    //First part - read existing properties from .cfg file
                     try {
                         val reader = CSVReader(FileReader(source.sourceCfg))
                         configProperties = reader.readAll()
                         for (property in configProperties!!) {
                             val propertyName = property[0]
-                            if (propertyName == "exposureMs") {
+                            if (propertyName == EXPOSURE_MS_PROP) {
                                 GUIMain.loggerService.log(
                                     Level.INFO,
                                     "Setting new exposure for ${source.sourceName} to $exposureValue"
@@ -832,6 +840,7 @@ class ExperimentService  : AbstractService(), ImageJService {
                         GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
                     }
 
+                    //Second part - write modified properties (just exposureMs modified) to .cfg file
                     if(configProperties != null) {
                         try {
                             val writer = CSVWriter(
