@@ -809,7 +809,7 @@ class ExperimentService  : AbstractService(), ImageJService {
     /**
      * Based on a record of exposures that have been changed, find the relevant config file(s) and update the exposure
      * setting, and then write to the relevant config file. The "changedExposures" hashMap will be populated from
-     * the setExposure() method in CameraWindow.ky
+     * the setExposure() method in CameraWindow.kt
      * @see CameraWindow
      */
     fun writeNewExposures(){

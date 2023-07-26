@@ -210,6 +210,11 @@ class CameraWindow constructor(val windowPanel: JPanel) {
                         val mmCore = x.value.second
                         GUIMain.loggerService.log(Level.INFO, "Setting exposure to $exposure")
                         mmCore.setExposure(cameraLabel, exposure)
+
+                        /**
+                         * This is important as it keeps a record of any exposures that have been changed. This is then
+                         * used to write the changes to file
+                         */
                         GUIMain.experimentService.changedExposures[sink!!.primaryCamera] = exposure
                     }
                 }

@@ -35,7 +35,7 @@ class HistogramFlow : FlowMethod{
                 binSize = 1
             }
             "Short" -> {
-                binSize = (binsShorts.last/(numBins-1))
+                binSize = (binsShorts.last/(numBins-1))*2
             }
             "Float" -> {
                 binSize = ((Float.MAX_VALUE-1F)/(numBins-1)).toInt()
@@ -140,12 +140,6 @@ class HistogramFlow : FlowMethod{
         val counts = arrayListOf<Double>()
         when(image.pix){
             is ByteArray ->{
-//                val pixels : ByteArray = if(isSigned(image)){
-//                    shiftToUnsignedBytes(image)
-//                }
-//                else{
-//                    image.pix as ByteArray
-//                }
                 val pixels = image.pix as ByteArray
 
                 for (bin in binsBytes.step(binSize)) {
@@ -156,13 +150,8 @@ class HistogramFlow : FlowMethod{
                 }
             }
             is ShortArray ->{
-//                val pixels : ShortArray = if(isSigned(image)){
-//                    shiftToUnsignedShorts(image)
-//                } else{
-//                    image.pix as ShortArray
-//                }
                 val pixels = image.pix as ShortArray
-
+                val test = binsShorts.step(binSize)
                 for(bin in binsShorts.step(binSize)){
                     val binStart = bin
                     val binEnd = bin+binSize
@@ -171,11 +160,6 @@ class HistogramFlow : FlowMethod{
                 }
             }
             is FloatArray ->{
-//                val pixels : FloatArray = if(isSigned(image)){
-//                    shiftToUnsignedFloats(image)
-//                } else{
-//                    image.pix as FloatArray
-//                }
                 val pixels = image.pix as FloatArray
 
                 for(bin in binsFloats.step(binSize)){

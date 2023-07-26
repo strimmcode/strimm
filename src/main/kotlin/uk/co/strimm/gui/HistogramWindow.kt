@@ -72,12 +72,12 @@ class HistogramWindowPlugin : AbstractDockableWindow() {
  */
 class CustomBarChart(xAxis : CategoryAxis, yAxis : NumberAxis) : BarChart<String, Number>(xAxis, yAxis) {
     val markers = observableArrayList<Data<Double, Double>>()
-
     init{
         markers.addListener { observable: Observable? ->
             layoutPlotChildren()
         }
     }
+
     fun addVerticalMarker(xPos : Double){
         val line = Line()
         val dataToAdd = Data(xPos, 0.0)
@@ -95,25 +95,23 @@ class CustomBarChart(xAxis : CategoryAxis, yAxis : NumberAxis) : BarChart<String
     }
 
     override fun layoutPlotChildren(){
-        Platform.runLater {
-            super.layoutPlotChildren()
-            for (marker in markers) {
-                val line = marker.node as Line
-                line.startX = marker.xValue
-                line.endX = line.startX
-                line.startY = 0.0
-                line.endY = boundsInLocal.height
-                line.toFront()
-            }
+        super.layoutPlotChildren()
+        for (marker in markers) {
+            val line = marker.node as Line
+            line.startX = marker.xValue
+            line.endX = line.startX
+            line.startY = 0.0
+            line.endY = boundsInLocal.height
+            line.toFront()
+        }
 
-            /**
-             * For some reason the x axis (category axis) tick marks don't hide/show as expected. Documentation
-             * on this is sparse. This will do for now
-             */
-            val tickMarks: ObservableList<Axis.TickMark<String>> = (xAxis as CategoryAxis).tickMarks
-            for (i in 0 until tickMarks.size) {
-                tickMarks[i].isTextVisible = tickMarks[i].value.toInt().mod(5) == 0
-            }
+        /**
+         * For some reason the x axis (category axis) tick marks don't hide/show as expected. Documentation
+         * on this is sparse. This will do for now
+         */
+        val tickMarks: ObservableList<Axis.TickMark<String>> = (xAxis as CategoryAxis).tickMarks
+        for (i in 0 until tickMarks.size) {
+            tickMarks[i].isTextVisible = tickMarks[i].value.toInt().mod(5) == 0
         }
     }
 }
@@ -127,6 +125,7 @@ class HistogramWindow {
     var scrollPane = ScrollPane()
     var histogramPane = VBox() //Each histogram will be added to this
     var histograms = hashMapOf<String, CustomBarChart>()
+//    var histograms = hashMapOf<String, BarChart<String, Number>>()
 
     val binMin = 1.0
     val binMax = 256.0
@@ -234,6 +233,7 @@ class HistogramWindow {
 
         val yAxis = NumberAxis()
         val histogram = CustomBarChart(xAxis, yAxis)
+//        val histogram = BarChart(xAxis, yAxis)
 
         val imageFeedName = buffer.channelNames.first()
         histograms[imageFeedName] = histogram
