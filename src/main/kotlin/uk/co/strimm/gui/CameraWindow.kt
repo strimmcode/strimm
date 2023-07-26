@@ -26,6 +26,8 @@ import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.io.File
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.util.*
 import java.util.logging.Level
 import javax.swing.JLabel
@@ -33,6 +35,7 @@ import javax.swing.JLayeredPane
 import javax.swing.JPanel
 import javax.swing.JTextField
 import kotlin.math.exp
+import kotlin.math.roundToInt
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Camera Feed")
 class CameraWindowPlugin : AbstractDockableWindow() {
@@ -112,8 +115,8 @@ class CameraWindow constructor(val windowPanel: JPanel) {
         exposureLabel.maximumSize = Dimension(100, 25)
         val exposureTextBox = JTextField("")
         exposureTextBox.isEnabled = GUIMain.strimmUIService.state == UIstate.PREVIEW
-        exposureTextBox.preferredSize = Dimension(40, 25)
-        exposureTextBox.maximumSize = Dimension(40, 25)
+        exposureTextBox.preferredSize = Dimension(50, 25)
+        exposureTextBox.maximumSize = Dimension(50, 25)
         val exposureSettingPanel = JPanel()
         exposureSettingPanel.layout = FlowLayout()
         exposureSettingPanel.add(exposureLabel, BorderLayout.NORTH)
@@ -183,8 +186,8 @@ class CameraWindow constructor(val windowPanel: JPanel) {
                     if (x.key == sink!!.primaryCamera) {
                         val cameraLabel = x.value.first
                         val mmCore = x.value.second
-                        val exposure = mmCore.getExposure(cameraLabel).toString()
-                        textField.text = exposure
+                        val exposure = mmCore.getExposure(cameraLabel)
+                        textField.text = exposure.toString()
                     }
                 }
             }

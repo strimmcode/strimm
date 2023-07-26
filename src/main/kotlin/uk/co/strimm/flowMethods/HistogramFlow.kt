@@ -5,15 +5,16 @@ import uk.co.strimm.STRIMMBuffer
 import uk.co.strimm.STRIMMPixelBuffer
 import uk.co.strimm.STRIMMSignalBuffer
 import uk.co.strimm.experiment.Flow
+import kotlin.math.pow
 
 class HistogramFlow : FlowMethod{
     lateinit var flow: Flow
-    val binsBytes = Byte.MIN_VALUE ..Byte.MAX_VALUE
-    val binsShorts = Short.MIN_VALUE .. Short.MAX_VALUE
+    val binsBytes = 0 ..Byte.MAX_VALUE*2
+    val binsShorts = 0 .. Short.MAX_VALUE*2
     val binsFloats = Int.MIN_VALUE .. Int.MAX_VALUE
     var binSize = 1
     val numBins = 256 //The number of bins we want regardless of the bit depth
-    private var isFirst = true
+    private var isFirst = true //Flag for if this is the first time the run method has been invoked
 
     override val properties: HashMap<String, String>
         get() = TODO("Not yet implemented")
@@ -35,10 +36,10 @@ class HistogramFlow : FlowMethod{
                 binSize = 1
             }
             "Short" -> {
-                binSize = (binsShorts.last/(numBins-1))*2
+                binSize = 256
             }
             "Float" -> {
-                binSize = ((Float.MAX_VALUE-1F)/(numBins-1)).toInt()
+                binSize = (2.toDouble().pow(24)).toInt()//((Float.MAX_VALUE-1F)/(numBins-1)).toInt()
             }
         }
     }
@@ -94,19 +95,20 @@ class HistogramFlow : FlowMethod{
     private fun getMinMaxPixelVals(image: STRIMMPixelBuffer) : Pair<Number, Number>{
         val minMax = Pair(0, 0)
         when(image.pix){
+            //IMPORTANT - Add the max value of the number type to make it unsigned
             is ByteArray -> {
-                val min = (image.pix as ByteArray).min()
-                val max = (image.pix as ByteArray).max()
+                val min = (image.pix as ByteArray).min() + Byte.MAX_VALUE + 1
+                val max = (image.pix as ByteArray).max() + Byte.MAX_VALUE + 1
                 return Pair(min, max)
             }
             is ShortArray -> {
-                val min = (image.pix as ShortArray).min()
-                val max = (image.pix as ShortArray).max()
+                val min = (image.pix as ShortArray).min() + Short.MAX_VALUE + 1
+                val max = (image.pix as ShortArray).max() + Short.MAX_VALUE + 1
                 return Pair(min, max)
             }
             is FloatArray -> {
-                val min = (image.pix as FloatArray).min()
-                val max = (image.pix as FloatArray).max()
+                val min = (image.pix as FloatArray).min() + Float.MAX_VALUE + 1
+                val max = (image.pix as FloatArray).max() + Float.MAX_VALUE + 1
                 return Pair(min, max)
             }
         }
@@ -116,14 +118,15 @@ class HistogramFlow : FlowMethod{
 
     private fun getAvgPixelIntensity(image : STRIMMPixelBuffer) : Double{
         when(image.pix){
+            //IMPORTANT - Add the max value of the number type to make it unsigned
             is ByteArray -> {
-                return (image.pix as ByteArray).average()
+                return (image.pix as ByteArray).average() + Byte.MAX_VALUE + 1
             }
             is ShortArray -> {
-                return (image.pix as ShortArray).average()
+                return (image.pix as ShortArray).average() + Short.MAX_VALUE + 1
             }
             is FloatArray -> {
-                return (image.pix as FloatArray).average()
+                return (image.pix as FloatArray).average() + Float.MAX_VALUE + 1
             }
         }
 
@@ -131,8 +134,9 @@ class HistogramFlow : FlowMethod{
     }
 
     /**
-     * This method will actually make the histogram. It will go through the range of all possible pixel values (based
-     * on bit depth) and count the pixels in each step range.
+     * This method will make the histogram. It will go through the range of all possible pixel values (based
+     * on bit depth) and count the pixels in each step range. Note this will convert all values to unsigned versions
+     * before doing the counting
      * @param image The image that is the basis of the histogram
      * @return The counts (histogram) of the image
      */
@@ -140,31 +144,28 @@ class HistogramFlow : FlowMethod{
         val counts = arrayListOf<Double>()
         when(image.pix){
             is ByteArray ->{
-                val pixels = image.pix as ByteArray
-
+                val pixels = (image.pix as ByteArray).map { x -> x.toUByte() }
                 for (bin in binsBytes.step(binSize)) {
-                    val binStart = bin
-                    val binEnd = bin + 1
+                    val binStart = bin.toUByte()
+                    val binEnd = (bin + binSize).toUByte()
                     val count = pixels.count { x -> x in binStart until binEnd }
                     counts.add(count.toDouble())
                 }
             }
             is ShortArray ->{
-                val pixels = image.pix as ShortArray
-                val test = binsShorts.step(binSize)
+                val pixels = (image.pix as ShortArray).map { x -> x.toUShort() }
                 for(bin in binsShorts.step(binSize)){
-                    val binStart = bin
-                    val binEnd = bin+binSize
+                    val binStart = bin.toUShort()
+                    val binEnd = (bin + binSize).toUShort()
                     val count = pixels.count { x -> x in binStart until binEnd }
                     counts.add(count.toDouble())
                 }
             }
             is FloatArray ->{
                 val pixels = image.pix as FloatArray
-
                 for(bin in binsFloats.step(binSize)){
                     val binStart = bin
-                    val binEnd = bin+1
+                    val binEnd = bin + binSize
                     val count = pixels.count { x -> x.toLong() in binStart until binEnd}
                     counts.add(count.toDouble())
                 }
@@ -184,80 +185,6 @@ class HistogramFlow : FlowMethod{
         val total = counts.sum()
         val normalisedCounts = counts.map { x -> (x/total) }
         return normalisedCounts.toDoubleArray()
-    }
-
-    /**
-     * Method to check if the values in an image are signed
-     * @param image The image to check
-     * @return boolean flag true if the image uses signed values
-     */
-    private fun isSigned(image: STRIMMPixelBuffer): Boolean{
-        var isSigned = false
-        when(image.pix) {
-            is ByteArray -> {
-                val pixels = image.pix as ByteArray
-                if(pixels.any{x -> x < 0} && pixels.all{x -> x <= Byte.MAX_VALUE}){
-                    isSigned = true
-                }
-            }
-            is ShortArray -> {
-                val pixels = image.pix as ShortArray
-                if(pixels.any{x -> x < 0} && pixels.all{x -> x <= Short.MAX_VALUE}){
-                    isSigned = true
-                }
-            }
-            is FloatArray -> {
-                val pixels = image.pix as FloatArray
-                if(pixels.any{x -> x < 0} && pixels.all{x -> x <= Float.MAX_VALUE}){
-                    isSigned = true
-                }
-            }
-        }
-        return isSigned
-    }
-
-    /**
-     * Converts a signed byte array to an unsigned byte array
-     * @param image The buffer containing the signed byte array
-     * @return The unsigned byte array
-     */
-    private fun shiftToUnsignedBytes(image: STRIMMPixelBuffer) : ByteArray{
-        val pixels = image.pix as ByteArray
-        val newPixels = ByteArray(pixels.size)
-        pixels.forEachIndexed{i, x ->
-            newPixels[i] = x.plus(Byte.MAX_VALUE).toByte()
-        }
-        return newPixels
-    }
-
-    /**
-     * Converts a signed short array to an unsigned short array
-     * @param image The buffer containing the signed short array
-     * @return The unsigned short array
-     */
-    private fun shiftToUnsignedShorts(image: STRIMMPixelBuffer) : ShortArray{
-        val pixels = image.pix as ShortArray
-        val newPixels = ShortArray(pixels.size)
-        val test = 1.toShort()
-        val test2 = test.toUShort()
-        pixels.forEachIndexed{i, x ->
-            newPixels[i] = x.toShort()
-        }
-        return newPixels
-    }
-
-    /**
-     * Converts a signed float array to an unsigned float array
-     * @param image The buffer containing the signed float array
-     * @return The unsigned float array
-     */
-    private fun shiftToUnsignedFloats(image: STRIMMPixelBuffer) : FloatArray{
-        val pixels = image.pix as FloatArray
-        val newPixels = FloatArray(pixels.size)
-        pixels.forEachIndexed{i, x ->
-            newPixels[i] = x.plus(Float.MAX_VALUE)
-        }
-        return newPixels
     }
 
     override fun preStart() {

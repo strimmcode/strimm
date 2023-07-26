@@ -781,7 +781,7 @@ class ExperimentService  : AbstractService(), ImageJService {
     }
 
     /**
-     * Sinks in the HDF file can have an attribute for a an associated marker sink. This method will return the value
+     * Sinks in the HDF file can have an attribute for an associated marker sink. This method will return the value
      * of that attribute if that exists.
      * @param fileAsGroupID The ID of the top level node but read as a group
      * @param dataFullPath The full path of the sink dataset in the HDF file

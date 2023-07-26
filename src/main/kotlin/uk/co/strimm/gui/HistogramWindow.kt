@@ -125,11 +125,9 @@ class HistogramWindow {
     var scrollPane = ScrollPane()
     var histogramPane = VBox() //Each histogram will be added to this
     var histograms = hashMapOf<String, CustomBarChart>()
-//    var histograms = hashMapOf<String, BarChart<String, Number>>()
 
     val binMin = 1.0
     val binMax = 256.0
-
     val autoStretchInitialVal = 0.2
 
     //Record of the current min max of each image as the data comes in. Updated each time updateExistingHistogram() is called
@@ -233,7 +231,6 @@ class HistogramWindow {
 
         val yAxis = NumberAxis()
         val histogram = CustomBarChart(xAxis, yAxis)
-//        val histogram = BarChart(xAxis, yAxis)
 
         val imageFeedName = buffer.channelNames.first()
         histograms[imageFeedName] = histogram
@@ -330,17 +327,15 @@ class HistogramWindow {
         var xVal = 0.0
         when(pixelType){
             0 ->{
-                val unsignedValue = (pixelValue+Byte.MAX_VALUE)
-                xVal = if(unsignedValue <= 1.0){
+                xVal = if(pixelValue <= 1.0){
                     binMin
                 }
                 else{
-                    unsignedValue
+                    pixelValue
                 }
             }
             1 -> {
-                val unsignedValue = (pixelValue+Short.MAX_VALUE)
-                val binValue = unsignedValue/256
+                val binValue = pixelValue/256
                 xVal = if(binValue <= 1.0){
                     binMin
                 }
@@ -349,8 +344,7 @@ class HistogramWindow {
                 }
             }
             4 -> {
-                val unsignedValue = (pixelValue+Float.MAX_VALUE)
-                val binValue = unsignedValue/(2.toDouble().pow(24))
+                val binValue = pixelValue/(2.toDouble().pow(24))
                 xVal = if(binValue <= 1.0){
                     binMin
                 }
@@ -485,13 +479,19 @@ class HistogramWindow {
                     var newMax = currentMax
 
                     if(cutoffPercentage > 0.0){
-                        newMin = currentMin+(abs(currentMin)*(cutoffPercentage/100))
-                        newMax = currentMax-(abs(currentMax)*(cutoffPercentage/100))
+                        //Note the increment for the minimum is a proportion of the change in the maximum
+                        val change = (abs(currentMax)*(cutoffPercentage/100))
+                        newMin = currentMin+change
+                        newMax = currentMax-change
                     }
 
                     //Guard in case newMax is somehow lower than newMin (unlikely to happen)
                     if(newMax <= newMin){
                         newMax = newMin+1
+                    }
+
+                    if(newMin < 1){
+                        newMin = 1.0
                     }
 
                     return Pair(newMin, newMax)
