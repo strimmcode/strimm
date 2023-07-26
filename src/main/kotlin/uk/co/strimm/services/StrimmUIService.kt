@@ -51,7 +51,7 @@ class StrimmUIService : AbstractService(), ImageJService {
 
     //Used with EventMarkerFlow flow
     var pressedEventKeys = arrayListOf<Pair<Int, String>>() //Pair(Index of key press, event key string)
-    val eventMarkerLabelThread = EventMarkerLabelThread("EventMarkerLabelThread")
+    var eventMarkerLabelThread = EventMarkerLabelThread("EventMarkerLabelThread")
 
     /**
      * Used when loading existing experiment to show to the user data is being loaded.

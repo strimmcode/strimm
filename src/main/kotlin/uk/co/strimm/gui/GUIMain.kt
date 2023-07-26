@@ -1,13 +1,10 @@
 package uk.co.strimm.gui
 
-
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.ActorMaterializerSettings
 import bibliothek.gui.dock.common.CControl
 import bibliothek.gui.dock.common.CGrid
-import com.opencsv.CSVReader
-import com.opencsv.CSVWriter
 import hdf.hdf5lib.H5
 import io.scif.services.DatasetIOService
 import javafx.application.Platform
@@ -38,8 +35,6 @@ import uk.co.strimm.experiment.ROI
 import uk.co.strimm.services.*
 import uk.co.strimm.setIcon
 import java.awt.BorderLayout
-//import java.awt.Color
-//import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.io.*
@@ -103,10 +98,10 @@ class GUIMain : Command {
          * saveJSON is legacy and will be replaced with saveROI which will save out user selected ROIs into the format
          * of imageJ ROI Manager so that they can be referenced in the JSON
          */
-        saveJSON.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
-        saveJSON.toolTipText = "Save ROIs to config file"
-        saveJSON.isEnabled = false
-        saveJSON.icon = setIcon(firstButton.width+10, firstButton.height+10, "/icons/saveROInew.png", "Save ROIs")
+        saveJSONButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
+        saveJSONButton.toolTipText = "Save ROIs to config file"
+        saveJSONButton.isEnabled = false
+        saveJSONButton.icon = setIcon(firstButton.width+10, firstButton.height+10, "/icons/saveROInew.png", "Save ROIs")
 
         saveExposuresButton.maximumSize = Dimension(firstButton.width + 15, firstButton.height + 15)
         saveExposuresButton.isEnabled = false
@@ -163,7 +158,7 @@ class GUIMain : Command {
         imageJButtonBar.add(loadExistingExperimentButton)
         addLoadExistingExperimentButtonListener()
 
-        imageJButtonBar.add(saveJSON)
+        imageJButtonBar.add(saveJSONButton)
         addSaveJSONButtonListener()
 
         imageJButtonBar.add(saveExposuresButton)
@@ -214,11 +209,9 @@ class GUIMain : Command {
     private fun addCloseAllWindowsExistingExpButtonListener(){
         closeAllWindowsExistingExpButton.addActionListener {
             loggerService.log(Level.INFO, "Closing all open windows")
-            val cameraScrollWindowPlugins =
-                GUIMain.dockableWindowPluginService.getPluginsOfType(CameraScrollWindowPlugin::class.java)
+            val cameraScrollWindowPlugins = dockableWindowPluginService.getPluginsOfType(CameraScrollWindowPlugin::class.java)
             cameraScrollWindowPlugins.forEach { x -> x.value.close() }
-            val traceScrollWindowPlugins =
-                GUIMain.dockableWindowPluginService.getPluginsOfType(TraceScrollWindowPlugin::class.java)
+            val traceScrollWindowPlugins = dockableWindowPluginService.getPluginsOfType(TraceScrollWindowPlugin::class.java)
             traceScrollWindowPlugins.forEach { x -> x.value.close() }
             experimentService.imageHDFDatasets = hashMapOf()
             experimentService.traceHDFDatasets = hashMapOf()
@@ -251,7 +244,7 @@ class GUIMain : Command {
     }
 
     private fun addSaveJSONButtonListener() {
-        saveJSON.addActionListener {
+        saveJSONButton.addActionListener {
             val overlays = overlayService.overlays
             for(sink in experimentService.expConfig.sinkConfig.sinks){
                 val disp = experimentService.experimentStream.cameraDisplays[sink.sinkName]
@@ -314,6 +307,7 @@ class GUIMain : Command {
                     strimmUIService.strimmFrame,
                     fileComboBox, "Select experiment configuration", JOptionPane.OK_CANCEL_OPTION
                 )
+
                 if (configChoice == 0) { //user selects OK
                     //todo check this
                     //experimentService.stopStream()
@@ -333,9 +327,13 @@ class GUIMain : Command {
                             startAcquisitionExperimentButton.isEnabled = true
                             startPreviewExperimentButton.isEnabled = true
                             loadExperimentConfigButton.isEnabled = true
-                            GUIMain.experimentService.EndExperimentAndSaveData =
-                                false //this is a flag which when set to true (in ACDQUISITION mode), will trigger the saving of data - this allows the user to press the stop button and everything be correctly saved.
-                        } else {
+                            /**
+                             * This is a flag which when set to true (in ACQUISITION mode), will trigger the saving of
+                             * data - this allows the user to press the stop button and everything be correctly saved.
+                             */
+                            experimentService.EndExperimentAndSaveData = false
+                        }
+                        else {
                             JOptionPane.showMessageDialog(
                                 strimmUIService.strimmFrame,
                                 ComponentTexts.AcquisitionDialogs.ERROR_LOADING_EXPCONFIG
@@ -352,44 +350,45 @@ class GUIMain : Command {
                 )
                 strimmUIService.state = UIstate.IDLE
             }
-
-
         }
     }
 
     //Both of the following functions will run the stream, they define different STRIMM modes and also activate and grey out different buttons on the toolbar
     private fun addStartPreviewButtonListener() {
         startPreviewExperimentButton.addActionListener {
-            strimmUIService.eventMarkerLabelThread.start()
-            strimmUIService.eventMarkerLabelThread.updateEventMarkerLabel("")
-            //Zero the pressed key events as they should only be listened to when in preview or live
-            strimmUIService.pressedEventKeys = arrayListOf<Pair<Int, String>>()
-            saveJSON.isEnabled = true
+            startEventMarkerThread()
+            saveJSONButton.isEnabled = true
             saveExposuresButton.isEnabled = true
             startPreviewExperimentButton.isEnabled = false
             startAcquisitionExperimentButton.isEnabled = false
             stopExperimentButton.isEnabled = true
             loadExperimentConfigButton.isEnabled = false
-            //  GUIMain.experimentService.EndExperimentAndSaveData = false
             strimmUIService.state = UIstate.PREVIEW
             //run the stream
             experimentService.runStream()
         }
     }
 
+    private fun startEventMarkerThread(){
+        //Zero the pressed key events so nothing superfluous is added
+        strimmUIService.pressedEventKeys = arrayListOf<Pair<Int, String>>()
+
+        //Create the thread anew
+        strimmUIService.eventMarkerLabelThread = StrimmUIService.EventMarkerLabelThread("EventMarkerLabelThread")
+        strimmUIService.eventMarkerLabelThread.start()
+    }
+
     private fun addStartAcquisitionButtonListener() {
         startAcquisitionExperimentButton.addActionListener {
-            strimmUIService.eventMarkerLabelThread.start()
-            strimmUIService.eventMarkerLabelThread.updateEventMarkerLabel("")
-            //Zero the pressed key events as they should only be listened to when in preview or live
-            strimmUIService.pressedEventKeys = arrayListOf<Pair<Int, String>>()
+            startEventMarkerThread()
             actorService.fileManagerActor.tell(AskInitHDF5File(), null)
             startAcquisitionExperimentButton.isEnabled = false
             startPreviewExperimentButton.isEnabled = false
             stopExperimentButton.isEnabled = true
             pauseExperimentButton.isEnabled = true
             loadExperimentConfigButton.isEnabled = false
-            //  GUIMain.experimentService.EndExperimentAndSaveData = false
+            saveJSONButton.isEnabled = false
+            saveExposuresButton.isEnabled = false
             strimmUIService.state = UIstate.ACQUISITION
             //run the stream
             experimentService.runStream()
@@ -561,7 +560,7 @@ class GUIMain : Command {
         val startAcquisitionExperimentButton = JButton() // runs the JSON, stores data, STRIMM is in an ACQUISITION mode
         val stopExperimentButton = JButton() // stops the JSON, destroys existing resources and then reloads the experiment and moves back to a WAITING mode
         val pauseExperimentButton = JButton() // will prevent an acquisition from saving data as long as paused, puts STRIMM into the ACQUISITION_PAUSED mode
-        val saveJSON = JButton() //legacy - this will be changed to a ROISave button - allowing the user to select ROIs and then  save them into an ImageJ format - which is then reference in the JSON, it also means that ROIs could be made directly in ImageJ and imported to STRIMM
+        val saveJSONButton = JButton() //legacy - this will be changed to a ROISave button - allowing the user to select ROIs and then  save them into an ImageJ format - which is then reference in the JSON, it also means that ROIs could be made directly in ImageJ and imported to STRIMM
         val saveExposuresButton = JButton()
         var markerEventLabel = JLabel("")
         var mainWindowIcon: ImageIcon? = null

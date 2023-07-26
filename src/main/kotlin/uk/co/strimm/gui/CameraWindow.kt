@@ -26,16 +26,12 @@ import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.io.File
-import java.math.RoundingMode
-import java.text.DecimalFormat
 import java.util.*
 import java.util.logging.Level
 import javax.swing.JLabel
 import javax.swing.JLayeredPane
 import javax.swing.JPanel
 import javax.swing.JTextField
-import kotlin.math.exp
-import kotlin.math.roundToInt
 
 @Plugin(type = DockableWindowPlugin::class, menuPath = "Window>Camera Feed")
 class CameraWindowPlugin : AbstractDockableWindow() {
