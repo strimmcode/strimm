@@ -13,7 +13,6 @@ class HistogramFlow : FlowMethod{
     val binsShorts = 0 .. Short.MAX_VALUE*2
     val binsFloats = Int.MIN_VALUE .. Int.MAX_VALUE
     var binSize = 1
-    val numBins = 256 //The number of bins we want regardless of the bit depth
     private var isFirst = true //Flag for if this is the first time the run method has been invoked
 
     override val properties: HashMap<String, String>
@@ -148,6 +147,7 @@ class HistogramFlow : FlowMethod{
                 for (bin in binsBytes.step(binSize)) {
                     val binStart = bin.toUByte()
                     val binEnd = (bin + binSize).toUByte()
+
                     val count = pixels.count { x -> x in binStart until binEnd }
                     counts.add(count.toDouble())
                 }

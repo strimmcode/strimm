@@ -118,6 +118,25 @@ open class MMCameraSource : SourceMethod {
 //        }
     }
 
+    fun loadCfg() {
+        if (source.sourceCfg != "") {
+            properties = hashMapOf<String, String>()
+            var r: List<Array<String>>? = null
+            try {
+                val reader = CSVReader(FileReader(source.sourceCfg))
+                r = reader.readAll()
+                for (props in r!!) {
+                    properties[props[0]] = props[1]
+                }
+
+            }
+            catch (ex: Exception) {
+                GUIMain.loggerService.log(Level.SEVERE, "Error in reading config ${source.sourceCfg} in MMCameraSource. Message: ${ex.message}")
+                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
+            }
+        }
+    }
+
     override fun run(): STRIMMBuffer? {
         if (bSnapped) {
             return runSnapped()
@@ -481,25 +500,6 @@ open class MMCameraSource : SourceMethod {
         }
         core!!.reset()
         Thread.sleep(2000)  //TODO does it need this?
-    }
-
-    fun loadCfg() {
-        if (source.sourceCfg != "") {
-            properties = hashMapOf<String, String>()
-            var r: List<Array<String>>? = null
-            try {
-                val reader = CSVReader(FileReader(source.sourceCfg))
-                r = reader.readAll()
-                for (props in r!!) {
-                    properties[props[0]] = props[1]
-                }
-
-            }
-            catch (ex: Exception) {
-                GUIMain.loggerService.log(Level.SEVERE, "Error in reading config ${source.sourceCfg} in MMCameraSource. Message: ${ex.message}")
-                GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
-            }
-        }
     }
 
     private fun StartAcquisition() {

@@ -288,8 +288,8 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                                             autoStretchMinMax
                                         }
                                         else {
-                                            val minPix = UByte.MIN_VALUE.toDouble()
-                                            val maxPix = UByte.MAX_VALUE.toDouble()
+                                            val minPix = pix.min().toDouble()
+                                            val maxPix = pix.max().toDouble()
                                             Pair(minPix, maxPix)
                                         }
                                         plugin.cameraWindowController.view?.setChannelRange(ch, minMax.first, minMax.second)
@@ -315,8 +315,8 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                                             autoStretchMinMax
                                         }
                                         else {
-                                            val minPix = UShort.MIN_VALUE.toDouble()
-                                            val maxPix = UShort.MAX_VALUE.toDouble()
+                                            val minPix = pix.min().toDouble()
+                                            val maxPix = pix.max().toDouble()
                                             Pair(minPix, maxPix)
                                         }
 
@@ -333,9 +333,15 @@ class CameraActor(val plugin: CameraWindowPlugin) : AbstractActor(){
                                 dataset.setPlane(0, pix)
 
                                 if (bNormalise) {
-                                    val minPix = pix.min().toDouble()
-                                    val maxPix = pix.max().toDouble()
-                                    plugin.cameraWindowController.view?.setChannelRange(0, minPix, maxPix)
+                                    val minMax : Pair<Double, Double> = if(doAutoStretch){
+                                        autoStretchMinMax
+                                    }
+                                    else {
+                                        val minPix = pix.min().toDouble()
+                                        val maxPix = pix.max().toDouble()
+                                        Pair(minPix, maxPix)
+                                    }
+                                    plugin.cameraWindowController.view?.setChannelRange(0, minMax.first, minMax.second)
                                 }
                                 else{
                                     plugin.cameraWindowController.view?.setChannelRange(0, Float.MIN_VALUE.toDouble(), Float.MAX_VALUE.toDouble())

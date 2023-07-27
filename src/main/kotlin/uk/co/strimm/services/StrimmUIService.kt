@@ -24,8 +24,8 @@ class StrimmUIService : AbstractService(), ImageJService {
         private class MyDispatcher : KeyEventDispatcher {
             var keyPressCounter = 0
             override fun dispatchKeyEvent(e: KeyEvent?): Boolean {
-                when {
-                    e!!.id == KeyEvent.KEY_PRESSED -> {
+                when (e!!.id) {
+                    KeyEvent.KEY_PRESSED -> {
                         GUIMain.strimmUIService.pressedEventKeys.add(Pair(keyPressCounter, KeyEvent.getKeyText(e.keyCode)))
                         keyPressCounter++
                     }
