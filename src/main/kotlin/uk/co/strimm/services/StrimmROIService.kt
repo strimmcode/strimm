@@ -73,7 +73,7 @@ class StrimmROIService : AbstractService(), ImageJService {
         csvReader.readNext()
         var csvRow = csvReader.readNext()
         while(csvRow != null) {
-            val name = csvRow[0].toInt()
+//            val name = csvRow[0].toInt()
             val type = csvRow[1].toInt()
 
             //fill in an ROI
@@ -82,10 +82,10 @@ class StrimmROIService : AbstractService(), ImageJService {
             roi.w = csvRow[4].toDouble()
             roi.y = csvRow[3].toDouble()
             roi.h = csvRow[5].toDouble()
-            if (type.toInt() == 1){
+            if (type == 1){
                 roi.ROItype = "RECTANGLE"
             }
-            else if (type.toInt() == 2){
+            else if (type == 2){
                 roi.ROItype = "ELLIPSE"
             }
             rois.add(roi)
