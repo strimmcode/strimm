@@ -147,11 +147,9 @@ open class MMCameraSource : SourceMethod {
 
     @Synchronized
     fun runSnapped(): STRIMMBuffer? {
-        core!!.snapImage()
-
         try {
+            core!!.snapImage()
             val pix = core!!.image //TODO should this use taggedImage instead?
-//            println("Image min is: ${(pix as ByteArray).min()}, max is: ${(pix as ByteArray).max()}")
             //note that ImageJ display supports many more pixelTypes and num of channels than MMan Core
             if (pixelType == "Byte") {
                 if (numChannels == 1) {
@@ -295,8 +293,8 @@ open class MMCameraSource : SourceMethod {
             }
             // GUIMain.protocolService.GDIPrintText(core.imageWidth.toInt(),core.imageHeight.toInt(), pix, "dataID : " + dataID.toString(),50.0, 50.0, 80)
         } catch (ex: Exception) {
-            GUIMain.loggerService.log(Level.SEVERE, "Error reading core image")
-            println(ex.message)  //something is going on with the camera
+            GUIMain.loggerService.log(Level.SEVERE, "Error reading core image. Message: ${ex.message}")
+            GUIMain.loggerService.log(Level.SEVERE, ex.stackTrace)
         }
 
         //If we're here then something went wrong. We just return an empty STRIMMPixelBuffer object
@@ -496,10 +494,13 @@ open class MMCameraSource : SourceMethod {
     }
 
     override fun postStop() {
-        if (!bSnapped) {
-        }
+        if (!bSnapped) { }
+        //For some reason accessing these two properties on the MMCore prevents a JVM fatal accession violation error
+        GUIMain.loggerService.log(Level.INFO, "Core is running sequence=" + core!!.isSequenceRunning)
+        GUIMain.loggerService.log(Level.INFO,"Device $label is busy=" + core!!.deviceBusy(label))
+
         core!!.reset()
-        Thread.sleep(2000)  //TODO does it need this?
+        Thread.sleep(1000)  //TODO does it need this?
     }
 
     private fun StartAcquisition() {
