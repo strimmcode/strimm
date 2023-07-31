@@ -19,9 +19,9 @@ Note that the dependencies on NIDAQ MX and VC++ redistributables are often for s
 ## Personnel
 STRÏMM is a collaborative project between individuals at the University of St Andrews, University of Sheffield, and [Cairn Research Ltd](https://www.cairn-research.co.uk/)
 ### Developers
-[Jacob Francis](https://pulverlab.wp.st-andrews.ac.uk/people/) (Lead Developer, University of St Andrews)  
-[Terry Wright](mailto:Terry.Wright1@Nottingham.ac.uk) (Lead Developer)  
-[Elliot Steele](https://ashleycadby.staff.shef.ac.uk/authors/elliot/) (University of Sheffield)  
+[Jacob Francis](https://pulverlab.wp.st-andrews.ac.uk/people/) (joint lead Developer)  
+[Terry Wright](mailto:Terry.Wright1@Nottingham.ac.uk) (joint lead Developer)  
+[Elliot Steele](https://ashleycadby.staff.shef.ac.uk/authors/elliot/) (Developer)
 
 ### Additional Contributors
 Jeremy Graham  
