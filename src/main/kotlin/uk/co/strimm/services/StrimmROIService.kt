@@ -73,7 +73,7 @@ class StrimmROIService : AbstractService(), ImageJService {
         csvReader.readNext()
         var csvRow = csvReader.readNext()
         while(csvRow != null) {
-            val name = csvRow[0].toInt()
+//            val name = csvRow[0].toInt()
             val type = csvRow[1].toInt()
 
             //fill in an ROI
