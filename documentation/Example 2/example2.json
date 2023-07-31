@@ -1,0 +1,60 @@
+{
+	"sourceConfig":{ 
+		"sources" : [
+			{
+				"sourceName" : "demoCamera",
+				"sourceType" : "MMCameraSource",
+				"sourceCfg" : "democamSource.cfg",
+				"isTimeLapse" : False,
+				"intervalMs" : 100.0
+			}
+		]
+	},
+	"flowConfig" : {
+		"flows" : [
+			{
+				"flowName" : "ROIFlow",
+				"flowType" : "ROIFlowMethod",
+				"flowCfg" : "roiFlowConfig.cfg",
+				"inputNames" : [
+					"demoCamera"
+				]
+			}
+		]
+	},
+	"sinkConfig":{ 
+		"sinks" : [
+			{
+				"sinkName" : "democamDisplay",
+				"sinkType" : "SinkImageJDisplayMethod",
+				"sinkCfg" : "democamSink.cfg",
+				"primaryCamera" : "demoCamera",
+				"inputNames" : [
+					"demoCamera"
+				]
+			},
+			{
+				"sinkName" : "democamSave",
+				"sinkType" : "SinkSaveMethod",
+				"inputNames" : [
+					"demoCamera"
+				]
+			},
+			{
+				"sinkName" : "ROIDisplay",
+				"sinkType" : "SinkTraceMethod",
+				"sinkCfg" : "roiDisplayProperties.cfg",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			},
+			{
+				"sinkName" : "ROISave",
+				"sinkType" : "SinkSaveMethod",
+				"inputNames" : [
+					"ROIFlow"
+				]
+			}
+		]
+	}
+}
