@@ -230,7 +230,7 @@ function getInputFromList
 function copyMavenJar
 {
     param([string]$Location, [string]$Name)
-    $MavenJar = Get-ChildItem -Path $Location | Where-Object { $_.Name -match "^$Name.\d.\d.\d(-SNAPSHOT)?.jar$" }
+    $MavenJar = Get-ChildItem -Path $Location | Where-Object { $_.Name -match "^$Name.\d.\d.\d\d?(-SNAPSHOT)?.jar$" }
     $Count = ($MavenJar | Measure-Object).count
     if (0 -eq $Count) {
         abort "Could not locate $Name jar file! Have you run the maven package?"
