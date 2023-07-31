@@ -89,8 +89,6 @@ class FileManagerActor : AbstractActor() {
                 stopSignalCount++
                 GUIMain.loggerService.log(Level.INFO, "One stop signal received. StopSignalCount=${stopSignalCount}, Number of buffers=${buffers.size}")
                 if(stopSignalCount == buffers.size || it.isFromNIDAQ) {
-                    GUIMain.loggerService.log(Level.INFO, "Stopping all cores")
-                    GUIMain.experimentService.allMMCores.forEach { x -> x.value.second.stopSequenceAcquisition() }
                     GUIMain.loggerService.log(Level.INFO, "Setting UI state to IDLE and saving datasets")
                     GUIMain.strimmUIService.state = UIstate.IDLE
                     val saveSuccess = saveDatasets()
